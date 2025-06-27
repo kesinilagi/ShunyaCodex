@@ -1,35 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Shunyacodex1.1</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  :root { --dynamic-font-size: 22px; } /* Ukuran default diperbesar */
-  .dynamic-paragraph { font-size: var(--dynamic-font-size); }
-  .glowing-border { animation: pulse-glow 2.5s ease-in-out infinite alternate; }
-  @keyframes pulse-glow {
-    from { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ea5e9; }
-    to { box-shadow: 0 0 10px #fff, 0 0 20px #0ea5e9, 0 0 30px #0ea5e9; }
-  }
-  .animate-fade-in { animation: fadeIn 1s ease-in-out; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
-
+  <title>Tes Login Netlify Minimalis</title>
+  
+  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
+  <style>
+    /* Sedikit style agar rapi */
+    body { font-family: sans-serif; padding: 2em; }
+    h1 { color: #003366; }
+    div[data-netlify-identity-button] { margin-top: 20px; }
+  </style>
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<div id="root"></div>
-<!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/chart.js'></script><script  src="./script.js"></script>
+
+  <h1>Halaman Tes Login</h1>
+  <p>Jika sebuah tombol login muncul di bawah ini, berarti widget inti kita berfungsi dengan baik!</p>
+
+  <div data-netlify-identity-button></div>
 
 </body>
 </html>
