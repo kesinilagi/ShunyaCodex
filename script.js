@@ -2003,23 +2003,24 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
 const App = () => {
-  const [user, setUser] = useState(null);
+  // State untuk Netlify Identity (sudah kita tambahkan)
+  const [user, setUser] = useState(null); 
+  
   const [isCoverUnlocked, setIsCoverUnlocked] = useState(false);
-  // --- STATE BARU UNTUK SIDEBAR ---
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const themes = {
     'blue': { name: 'Biru Klasik', header: 'bg-blue-700' },
     'green': { name: 'Hijau Menenangkan', header: 'bg-teal-700' },
     'purple': { name: 'Ungu Spiritual', header: 'bg-indigo-700' },
-    'dark': { name: 'Mode Gelap', header: 'bg-gray-800' } };
-
+    'dark': { name: 'Mode Gelap', header: 'bg-gray-800' } 
+  };
   const [themeKey, setThemeKey] = useState('blue');
   const fontSizes = ['14px', '16px', '18px', '20px', '22px', '24px', '26px', '28px', '30px', '32px', '34px', '36px'];
   const [fontSizeIndex, setFontSizeIndex] = useState(1);
   const [currentPageKey, setCurrentPageKey] = useState('home');
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State untuk menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // useEffect untuk menyimpan tema
   useEffect(() => {
     const savedTheme = localStorage.getItem('ebookThemeKey');
     if (savedTheme && themes[savedTheme]) {
@@ -2027,36 +2028,34 @@ const App = () => {
     }
   }, []);
 
+  // useEffect untuk mengubah font size
   useEffect(() => {
     document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
   }, [fontSizeIndex]);
 
+  // useEffect untuk scroll ke atas
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPageKey]);
- // --- EFEK UNTUK NETLIFY IDENTITY ---
+
+  // useEffect untuk "Mesin" Netlify Identity (sudah kita tambahkan)
   useEffect(() => {
     if (window.netlifyIdentity) {
       window.netlifyIdentity.init();
-
-      // Cek pengguna saat pertama kali load
       const currentUser = window.netlifyIdentity.currentUser();
       if (currentUser) {
         setUser(currentUser);
       }
-
-      // Event listener untuk login
       window.netlifyIdentity.on('login', (loggedInUser) => {
         setUser(loggedInUser);
         window.netlifyIdentity.close();
       });
-
-      // Event listener untuk logout
       window.netlifyIdentity.on('logout', () => {
         setUser(null);
       });
     }
   }, []);
+
   const contextValue = {
     user, setUser,
     themes, themeKey, setThemeKey,
@@ -2064,20 +2063,24 @@ const App = () => {
     currentPageKey, setCurrentPageKey,
     isCoverUnlocked, setIsCoverUnlocked,
     isSidebarOpen, setIsSidebarOpen,
-    isMenuOpen, setIsMenuOpen };
+    isMenuOpen, setIsMenuOpen 
+  };
 
-
-  return (
-    <AppContext.Provider value={contextValue}>
-      {
-        !isCoverUnlocked ? <CoverScreen /> :
-        !user ? <LoginPrompt /> : // <-- JIKA BELUM LOGIN, TAMPILKAN INI
-        currentPageKey === 'pixel-thoughts' ? <PixelThoughts /> :
-        currentPageKey === 'affirmation-room' ? <AffirmationRoom /> :
-        <MainLayout /> // <-- JIKA SUDAH LOGIN, TAMPILKAN INI
-      }
-    </AppContext.Provider>
+  // LOGIKA RENDER FINAL dalam React.createElement
+  return /*#__PURE__*/(
+    React.createElement(AppContext.Provider, { value: contextValue },
+      !isCoverUnlocked
+        ? React.createElement(CoverScreen, null)
+        : !user
+          ? React.createElement(LoginPrompt, null)
+          : currentPageKey === 'pixel-thoughts'
+            ? React.createElement(PixelThoughts, null)
+            : currentPageKey === 'affirmation-room'
+              ? React.createElement(AffirmationRoom, null)
+              : React.createElement(MainLayout, null)
+    )
   );
+};
 
 // Perintah Final untuk merender Aplikasi
 ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById('root'));
