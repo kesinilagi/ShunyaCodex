@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>Tes Login Netlify Minimalis</title>
+  <title>Shunyacodex1.1</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
-
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   
   <style>
-    /* Sedikit style agar rapi */
-    body { font-family: sans-serif; padding: 2em; }
-    h1 { color: #003366; }
-    div[data-netlify-identity-button] { margin-top: 20px; }
+    /* Style Anda tetap di sini */
+    :root { --dynamic-font-size: 22px; }
+    .dynamic-paragraph { font-size: var(--dynamic-font-size); }
+    .glowing-border { animation: pulse-glow 2.5s ease-in-out infinite alternate; }
+    @keyframes pulse-glow {
+      from { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ea5e9; }
+      to { box-shadow: 0 0 10px #fff, 0 0 20px #0ea5e9, 0 0 30px #0ea5e9; }
+    }
+    .animate-fade-in { animation: fadeIn 1s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
-  
 <body>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', user => {
-          if (!user) {
-            window.netlifyIdentity.on('login', () => {
-              document.location.href = '/';
-            });
-          }
-        });
-      }
-    });
-  </script>
-</body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="./script.js"></script> </body>
 </html>
