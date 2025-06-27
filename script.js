@@ -1,6 +1,6 @@
 'use strict';
 // ===================================================================
-// KODE MASTER FINAL v16 - THE REAL FINAL BOSS
+// KODE MASTER FINAL v17 - THE REAL CLEAN SWEEP - By Partner Coding
 // ===================================================================
 
 const { useState, useEffect, useRef, createContext, useContext } = React;
@@ -111,36 +111,29 @@ const LoginPrompt = () => {
   );
 };
 
+const AuthorFootnote = () => React.createElement("div", { className: "text-center mt-12 pt-4 border-t border-gray-200" }, React.createElement("p", { className: "text-sm text-gray-500 italic" }, "Karya: Akasha Bayu Sasmita"));
 
-// --- KOMPONEN BARU UNTUK HALAMAN KATA PENGANTAR ---
 const KataPengantar = () => {
   const { setCurrentPageKey } = useContext(AppContext);
 
-  return /*#__PURE__*/(
-    React.createElement("div", { className: contentContainerClasses }, /*#__PURE__*/
-      React.createElement("h4", { className: `${sectionTitleClasses} text-left` }, "\u270D\uFE0F KATA PENGANTAR"), /*#__PURE__*/
-      React.createElement("p", { className: `${paragraphClasses}` }, "Selamat datang di buku ini. Sebuah peta batin yang tidak menggurui, tapi menawarkan satu kemungkinan arah pulang\u2014ke dalam. Ke tempat yang tenang di balik segala keramaian. Ke hati yang tahu meski sering diabaikan."), /*#__PURE__*/
-      React.createElement("p", { className: `${paragraphClasses}` }, "Di dunia yang serba cepat, penuh notifikasi dan tagihan, kita butuh sesuatu yang tidak sekadar menenangkan\u2014tapi membebaskan. E-Book Interactive ini bukan sekedar E Book motivasi. Ia lebih seperti kawan cerita yang mau duduk bareng sambil berkata, \"Yuk, kita beresin hati pelan-pelan.\""), /*#__PURE__*/
-      React.createElement("p", { className: `${paragraphClasses}` }, "Di dalamnya, Anda tidak hanya akan membaca tentang hati, akal, intuisi, atau metode Kawrooh. Anda akan diajak mengalami\u2014merenung, melepaskan, menyambung ulang. Bukan sekadar teori. ", /*#__PURE__*/React.createElement("b", null, "Ini Ebook untuk dipraktikkan, bukan hanya dikoleksi."), " Semoga setiap bab-nya membawa Anda ", /*#__PURE__*/React.createElement("b", null, "lebih dekat pada rasa tenteram, lebih jujur pada diri sendiri, lebih terbuka pada limpahan karunia-Nya,Sehingga Pintu Rejeki Terbuka, dan Hidup Penuh Keberkahan"), ". Selamat menyelami."), /*#__PURE__*/
-
-
-      React.createElement("div", { className: "text-center mt-10" }, /*#__PURE__*/
-        React.createElement("button", {
-          onClick: () => setCurrentPageKey('daftar-isi'),
-          className: "bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
-        }, "Siap Untuk Kembali Ke Dalam Keberlimpahan...")), /*#__PURE__*/
-      React.createElement(AuthorFootnote, null)));
+  return (React.createElement("div", { className: contentContainerClasses },
+    React.createElement("h4", { className: `${sectionTitleClasses} text-left` }, "\u270D\uFE0F KATA PENGANTAR"),
+    React.createElement("p", { className: `${paragraphClasses}` }, "Selamat datang di buku ini. Sebuah peta batin yang tidak menggurui, tapi menawarkan satu kemungkinan arah pulang\u2014ke dalam. Ke tempat yang tenang di balik segala keramaian. Ke hati yang tahu meski sering diabaikan."),
+    React.createElement("p", { className: `${paragraphClasses}` }, "Di dunia yang serba cepat, penuh notifikasi dan tagihan, kita butuh sesuatu yang tidak sekadar menenangkan\u2014tapi membebaskan. E-Book Interactive ini bukan sekedar E Book motivasi. Ia lebih seperti kawan cerita yang mau duduk bareng sambil berkata, \"Yuk, kita beresin hati pelan-pelan.\""),
+    React.createElement("p", { className: `${paragraphClasses}` }, "Di dalamnya, Anda tidak hanya akan membaca tentang hati, akal, intuisi, atau metode Kawrooh. Anda akan diajak mengalami\u2014merenung, melepaskan, menyambung ulang. Bukan sekadar teori. ", React.createElement("b", null, "Ini Ebook untuk dipraktikkan, bukan hanya dikoleksi."), " Semoga setiap bab-nya membawa Anda ", React.createElement("b", null, "lebih dekat pada rasa tenteram, lebih jujur pada diri sendiri, lebih terbuka pada limpahan karunia-Nya,Sehingga Pintu Rejeki Terbuka, dan Hidup Penuh Keberkahan"), ". Selamat menyelami."),
+    React.createElement("div", { className: "text-center mt-10" },
+      React.createElement("button", {
+        onClick: () => setCurrentPageKey('daftar-isi'),
+        className: "bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+      }, "Siap Untuk Kembali Ke Dalam Keberlimpahan...")),
+    React.createElement(AuthorFootnote, null)));
 };
 
-const AuthorFootnote = () => /*#__PURE__*/
-  React.createElement("div", { className: "text-center mt-12 pt-4 border-t border-gray-200" }, /*#__PURE__*/
-    React.createElement("p", { className: "text-sm text-gray-500 italic" }, "Karya: Akasha Bayu Sasmita"));
-
 const DaftarIsi = () => {
-  const { setCurrentPageKey } = useContext(AppContext);
-  const tocSectionClasses = "block w-full text-left font-bold text-lg text-black-700 p-2 rounded-lg hover:bg-black-100 transition-colors";
-  const tocChapterClasses = "block w-full text-left text-gray-700 p-2 pl-4 rounded-lg hover:bg-sky-100 transition-colors";
-  const tocFeatureClasses = "block w-full text-left font-bold text-xl p-2 rounded-lg hover:bg-yellow-100 transition-colors";
+    const { setCurrentPageKey } = useContext(AppContext);
+    const tocSectionClasses = "block w-full text-left font-bold text-lg text-black-700 p-2 rounded-lg hover:bg-black-100 transition-colors";
+    const tocChapterClasses = "block w-full text-left text-gray-700 p-2 pl-4 rounded-lg hover:bg-sky-100 transition-colors";
+    const tocFeatureClasses = "block w-full text-left font-bold text-xl p-2 rounded-lg hover:bg-yellow-100 transition-colors";
 
   return /*#__PURE__*/ (
     React.createElement("div", { className: contentContainerClasses }, /*#__PURE__*/
@@ -1737,6 +1730,21 @@ const MainLayout = () => {
         React.createElement("div", { className: "mt-3" }, React.createElement(RandomQuote, null)))));
 };
 
+
+const CoverScreen = () => {
+    const { setIsCoverUnlocked, setCurrentPageKey } = useContext(AppContext);
+    const [isExiting, setIsExiting] = useState(false);
+    const handleUnlock = () => {
+        openFullscreen(document.documentElement);
+        setTimeout(() => {
+            setCurrentPageKey('kata-pengantar');
+            setIsCoverUnlocked(true);
+        }, 500);
+    };
+    return React.createElement("div", { className: "fixed inset-0 bg-gray-900 text-white flex flex-col items-center justify-center p-4 overflow-hidden" }, /* ... content ... */);
+};
+
+
 const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15', 'affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan'];
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
@@ -1811,13 +1819,12 @@ const App = () => {
   );
 };
 
-
 // Perintah Final untuk merender Aplikasi
 ReactDOM.render(React.createElement(App, null), document.getElementById('root'));
 
 // CSS
 const style = document.createElement('style');
-style.innerHTML = `
+style.innerHTML = 
     /* === Global & Reset === */
     body {
         margin: 0;
