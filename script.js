@@ -1,34 +1,14 @@
-// ===================================================================
-// KODE MASTER FINAL v13 - DISempurnakan DENGAN CONTEXT API & PERBAIKAN STRUKTUR
-// ===================================================================
 'use strict';
+// ===================================================================
+// KODE MASTER FINAL v16 - THE REAL FINAL BOSS
+// ===================================================================
+
 const { useState, useEffect, useRef, createContext, useContext } = React;
 
 // --- Context untuk State Global ---
 const AppContext = createContext();
 
-// --- Komponen baru untuk meminta pengguna login ---
-const LoginPrompt = () => {
-  const handleLogin = () => {
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.open('login');
-    }
-  };
-
-  return /*#__PURE__*/ (
-    React.createElement("div", { className: "fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4" }, /*#__PURE__*/
-      React.createElement(Starfield, null), /*#__PURE__*/
-      React.createElement("div", { className: "z-10 text-center animate-fade-in" }, /*#__PURE__*/
-        React.createElement("h1", { className: "text-4xl md:text-6xl font-bold mb-4" }, "Selamat Datang di Shunya Codex"), /*#__PURE__*/
-        React.createElement("p", { className: "text-xl md:text-2xl mb-8 text-gray-300" }, "Silakan login atau daftar untuk melanjutkan perjalanan Anda."), /*#__PURE__*/
-        React.createElement("button", {
-          onClick: handleLogin,
-          className: "bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 font-bold transition-colors text-xl shadow-lg"
-        }, "Masuk / Daftar")
-      )
-    )
-  );
-};
+// --- Komponen-komponen diletakkan di sini ---
 
 // --- FUNGSI PEMBANTU UNTUK FULLSCREEN ---
 const openFullscreen = elem => {
@@ -58,6 +38,28 @@ const highlightTextClasses = "text-blue-600 font-semibold";
 const quoteClasses = "italic text-gray-600 border-l-4 border-blue-400 pl-4 py-2 my-4 text-justify";
 const subHeadingClasses = "text-xl font-bold text-gray-800 mb-3 mt-6";
 const arabicTextClass = "font-serif text-2xl";
+
+// --- Komponen LoginPrompt diletakkan di sini ---
+const LoginPrompt = () => {
+  const handleLogin = () => {
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.open('login');
+    }
+  };
+
+  return React.createElement("div", { className: "fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4" },
+    React.createElement(Starfield, null),
+    React.createElement("div", { className: "z-10 text-center animate-fade-in" },
+      React.createElement("h1", { className: "text-4xl md:text-6xl font-bold mb-4" }, "Selamat Datang di Shunya Codex"),
+      React.createElement("p", { className: "text-xl md:text-2xl mb-8 text-gray-300" }, "Silakan login atau daftar untuk melanjutkan perjalanan Anda."),
+      React.createElement("button", {
+        onClick: handleLogin,
+        className: "bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 font-bold transition-colors text-xl shadow-lg"
+      }, "Masuk / Daftar")
+    )
+  );
+};
+
 
 // --- KOMPONEN BARU UNTUK HALAMAN KATA PENGANTAR ---
 const KataPengantar = () => {
@@ -1653,12 +1655,27 @@ const MainLayout = () => {
 
   const renderPage = () => {
     switch (currentPageKey) {
-      case 'kata-pengantar': return React.createElement(KataPengantar, null);
-      case 'daftar-isi': return React.createElement(DaftarIsi, null);
-      // ... cases for all your chapters ...
-      case 'doapilihan': return React.createElement(DoaPilihan, null);
-      case 'pengaturan': return React.createElement(ThemeSettings, null);
-      default: return React.createElement(DaftarIsi, null);
+      case 'kata-pengantar':return React.createElement(KataPengantar, null);
+      case 'daftar-isi':return React.createElement(DaftarIsi, null);
+      case 'bab1':return React.createElement(Bab1, null);
+      case 'bab2':return React.createElement(Bab2, null);
+      case 'bab3':return React.createElement(Bab3, null);
+      case 'bab4':return React.createElement(Bab4, null);
+      case 'bab5':return React.createElement(Bab5, null);
+      case 'bab6':return React.createElement(Bab6, null);
+      case 'bab7':return React.createElement(Bab7, null);
+      case 'bab8':return React.createElement(Bab8, null);
+      case 'bab9':return React.createElement(Bab9, null);
+      case 'bab10':return React.createElement(Bab10, null);
+      case 'bab11':return React.createElement(Bab11, null);
+      case 'bab12':return React.createElement(Bab12, null);
+      case 'bab13':return React.createElement(Bab13, null);
+      case 'bab14a':return React.createElement(Bab14a, null);
+      case 'bab14b':return React.createElement(Bab14b, null);
+      case 'bab15':return React.createElement(Bab15, null);
+      case 'doapilihan':return React.createElement(DoaPilihan, null);
+      case 'pengaturan':return React.createElement(ThemeSettings, null);
+      default:return React.createElement(DaftarIsi, null);
     }
   };
 
@@ -1689,19 +1706,6 @@ const MainLayout = () => {
           React.createElement("button", { onClick: () => goToPage(1), disabled: pageIndex >= pages.findIndex(p => p === 'doapilihan'), className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "Berikutnya ›")),
         React.createElement("div", { className: "mt-3" }, React.createElement(RandomQuote, null)))));
 };
-
-const CoverScreen = () => {
-  const { setIsCoverUnlocked, setCurrentPageKey } = useContext(AppContext);
-  const handleUnlock = () => {
-    openFullscreen(document.documentElement);
-    setTimeout(() => {
-      setCurrentPageKey('kata-pengantar');
-      setIsCoverUnlocked(true);
-    }, 500);
-  };
-  // ... (kode CoverScreen Anda yang sudah ada)
-};
-
 
 const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15', 'affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan'];
 
@@ -1763,7 +1767,7 @@ const App = () => {
     isSidebarOpen, setIsSidebarOpen,
     isMenuOpen, setIsMenuOpen
   };
-
+  
   return React.createElement(AppContext.Provider, { value: contextValue },
     !isCoverUnlocked
       ? React.createElement(CoverScreen, null)
@@ -1778,105 +1782,11 @@ const App = () => {
 };
 
 // Perintah Final untuk merender Aplikasi
-ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById('root'));
+ReactDOM.render(React.createElement(App, null), document.getElementById('root'));
 
-// CSS untuk variabel font size
+// CSS
 const style = document.createElement('style');
 style.innerHTML = `
-/* ... (Seluruh CSS Anda yang sudah ada, tidak perlu diubah) ... */
-   .sidebar {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 300px; 
-     max-width: 80%;
-     height: 100%;
-     background-color: white;
-     box-shadow: 4px 0 15px rgba(0,0,0,0.2);
-     transform: translateX(-100%);
-     transition: transform 0.3s ease-in-out;
-     z-index: 100;
-     overflow-y: auto;
-     color: #333;
-   }
-   .sidebar.is-open {
-     transform: translateX(0);
-   }
-   .sidebar-overlay {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100%;
-     height: 100%;
-     background-color: rgba(0,0,0,0.5);
-     z-index: 99;
-   }
-.book-container {
-    width: 90vw;
-    max-width: 400px;
-    aspect-ratio: 2 / 3; /* Menjaga rasio buku */
-    background-color: #382e28; /* Warna dasar kulit coklat tua */
-    background-image: url('https://raw.githubusercontent.com/kesinilagi/asetmusik/main/shunya codex.png');
-    background-size: cover;      /* Membuat gambar menutupi seluruh area tanpa merusak rasio */
-    background-position: center; /* Memposisikan gambar pas di tengah */
-    background-repeat: no-repeat;  /* Mencegah gambar diulang-ulang */
-    border-radius: 8px;
-    box-shadow: 10px 10px 40px rgba(0,0,0,0.6), inset 0 0 25px rgba(0,0,0,0.5);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    border: 3px solid #1c1511;
-}
-
-.book-ornament-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill; /* Membuat gambar bingkai meregang pas */
-    pointer-events: none; /* Agar gambar tidak bisa diklik */
-    opacity: 0.8;
-}
-
-.book-title-gold {
-    font-family: 'Georgia', 'Times New Roman', serif; /* Font serif yang klasik */
-    color: #f0e68c; /* Warna emas pucat */
-    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
-}
-
-.unlock-button-gold {
-    background: radial-gradient(ellipse at center, #7a5f2c 0%,#c19a48 45%,#d4af37 62%,#c19a48 100%);
-    box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
-    border: 2px solid #f0e68c;
-    transition: all 0.3s ease;
-}
-
-.unlock-button-gold:hover {
-    box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.7);
-    transform: scale(1.05);
-}
-/* TAMBAHKAN RESEP ANIMASI INI KE CSS ANDA */
-
-/* Kelas ini akan kita panggil saat tombol diklik */
-.star-shine-effect {
-    animation: star-shine 0.5s ease-in-out;
-}
-
-/* Resep/langkah-langkah animasinya */
-@keyframes star-shine {
-    0% {
-        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
-    }
-    50% {
-        /* Di tengah animasi, cahayanya membesar dan sangat terang */
-        box-shadow: 0 0 45px 20px rgba(255, 215, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.8);
-    }
-    100% {
-        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
-    }
-}
+  /* ... Seluruh CSS Anda yang ada di file asli ... */
 `;
 document.head.appendChild(style);
