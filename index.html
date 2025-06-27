@@ -15,12 +15,19 @@
     div[data-netlify-identity-button] { margin-top: 20px; }
   </style>
 </head>
-<body>
-
-  <h1>Halaman Tes Login</h1>
-  <p>Jika sebuah tombol login muncul di bawah ini, berarti widget inti kita berfungsi dengan baik!</p>
-
-  <div data-netlify-identity-button></div>
-
+body>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('init', user => {
+          if (!user) {
+            window.netlifyIdentity.on('login', () => {
+              document.location.href = '/';
+            });
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
