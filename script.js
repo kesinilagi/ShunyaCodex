@@ -780,42 +780,6 @@ const RandomQuote = () => {
 
 // --- KOMPONEN HALAMAN & KONTEN ---
 
-const LoginScreen = () => {
-  const { setUserName } = useContext(AppContext);
-  const [name, setName] = useState('');
-
-  const handleLogin = () => {
-    if (name.trim()) {
-      const trimmedName = name.trim();
-      localStorage.setItem('ebookUserName', trimmedName);
-      setUserName(trimmedName);
-    }
-  };
-
-  return /*#__PURE__*/(
-    React.createElement("div", { className: "fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4" }, /*#__PURE__*/
-    React.createElement(Starfield, null), /*#__PURE__*/
-    React.createElement("div", { className: "z-10 text-center animate-fade-in" }, /*#__PURE__*/
-    React.createElement("h1", { className: "text-4xl md:text-6xl font-bold mb-4" }, "Selamat Datang"), /*#__PURE__*/
-    React.createElement("p", { className: "text-xl md:text-2xl mb-8 text-gray-300" }, "Silakan masukkan nama Anda untuk memulai."), /*#__PURE__*/
-    React.createElement("div", { className: "flex" }, /*#__PURE__*/
-    React.createElement("input", {
-      type: "text",
-      value: name,
-      onChange: e => setName(e.target.value),
-      onKeyPress: e => e.key === 'Enter' && handleLogin(),
-      className: "bg-gray-800 border border-gray-700 rounded-l-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-      placeholder: "Nama Anda..." }), /*#__PURE__*/
-
-    React.createElement("button", { onClick: handleLogin, className: "bg-indigo-600 text-white px-6 py-3 rounded-r-lg hover:bg-indigo-700 font-bold transition-colors" }, "Masuk")))));
-
-
-
-
-
-
-};
-
 const ThemeSettings = () => {
   // 1. Ambil fungsi `setCurrentPageKey` dari Context
   const { themeKey, setThemeKey, themes, setCurrentPageKey } = useContext(AppContext);
@@ -1669,7 +1633,30 @@ React.createElement("td", { className: "py-3 px-4 border-b" }, /*#__PURE__*/Reac
 React.createElement("td", { className: "py-3 px-4 border-b" }, "Memohon rasa cukup, keberkahan, dan penggantian yang lebih baik."), /*#__PURE__*/
 React.createElement("td", { className: "py-3 px-4 border-b" }, /*#__PURE__*/React.createElement(IntegratedAudioPlayer, { src: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma qanni.mp3", text: "Allahumma qanni\u2019ni bima razaqtani, wa barik li fihi, wakhluf \u2018alayya kulla gha\u2019ibatin li bi khayr." })))))));
 
+// Komponen untuk meminta pengguna login
+const LoginPrompt = () => {
+  const handleLogin = () => {
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.open('login');
+    }
+  };
 
+  return (
+    <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
+      <Starfield />
+      <div className="z-10 text-center animate-fade-in">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">Selamat Datang di Shunya Codex</h1>
+        <p className="text-xl md:text-2xl mb-8 text-gray-300">Silakan login atau daftar untuk melanjutkan perjalanan Anda.</p>
+        <button 
+          onClick={handleLogin} 
+          className="bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 font-bold transition-colors text-xl shadow-lg"
+        >
+          Masuk / Daftar
+        </button>
+      </div>
+    </div>
+  );
+};
 
 
 
@@ -1681,13 +1668,19 @@ React.createElement("td", { className: "py-3 px-4 border-b" }, /*#__PURE__*/Reac
 const MainLayout = () => {
   // Ambil semua state dan fungsi yang dibutuhkan dari context
   const {
+    user,
     themeKey, themes,
     currentPageKey, setCurrentPageKey,
     fontSizeIndex, setFontSizeIndex, fontSizes,
     setIsCoverUnlocked,
     isSidebarOpen, setIsSidebarOpen } =
   useContext(AppContext);
-
+/ Fungsi untuk logout
+  const handleLogout = () => {
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.logout();
+    }
+  };
   const currentTheme = themes[themeKey];
   const pageIndex = pages.findIndex(p => p === currentPageKey);
 
@@ -1756,7 +1749,17 @@ const MainLayout = () => {
     React.createElement("div", { className: "container mx-auto px-4 py-4 flex justify-between items-center" }, /*#__PURE__*/
     React.createElement("button", { onClick: () => setIsSidebarOpen(true), className: "font-bold text-lg hover:opacity-80 flex items-center gap-2" }, /*#__PURE__*/
     React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /*#__PURE__*/React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 6h16M4 12h16M4 18h16" })), "Daftar Isi"), /*#__PURE__*/
-
+</button>
+              
+              <div className="flex items-center gap-2 md:gap-4">
+                 {/* --- TOMBOL LOGOUT BARU --- */}
+                <button 
+                  onClick={handleLogout} 
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded text-sm" 
+                  title="Logout"
+                >
+                  Keluar
+                </button>
 
     React.createElement("div", { className: "flex items-center gap-2 md:gap-4" }, /*#__PURE__*/
     React.createElement("button", { onClick: () => setCurrentPageKey('pengaturan'), className: "p-2 rounded-full hover:bg-white/20", title: "Pengaturan Tema" }, /*#__PURE__*/
@@ -2035,6 +2038,7 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
 const App = () => {
+  const [user, setUser] = useState(null);
   const [isCoverUnlocked, setIsCoverUnlocked] = useState(false);
   // --- STATE BARU UNTUK SIDEBAR ---
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -2065,8 +2069,31 @@ const App = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPageKey]);
+ // --- EFEK UNTUK NETLIFY IDENTITY ---
+  useEffect(() => {
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.init();
 
+      // Cek pengguna saat pertama kali load
+      const currentUser = window.netlifyIdentity.currentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      }
+
+      // Event listener untuk login
+      window.netlifyIdentity.on('login', (loggedInUser) => {
+        setUser(loggedInUser);
+        window.netlifyIdentity.close();
+      });
+
+      // Event listener untuk logout
+      window.netlifyIdentity.on('logout', () => {
+        setUser(null);
+      });
+    }
+  }, []);
   const contextValue = {
+    user, setUser,
     themes, themeKey, setThemeKey,
     fontSizes, fontSizeIndex, setFontSizeIndex,
     currentPageKey, setCurrentPageKey,
@@ -2075,17 +2102,17 @@ const App = () => {
     isMenuOpen, setIsMenuOpen };
 
 
-  return /*#__PURE__*/(
-    React.createElement(AppContext.Provider, { value: contextValue },
-
-    !isCoverUnlocked ? /*#__PURE__*/React.createElement(CoverScreen, null) :
-    currentPageKey === 'pixel-thoughts' ? /*#__PURE__*/React.createElement(PixelThoughts, null) :
-    currentPageKey === 'affirmation-room' ? /*#__PURE__*/React.createElement(AffirmationRoom, null) // <-- TAMBAHKAN INI
-    : /*#__PURE__*/React.createElement(MainLayout, null)));
-
-
-
-};
+  return (
+    <AppContext.Provider value={contextValue}>
+      {
+        !isCoverUnlocked ? <CoverScreen /> :
+        !user ? <LoginPrompt /> : // <-- JIKA BELUM LOGIN, TAMPILKAN INI
+        currentPageKey === 'pixel-thoughts' ? <PixelThoughts /> :
+        currentPageKey === 'affirmation-room' ? <AffirmationRoom /> :
+        <MainLayout /> // <-- JIKA SUDAH LOGIN, TAMPILKAN INI
+      }
+    </AppContext.Provider>
+  );
 
 // Perintah Final untuk merender Aplikasi
 ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById('root'));
