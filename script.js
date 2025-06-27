@@ -1665,22 +1665,26 @@ const LoginPrompt = () => {
 // ### KOMPONEN LAYOUT UTAMA ###
 // Komponen baru untuk mengatur struktur halaman utama
 // ### GANTI SELURUH MAINLAYOUT ANDA DENGAN VERSI BERSIH INI ###
+// GANTI SELURUH KOMPONEN MAINLAYOUT ANDA DENGAN INI
+
 const MainLayout = () => {
   // Ambil semua state dan fungsi yang dibutuhkan dari context
   const {
-    user,
+    user, // Ambil data user
     themeKey, themes,
     currentPageKey, setCurrentPageKey,
     fontSizeIndex, setFontSizeIndex, fontSizes,
     setIsCoverUnlocked,
     isSidebarOpen, setIsSidebarOpen } =
   useContext(AppContext);
-// Fungsi untuk logout
+
+  // Fungsi untuk logout
   const handleLogout = () => {
     if (window.netlifyIdentity) {
       window.netlifyIdentity.logout();
     }
   };
+
   const currentTheme = themes[themeKey];
   const pageIndex = pages.findIndex(p => p === currentPageKey);
 
@@ -1729,75 +1733,36 @@ const MainLayout = () => {
       case 'doapilihan':return /*#__PURE__*/React.createElement(DoaPilihan, null);
       case 'pengaturan':return /*#__PURE__*/React.createElement(ThemeSettings, null);
       default:return /*#__PURE__*/React.createElement(DaftarIsi, null);}
-
   };
-
+  
+  // Ini adalah return statement yang sudah ditulis ulang dengan React.createElement
   return /*#__PURE__*/(
     React.createElement("div", { className: "min-h-screen w-full bg-gray-900" }, /*#__PURE__*/
-
-    React.createElement("div", { className: `sidebar ${isSidebarOpen ? 'is-open' : ''}` }, /*#__PURE__*/
-    React.createElement(SidebarMenu, null)),
-
-    isSidebarOpen && /*#__PURE__*/
-    React.createElement("div", { onClick: () => setIsSidebarOpen(false), className: "sidebar-overlay" }), /*#__PURE__*/
-
-
-
-    React.createElement("div", { className: "flex flex-col min-h-screen" },
-    currentPageKey !== 'kata-pengantar' && /*#__PURE__*/
-    React.createElement("header", { className: `sticky top-0 z-40 w-full text-white shadow-md ${currentTheme.header}` }, /*#__PURE__*/
-    React.createElement("div", { className: "container mx-auto px-4 py-4 flex justify-between items-center" }, /*#__PURE__*/
-    React.createElement("button", { onClick: () => setIsSidebarOpen(true), className: "font-bold text-lg hover:opacity-80 flex items-center gap-2" }, /*#__PURE__*/
-    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /*#__PURE__*/React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 6h16M4 12h16M4 18h16" })), "Daftar Isi"), /*#__PURE__*/
-</button>
-              
-              <div className="flex items-center gap-2 md:gap-4">
-                 {/* --- TOMBOL LOGOUT BARU --- */}
-                <button 
-                  onClick={handleLogout} 
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded text-sm" 
-                  title="Logout"
-                >
-                  Keluar
-                </button>
-
-    React.createElement("div", { className: "flex items-center gap-2 md:gap-4" }, /*#__PURE__*/
-    React.createElement("button", { onClick: () => setCurrentPageKey('pengaturan'), className: "p-2 rounded-full hover:bg-white/20", title: "Pengaturan Tema" }, /*#__PURE__*/
-    React.createElement("span", { className: "text-2xl" }, "\uD83C\uDFA8")), /*#__PURE__*/
-
-    React.createElement("button", { onClick: handleCloseBook, className: "p-2 rounded-full hover:bg-white/20", title: "Tutup E-book" }, /*#__PURE__*/
-    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: 2 }, /*#__PURE__*/
-    React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" })))))), /*#__PURE__*/
-
-
-
-
-
-
-
-    React.createElement("main", { className: `flex-grow container mx-auto px-4 ${currentPageKey === 'kata-pengantar' ? 'py-16' : 'py-8 md:py-12'}` },
-    renderPage()),
-
-
-    currentPageKey !== 'kata-pengantar' && /*#__PURE__*/
-    React.createElement("footer", { className: `sticky bottom-0 z-40 w-full text-white shadow-inner p-4 ${currentTheme.header}` }, /*#__PURE__*/
-    React.createElement("div", { className: "container mx-auto flex justify-between items-center" }, /*#__PURE__*/
-    React.createElement("button", { onClick: () => goToPage(-1), disabled: pageIndex <= 1, className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "\u2039 Sebelumnya"), /*#__PURE__*/
-    React.createElement("div", { className: "flex items-center gap-2" }, /*#__PURE__*/
-    React.createElement("button", { onClick: () => changeFontSize(-1), disabled: fontSizeIndex <= 0, className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "A-"), /*#__PURE__*/
-    React.createElement("span", { className: "w-8 text-center font-semibold" }, parseInt(fontSizes[fontSizeIndex])), /*#__PURE__*/
-    React.createElement("button", { onClick: () => changeFontSize(1), disabled: fontSizeIndex >= fontSizes.length - 1, className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "A+")), /*#__PURE__*/
-
-    React.createElement("button", { onClick: () => goToPage(1), disabled: pageIndex >= pages.findIndex(p => p === 'doapilihan'), className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "Berikutnya \u203A")), /*#__PURE__*/
-
-    React.createElement("div", { className: "mt-3" }, /*#__PURE__*/
-    React.createElement(RandomQuote, null))))));
-
-
-
-
-
-
+      React.createElement("div", { className: `sidebar ${isSidebarOpen ? 'is-open' : ''}` }, /*#__PURE__*/React.createElement(SidebarMenu, null)),
+      isSidebarOpen && /*#__PURE__*/ React.createElement("div", { onClick: () => setIsSidebarOpen(false), className: "sidebar-overlay" }),
+      React.createElement("div", { className: "flex flex-col min-h-screen" },
+        currentPageKey !== 'kata-pengantar' && /*#__PURE__*/
+        React.createElement("header", { className: `sticky top-0 z-40 w-full text-white shadow-md ${currentTheme.header}` }, /*#__PURE__*/
+          React.createElement("div", { className: "container mx-auto px-4 py-3 flex justify-between items-center" }, /*#__PURE__*/
+            React.createElement("button", { onClick: () => setIsSidebarOpen(true), className: "font-bold text-lg hover:opacity-80 flex items-center gap-2" }, /*#__PURE__*/
+              React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /*#__PURE__*/React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 6h16M4 12h16M4 18h16" })), "Daftar Isi"), /*#__PURE__*/
+            React.createElement("div", { className: "flex items-center gap-2 md:gap-4" },
+              /*#__PURE__*/React.createElement("button", { onClick: handleLogout, className: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded text-sm", title: "Logout" }, "Keluar"),
+              /*#__PURE__*/React.createElement("button", { onClick: () => setCurrentPageKey('pengaturan'), className: "p-2 rounded-full hover:bg-white/20", title: "Pengaturan Tema" }, /*#__PURE__*/React.createElement("span", { className: "text-2xl" }, "🎨")),
+              /*#__PURE__*/React.createElement("button", { onClick: handleCloseBook, className: "p-2 rounded-full hover:bg-white/20", title: "Tutup E-book" }, /*#__PURE__*/
+                React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: 2 }, /*#__PURE__*/
+                  React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" })))))),
+        /*#__PURE__*/React.createElement("main", { className: `flex-grow container mx-auto px-4 ${currentPageKey === 'kata-pengantar' ? 'py-16' : 'py-8 md:py-12'}` }, renderPage()),
+        currentPageKey !== 'kata-pengantar' && /*#__PURE__*/
+        React.createElement("footer", { className: `sticky bottom-0 z-40 w-full text-white shadow-inner p-4 ${currentTheme.header}` }, /*#__PURE__*/
+          React.createElement("div", { className: "container mx-auto flex justify-between items-center" }, /*#__PURE__*/
+            React.createElement("button", { onClick: () => goToPage(-1), disabled: pageIndex <= 1, className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "‹ Sebelumnya"), /*#__PURE__*/
+            React.createElement("div", { className: "flex items-center gap-2" }, /*#__PURE__*/
+              React.createElement("button", { onClick: () => changeFontSize(-1), disabled: fontSizeIndex <= 0, className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "A-"), /*#__PURE__*/
+              React.createElement("span", { className: "w-8 text-center font-semibold" }, parseInt(fontSizes[fontSizeIndex])), /*#__PURE__*/
+              React.createElement("button", { onClick: () => changeFontSize(1), disabled: fontSizeIndex >= fontSizes.length - 1, className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "A+")), /*#__PURE__*/
+            React.createElement("button", { onClick: () => goToPage(1), disabled: pageIndex >= pages.findIndex(p => p === 'doapilihan'), className: "px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20" }, "Berikutnya ›")), /*#__PURE__*/
+          React.createElement("div", { className: "mt-3" }, /*#__PURE__*/React.createElement(RandomQuote, null))))));
 };
 
 //hujankata
