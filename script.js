@@ -527,28 +527,7 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
 
 };
 
-const Starfield = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let animationFrameId;
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      stars = [];
-      for (let i = 0; i < 500; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          radius: Math.random() * 1.5 + 0.5,
-          alpha: Math.random(),
-          speed: Math.random() * 0.2 + 0.1 });
-
-      }
-    };
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
