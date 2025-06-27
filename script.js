@@ -8,15 +8,13 @@ const { useState, useEffect, useRef, createContext, useContext } = React;
 // --- Context untuk State Global ---
 const AppContext = createContext();
 
-// --- Komponen-komponen diletakkan di sini ---
-
 // --- FUNGSI PEMBANTU UNTUK FULLSCREEN ---
 const openFullscreen = elem => {
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) {/* Safari */
+  } else if (elem.webkitRequestFullscreen) {
     elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) {/* IE11 */
+  } else if (elem.msRequestFullscreen) {
     elem.msRequestFullscreen();
   }
 };
@@ -24,12 +22,13 @@ const openFullscreen = elem => {
 const closeFullscreen = () => {
   if (document.exitFullscreen) {
     document.exitFullscreen();
-  } else if (document.webkitExitFullscreen) {/* Safari */
+  } else if (document.webkitExitFullscreen) {
     document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) {/* IE11 */
+  } else if (document.msExitFullscreen) {
     document.msExitFullscreen();
   }
 };
+
 // --- Styling Constants ---
 const contentContainerClasses = "p-6 md:p-10 bg-amber-200 rounded-3xl shadow-lg animate-fade-in mb-8";
 const sectionTitleClasses = "text-2xl md:text-3xl font-bold text-center text-black-800 mb-6 border-b-2 pb-2 border-black-200";
@@ -39,7 +38,59 @@ const quoteClasses = "italic text-gray-600 border-l-4 border-blue-400 pl-4 py-2 
 const subHeadingClasses = "text-xl font-bold text-gray-800 mb-3 mt-6";
 const arabicTextClass = "font-serif text-2xl";
 
-// --- Komponen LoginPrompt diletakkan di sini ---
+// --- KOMPONEN-KOMPONEN ---
+
+const Starfield = () => {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let animationFrameId;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 500; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5 + 0.5,
+          alpha: Math.random(),
+          speed: Math.random() * 0.2 + 0.1
+        });
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        ctx.fill();
+        star.y -= star.speed;
+        if (star.y < 0) {
+          star.y = canvas.height;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+  return React.createElement("canvas", { id: "starfield", ref: canvasRef, style: { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 } });
+};
+
 const LoginPrompt = () => {
   const handleLogin = () => {
     if (window.netlifyIdentity) {
@@ -1781,12 +1832,242 @@ const App = () => {
   );
 };
 
+
 // Perintah Final untuk merender Aplikasi
 ReactDOM.render(React.createElement(App, null), document.getElementById('root'));
 
 // CSS
 const style = document.createElement('style');
 style.innerHTML = `
-  /* ... Seluruh CSS Anda yang ada di file asli ... */
+    /* === Global & Reset === */
+    body {
+        margin: 0;
+        background-color: #111827;
+    }
+    :root {
+        --dynamic-font-size: 18px;
+    }
+    .dynamic-paragraph {
+        font-size: var(--dynamic-font-size);
+        transition: font-size 0.3s ease-in-out;
+    }
+    .animate-fade-in {
+        animation: fadeIn 1.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* === CSS untuk Hujan Kata-Kata (CoverScreen) === */
+    .falling-word {
+        position: absolute; top: -50px; color: var(--rain-color, #E6C700);
+    text-shadow: 0 0 10px var(--rain-color, #FFD700);
+
+    font-family: 'Times New Roman', serif;
+    white-space: nowrap;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    user-select: none;
+    text-transform: uppercase;
+}
+    @keyframes fall {
+        from { transform: translateY(0vh) rotate(-10deg); }
+        to { transform: translateY(110vh) rotate(10deg); }
+    }
+    
+    /* Kelas baru untuk setiap KATA yang muncul */
+/* Kelas baru untuk setiap KATA yang muncul dengan efek zoom */
+.zooming-word {
+    position: absolute;
+    /* WARNA SEKARANG DIAMBIL DARI VARIABLE, JADI BISA BERUBAH-UBAH */
+    color: var(--rain-color, #38bdf8); 
+    text-shadow: 0 0 10px var(--rain-color, #38bdf8);
+    font-family: 'Times New Roman', serif;
+    white-space: nowrap;
+    animation-name: zoomInOut; /* Menggunakan resep animasi baru */
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    user-select: none;
+    text-transform: uppercase;
+}
+
+/* Resep animasi "zoom mendekat dan menghilang" yang baru */
+@keyframes zoomInOut {
+    0% {
+        transform: scale(0.2);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        /* Tujuan akhir: jadi 2x lebih besar (mendekat) dan menghilang */
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+    /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
+    .thought-bubble {
+        /* Transisi untuk menyusut */
+        transition: transform 20s ease-in-out, opacity 1s ease-out;
+        transform: scale(1);
+        opacity: 1;
+    }
+    .thought-bubble.recede {
+        /* Saat menyusut, ukuran jadi 2% */
+        transform: scale(0.02);
+    }
+    .thought-bubble.vanish {
+        /* Saat terbang, ukurannya mengecil lagi dan terbang ke atas sambil menghilang */
+        transform: scale(0.015) translateY(-3500vh);
+        opacity: 0.5;
+        /* Transisi untuk terbang dibuat lebih cepat dan dramatis */
+        transition: transform 9s cubic-bezier(0.5, 0, 1, 1), opacity 1.5s ease-out;
+    }
+    .glowing-border {
+        box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.5), 0 0 30px 10px rgba(79, 70, 229, 0.4);
+    }
+    .message-fade-in {
+        animation: messageFade 1.5s ease-in-out forwards;
+        white-space: pre-line;
+    }
+    @keyframes messageFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    // TAMBAHKAN KELAS INI KE DALAM BLOK <STYLE> ANDA
+
+.affirmation-flasher {
+    position: absolute;
+    z-index: 10;
+    /* Ukuran font dibuat responsif dan tidak terlalu besar agar muat */
+    font-size: clamp(10rem, 20vw, 10rem);
+    font-weight: extrabold;
+    color: white;
+    text-shadow: 0 0 25px white, 0 0 40px #0ea5e9;
+    pointer-events: none;
+        
+    /* Pengaturan agar selalu di tengah dan tidak terpotong */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; /* Lebar maksimal 90% dari layar */
+    max-width: 800px; /* Lebar absolut maksimal */
+    text-align: center;
+    text-transform: uppercase;
+    
+    /* Transisi untuk flash yang lebih halus */
+    transition: opacity 0.2s ease-in-out; 
+    
+}
+/* TAMBAHKAN KELAS INI KE BLOK CSS ANDA */
+
+.force-uppercase {
+    text-transform: uppercase;
+}
+/* Untuk placeholder agar tidak ikut kapital */
+.force-uppercase::placeholder {
+    text-transform: uppercase;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px; /* Lebar sidebar */
+    max-width: 80%;
+    height: 100%;
+    background-color: white;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+    transform: translateX(-100%); /* Sembunyi di kiri */
+    transition: transform 0.3s ease-in-out;
+    z-index: 100;
+    overflow-y: auto; /* Bisa di-scroll jika isinya panjang */
+    color: #333; /* Warna teks di dalam sidebar */
+}
+
+.sidebar.is-open {
+    transform: translateX(0); /* Muncul ke layar */
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Warna gelap transparan */
+    z-index: 99;
+}
+.book-container {
+    width: 90vw;
+    max-width: 450px;
+    aspect-ratio: 2 / 3; /* Menjaga rasio buku */
+    max-height: 85vh
+    background-color: #382e28; /* Warna dasar kulit coklat tua */
+    background-image: url('https://raw.githubusercontent.com/kesinilagi/asetmusik/main/coverbaru.png');
+    background-size: cover;      /* Membuat gambar menutupi seluruh area tanpa merusak rasio */
+    background-position: center; /* Memposisikan gambar pas di tengah */
+    background-repeat: no-repeat;  /* Mencegah gambar diulang-ulang */
+    border-radius: 8px;
+    box-shadow: 10px 10px 40px rgba(0,0,0,0.6), inset 0 0 25px rgba(0,0,0,0.5);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border: 3px solid #1c1511;
+}
+
+.book-ornament-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* Membuat gambar bingkai meregang pas */
+    pointer-events: none; /* Agar gambar tidak bisa diklik */
+    opacity: 0.8;
+}
+
+.book-title-gold {
+    font-family: 'Georgia', 'Times New Roman', serif; /* Font serif yang klasik */
+    color: #f0e68c; /* Warna emas pucat */
+    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+.unlock-button-gold {
+    background: radial-gradient(ellipse at center, #7a5f2c 0%,#c19a48 45%,#d4af37 62%,#c19a48 100%);
+    box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
+    border: 2px solid #f0e68c;
+    transition: all 0.3s ease;
+}
+
+.unlock-button-gold:hover {
+    box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.7);
+    transform: scale(1.05);
+}
+/* TAMBAHKAN RESEP ANIMASI INI KE CSS ANDA */
+
+/* Kelas ini akan kita panggil saat tombol diklik */
+.star-shine-effect {
+    animation: star-shine 0.5s ease-in-out;
+}
+
+/* Resep/langkah-langkah animasinya */
+@keyframes star-shine {
+    0% {
+        box-shadow: 0 60 60px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+    50% {
+        /* Di tengah animasi, cahayanya membesar dan sangat terang */
+        box-shadow: 0 60 60px 20px rgba(255, 215, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.8);
+    }
+    100% {
+        box-shadow: 0 60 60px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+}
 `;
 document.head.appendChild(style);
