@@ -1675,7 +1675,7 @@ const MainLayout = () => {
     setIsCoverUnlocked,
     isSidebarOpen, setIsSidebarOpen } =
   useContext(AppContext);
-/ Fungsi untuk logout
+// Fungsi untuk logout
   const handleLogout = () => {
     if (window.netlifyIdentity) {
       window.netlifyIdentity.logout();
