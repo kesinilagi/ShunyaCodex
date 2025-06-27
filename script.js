@@ -2002,6 +2002,8 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
 
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
+// GANTI SELURUH BLOK KOMPONEN 'APP' ANDA DENGAN KODE LENGKAP INI
+
 const App = () => {
   // State untuk Netlify Identity (sudah kita tambahkan)
   const [user, setUser] = useState(null); 
@@ -2055,6 +2057,32 @@ const App = () => {
       });
     }
   }, []);
+
+  const contextValue = {
+    user, setUser,
+    themes, themeKey, setThemeKey,
+    fontSizes, fontSizeIndex, setFontSizeIndex,
+    currentPageKey, setCurrentPageKey,
+    isCoverUnlocked, setIsCoverUnlocked,
+    isSidebarOpen, setIsSidebarOpen,
+    isMenuOpen, setIsMenuOpen 
+  };
+
+  // LOGIKA RENDER FINAL dalam React.createElement
+  return /*#__PURE__*/(
+    React.createElement(AppContext.Provider, { value: contextValue },
+      !isCoverUnlocked
+        ? React.createElement(CoverScreen, null)
+        : !user
+          ? React.createElement(LoginPrompt, null)
+          : currentPageKey === 'pixel-thoughts'
+            ? React.createElement(PixelThoughts, null)
+            : currentPageKey === 'affirmation-room'
+              ? React.createElement(AffirmationRoom, null)
+              : React.createElement(MainLayout, null)
+    )
+  );
+};
 
   const contextValue = {
     user, setUser,
