@@ -3011,6 +3011,7 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
 // Pastikan baris ini ada di paling atas file JS kamu:
 // const { useState, useEffect, useRef, createContext, useContext } = React;
 
+// ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
 const App = () => {
     const [isCoverUnlocked, setIsCoverUnlocked] = useState(false); 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -3024,7 +3025,7 @@ const App = () => {
     const [themeKey, setThemeKey] = useState('blue');
     const fontSizes = [ '14px','16px','18px','20px', '22px', '24px','26px', '28px', '30px','32px', '34px', '36px'];
     const [fontSizeIndex, setFontSizeIndex] = useState(1);
-    const [currentPageKey, setCurrentPageKey] = useState('home');
+    const [currentPageKey, setCurrentPageKey] = useState('home'); // Default ke 'home' atau halaman pertama setelah aktivasi
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80); 
@@ -3081,11 +3082,13 @@ const App = () => {
     }, [fontSizeIndex]);
 
     // --- Efek untuk Scroll ke Atas Saat Halaman Berubah ---
+    // Ini juga akan membantu memicu re-render jika currentPageKey berubah
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
 
-    // --- Efek untuk memantau perubahan localStorage untuk isActivated (KOREKSI ERROR DI SINI) ---
+    // --- Efek untuk memantau perubahan localStorage untuk isActivated ---
+    // Ini PENTING agar App bereaksi ketika ActivationScreen mengubah 'ebookActivated'
     useEffect(() => {
         const handleStorageChange = () => {
             const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
@@ -3094,25 +3097,21 @@ const App = () => {
                 setIsActivated(newActivationStatus);
             }
         };
-        // Tambahkan listener
         window.addEventListener('storage', handleStorageChange);
-        
-        // Clean up listener saat komponen di-unmount
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
+        return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
 
-    // Context Value
+    // Context Value - isActivated dan setIsActivated sekarang disertakan!
     const contextValue = {
         themes, themeKey, setThemeKey,
         fontSizes, fontSizeIndex, setFontSizeIndex,
-        currentPageKey, setCurrentPageKey,
+        currentPageKey, setCurrentPageKey, // currentPageKey ini yang akan dikontrol oleh App
         isCoverUnlocked, setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
         isMenuOpen, setIsMenuOpen,
         bgOpacity, setBgOpacity,
-        isDoaLooping, setIsDoaLooping
+        isDoaLooping, setIsDoaLooping,
+        isActivated, setIsActivated // <-- TAMBAHKAN INI KE CONTEXT!
     };
     
     return (
@@ -3120,11 +3119,14 @@ const App = () => {
             <Starfield /> 
             {
                 !isCoverUnlocked ? <CoverScreen /> 
-                : !isActivated ? <ActivationScreen /> // TAMPILKAN LAYAR AKTIVASI JIKA BELUM AKTIF
+                // Logika routing berdasarkan isActivated dan currentPageKey
+                // Jika belum aktif, selalu tampilkan ActivationScreen
+                : !isActivated ? <ActivationScreen /> 
+                // Jika sudah aktif, baru routing normal berdasarkan currentPageKey
                 : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
                 : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
                 : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                : <MainLayout /> 
+                : <MainLayout /> // MainLayout adalah default jika tidak ada halaman spesifik
             }
         </AppContext.Provider>
     );
