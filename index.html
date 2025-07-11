@@ -1,33 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Shunyacodex1.1</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  
-  <style>
-    /* Style Anda tetap di sini */
-    :root { --dynamic-font-size: 22px; }
-    .dynamic-paragraph { font-size: var(--dynamic-font-size); }
-    .glowing-border { animation: pulse-glow 2.5s ease-in-out infinite alternate; }
-    @keyframes pulse-glow {
-      from { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ea5e9; }
-      to { box-shadow: 0 0 10px #fff, 0 0 20px #0ea5e9, 0 0 30px #0ea5e9; }
-    }
-    .animate-fade-in { animation: fadeIn 1s ease-in-out; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Shunya Codex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c1e18">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    
+    
+    <style>
+        :root { --dynamic-font-size: 22px; }
+        .dynamic-paragraph { font-size: var(--dynamic-font-size); }
+       .glowing-border { animation: pulse-glow 2.5s ease-in-out infinite alternate; }
+  @keyframes pulse-glow {
+    from { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ea5e9; }
+    to { box-shadow: 0 0 10px #fff, 0 0 20px #0ea5e9, 0 0 30px #0ea5e9; }
+  }
+  .animate-fade-in { animation: fadeIn 1s ease-in-out; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+    </style>
 </head>
 <body>
-  <div id="root"></div>
+    <div id="root"></div>
+    
+    <script type="text/babel" src="./script.js"></script>
 
-  <script type="text/babel" src="./script.js"></script> </body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker terdaftar.', reg))
+                    .catch(err => console.log('Pendaftaran Service Worker gagal:', err));
+            });
+        }
+    </script>
+    
+</body>
 </html>
