@@ -2,7 +2,6 @@
 // KODE MASTER FINAL v13 - DISempurnakan DENGAN CONTEXT API & PERBAIKAN STRUKTUR
 // ===================================================================
 // --- KOMPONEN BARU: LAYAR AKTIVASI ---
-// --- KOMPONEN BARU: LAYAR AKTIVASI ---
 const ActivationScreen = () => {
     // Ambil setIsActivated dari context, bukan hanya setCurrentPageKey
     const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
@@ -74,6 +73,9 @@ const ActivationScreen = () => {
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
             <Starfield />
+        
+            <div className="z-10 text-center animate-fade-in bg-black/60 p-8 rounded-xl shadow-lg">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-yellow-300">Aktivasi E-book</h1>
         <div className="flex flex-col items-center">
                     <input
                         type="text"
@@ -84,8 +86,6 @@ const ActivationScreen = () => {
                         placeholder="KUNCI AKTIVASI"
                         disabled={isLoading}
                     />
-            <div className="z-10 text-center animate-fade-in bg-black/60 p-8 rounded-xl shadow-lg">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-yellow-300">Aktivasi E-book</h1>
                 <p className="text-lg md:text-xl mb-4 text-gray-300">
                     Masukkan kunci aktivasi Anda untuk mengakses fitur penuh.
                 </p>
@@ -103,13 +103,7 @@ const ActivationScreen = () => {
                     </button>
                 </div>
             </div>
-            {/* Tombol kembali ke Daftar Isi (opsional, bisa dihapus jika akses hanya via aktivasi) */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
-                <button onClick={() => setCurrentPageKey('daftar-isi')} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
-                    Kembali ke Daftar Isi
-                </button>
-            </div>
-        </div>
+                    </div>
     );
 };
 const { useState, useEffect, useRef, createContext, useContext } = React;
