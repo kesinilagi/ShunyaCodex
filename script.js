@@ -3025,6 +3025,13 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
      const [isMenuOpen, setIsMenuOpen] = useState(false); // State untuk menu
 // --- STATE BARU UNTUK MENYIMPAN EVENT INSTALASI ---
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
+// --- State Kunci untuk Fitur Aktivasi ---
+    // Baca status aktivasi dari localStorage saat inisialisasi App
+        const [isActivated, setIsActivated] = useState(() => {
+        const storedActivation = localStorage.getItem('ebookActivated') === 'true';
+        console.log("App startup: isActivated from localStorage =", storedActivation);
+        return storedActivation;
+    });
     // --- STATE BARU UNTUK TRANSPARANSI ---
   const [bgOpacity, setBgOpacity] = useState(80); // Default 80%
 const [isDoaLooping, setIsDoaLooping] = useState(false); //<--- ADD THIS NEW STATE looping
@@ -3074,13 +3081,18 @@ const [isDoaLooping, setIsDoaLooping] = useState(false); //<--- ADD THIS NEW STA
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
-    const [isActivated, setIsActivated] = useState(localStorage.getItem('ebookActivated') === 'true');
-     const handleStorageChange = () => {
-            setIsActivated(localStorage.getItem('ebookActivated') === 'true');
+    const handleStorageChange = () => {
+            const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
+            if (newActivationStatus !== isActivated) {
+                console.log("localStorage 'ebookActivated' changed! Updating App state to", newActivationStatus);
+                setIsActivated(newActivationStatus);
+            }
         };
         window.addEventListener('storage', handleStorageChange);
+        // Clean up listener saat komponen di-unmount
         return () => window.removeEventListener('storage', handleStorageChange);
-    }, []);
+    }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
+
     const contextValue = {
         themes, themeKey, setThemeKey,
         fontSizes, fontSizeIndex, setFontSizeIndex,
