@@ -3007,11 +3007,14 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
 
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
-   const App = () => {
+   // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
+// Pastikan baris ini ada di paling atas file JS kamu:
+// const { useState, useEffect, useRef, createContext, useContext } = React;
+
+const App = () => {
     const [isCoverUnlocked, setIsCoverUnlocked] = useState(false); 
-    // --- STATE BARU UNTUK SIDEBAR ---
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-     
+    
     const themes = {
         'blue': { name: 'Biru Klasik', header: 'bg-blue-700' },
         'green': { name: 'Hijau Menenangkan', header: 'bg-teal-700' },
@@ -3022,51 +3025,49 @@ const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', '
     const fontSizes = [ '14px','16px','18px','20px', '22px', '24px','26px', '28px', '30px','32px', '34px', '36px'];
     const [fontSizeIndex, setFontSizeIndex] = useState(1);
     const [currentPageKey, setCurrentPageKey] = useState('home');
-     const [isMenuOpen, setIsMenuOpen] = useState(false); // State untuk menu
-// --- STATE BARU UNTUK MENYIMPAN EVENT INSTALASI ---
+    const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
-// --- State Kunci untuk Fitur Aktivasi ---
+    const [bgOpacity, setBgOpacity] = useState(80); 
+    const [isDoaLooping, setIsDoaLooping] = useState(false); 
+
+    // --- State Kunci untuk Fitur Aktivasi ---
     // Baca status aktivasi dari localStorage saat inisialisasi App
-        const [isActivated, setIsActivated] = useState(() => {
+    const [isActivated, setIsActivated] = useState(() => {
         const storedActivation = localStorage.getItem('ebookActivated') === 'true';
         console.log("App startup: isActivated from localStorage =", storedActivation);
         return storedActivation;
     });
-    // --- STATE BARU UNTUK TRANSPARANSI ---
-  const [bgOpacity, setBgOpacity] = useState(80); // Default 80%
-const [isDoaLooping, setIsDoaLooping] = useState(false); //<--- ADD THIS NEW STATE looping
-  useEffect(() => {
-    // Ambil nilai transparansi yang tersimpan
-    const savedOpacity = localStorage.getItem('ebookBgOpacity');
-    if (savedOpacity) {
-      setBgOpacity(Number(savedOpacity));
-    }
-  }, []);
 
-  // --- EFEK BARU UNTUK MENGUBAH CSS ---
-  useEffect(() => {
-    // Simpan nilai ke localStorage setiap kali berubah
-    localStorage.setItem('ebookBgOpacity', bgOpacity);
-    // Ubah variabel CSS di root dokumen
-    document.documentElement.style.setProperty('--content-bg-opacity', bgOpacity / 100);
-  }, [bgOpacity]);
-     
-     useEffect(() => {
+    useEffect(() => {
+        // Ambil nilai transparansi yang tersimpan
+        const savedOpacity = localStorage.getItem('ebookBgOpacity');
+        if (savedOpacity) {
+            setBgOpacity(Number(savedOpacity));
+        }
+    }, []);
+
+    // --- EFEK UNTUK MENGUBAH CSS VARIABEL ---
+    useEffect(() => {
+        localStorage.setItem('ebookBgOpacity', bgOpacity);
+        document.documentElement.style.setProperty('--content-bg-opacity', bgOpacity / 100);
+    }, [bgOpacity]);
+        
+    // --- Efek untuk PWA Install Prompt ---
+    useEffect(() => {
         const handleBeforeInstallPrompt = (event) => {
-            // Mencegah browser menampilkan prompt default-nya
             event.preventDefault();
-            // Simpan event-nya agar bisa kita panggil nanti
             setInstallPromptEvent(event);
             console.log("PWA bisa di-install, event ditangkap!");
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-        // Cleanup
         return () => {
             window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         };
     }, []);
+
+    // --- Efek untuk Memuat Tema Tersimpan ---
     useEffect(() => {
         const savedTheme = localStorage.getItem('ebookThemeKey');
         if (savedTheme && themes[savedTheme]) {
@@ -3074,48 +3075,58 @@ const [isDoaLooping, setIsDoaLooping] = useState(false); //<--- ADD THIS NEW STA
         }
     }, []);
 
+    // --- Efek untuk Mengatur Ukuran Font Dinamis ---
     useEffect(() => {
         document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
     }, [fontSizeIndex]);
 
+    // --- Efek untuk Scroll ke Atas Saat Halaman Berubah ---
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
-    const handleStorageChange = () => {
+
+    // --- Efek untuk memantau perubahan localStorage untuk isActivated (KOREKSI ERROR DI SINI) ---
+    useEffect(() => {
+        const handleStorageChange = () => {
             const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
             if (newActivationStatus !== isActivated) {
                 console.log("localStorage 'ebookActivated' changed! Updating App state to", newActivationStatus);
                 setIsActivated(newActivationStatus);
             }
         };
+        // Tambahkan listener
         window.addEventListener('storage', handleStorageChange);
+        
         // Clean up listener saat komponen di-unmount
-        return () => window.removeEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
 
+    // Context Value
     const contextValue = {
         themes, themeKey, setThemeKey,
         fontSizes, fontSizeIndex, setFontSizeIndex,
         currentPageKey, setCurrentPageKey,
         isCoverUnlocked, setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
-       isMenuOpen, setIsMenuOpen,
-      bgOpacity, setBgOpacity ,
-      isDoaLooping, setIsDoaLooping
+        isMenuOpen, setIsMenuOpen,
+        bgOpacity, setBgOpacity,
+        isDoaLooping, setIsDoaLooping
     };
     
     return (
         <AppContext.Provider value={contextValue}>
-      <Starfield />
-        {
-            !isCoverUnlocked ? <CoverScreen />
-            : !isActivated ? <ActivationScreen />
-            : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
-            : currentPageKey === 'affirmation-room' ? <AffirmationRoom /> // <-- TAMBAHKAN INI
-            : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-              : <MainLayout />
-        }
-    </AppContext.Provider>
+            <Starfield /> 
+            {
+                !isCoverUnlocked ? <CoverScreen /> 
+                : !isActivated ? <ActivationScreen /> // TAMPILKAN LAYAR AKTIVASI JIKA BELUM AKTIF
+                : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
+                : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
+                : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
+                : <MainLayout /> 
+            }
+        </AppContext.Provider>
     );
 };
 
