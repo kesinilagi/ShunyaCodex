@@ -11,7 +11,7 @@ const ActivationScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT KAMU DI SINI!
-    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiRzQdn-X-Tq08XOyPNGykN_Sw2BYHoT7bdg2h6JgQ6tLOrwIJTo_AKmBPaw4BJJwm1yA7WPTinXNNM6xsniLtHkIDut8EkUALI61GfdWwHlbVVOo68CzyZoCwfW2u3VwZ5JtlpdJqPpqXns3itm77U637TaUXkDVCGCJhY8Q6lq167PsrrCV2t5AP2D5_9ufwxV0mOkPnwC28RcYC71ZdZqGLb04tXB4x1VnhdcVNSo4kttNfUwTbUaIgM58hTSeNR6qoypK3qnr_9keGu0CrJEHnIHQ&lib=MXvw5GI5DTbn4hxD_Aeh3UQlYtS0PkaXW'; 
+    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyvtJwSHb0rJLX4p1PYHAS9RSdU2H2fBPdyJoYIZygCUz3NSvEuAhB9NefBjpHIbp5u/exec'; 
 
     const verifyKeyWithBackend = async (keyToVerify) => { 
         try {
