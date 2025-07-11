@@ -1,7 +1,115 @@
 // ===================================================================
 // KODE MASTER FINAL v13 - DISempurnakan DENGAN CONTEXT API & PERBAIKAN STRUKTUR
 // ===================================================================
+// --- KOMPONEN BARU: LAYAR AKTIVASI ---
+const ActivationScreen = () => {
+    const { setCurrentPageKey } = useContext(AppContext);
+    const [activationKey, setActivationKey] = useState('');
+    const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
+    // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT KAMU DI SINI!
+    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyvtJwSHb0rJLX4p1PYHAS9RSdU2H2fBPdyJoYIZygCUz3NSvEuAhB9NefBjpHIbp5u/exec'; 
+
+    // Fungsi untuk memverifikasi kunci dengan Google Apps Script
+    const verifyKeyWithBackend = async (keyToVerify) => {
+        try {
+            // Mengirim request GET ke Apps Script API dengan kunci sebagai parameter query
+            const response = await fetch(`${GOOGLE_APPS_SCRIPT_API_URL}?key=${encodeURIComponent(keyToVerify.trim())}`);
+            const data = await response.json(); // Mengubah response menjadi JSON
+            return data; // Mengembalikan seluruh objek data (termasuk success dan message)
+        } catch (error) {
+            console.error("Error verifying key with backend:", error);
+            return { success: false, message: "Terjadi kesalahan koneksi. Mohon periksa koneksi internet Anda." };
+        }
+    };
+
+    // Fungsi yang dipanggil saat tombol "Aktivasi" diklik
+    const handleActivate = async () => {
+        if (!activationKey.trim()) {
+            setMessage('Mohon masukkan kunci aktivasi.');
+            return;
+        }
+
+        setIsLoading(true);
+        setMessage('Memverifikasi kunci...');
+
+        // Verifikasi kunci ke Google Apps Script
+        const result = await verifyKeyWithBackend(activationKey); 
+
+        if (result.success) {
+            // Jika valid dari backend, simpan status aktivasi di localStorage
+            localStorage.setItem('ebookActivated', 'true'); 
+            localStorage.setItem('ebookActivationKey', activationKey.trim()); // Opsional: simpan kunci itu sendiri (untuk debugging/referensi)
+            setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
+            setTimeout(() => {
+                setCurrentPageKey('daftar-isi'); // Arahkan ke Daftar Isi atau halaman utama E-book
+            }, 1500);
+        } else {
+            // Jika tidak valid dari backend, tampilkan pesan error dari Apps Script
+            setMessage(`Aktivasi Gagal: ${result.message}`);
+        }
+        setIsLoading(false);
+    };
+
+    // Saat komponen dimuat, cek apakah E-book sudah aktif di perangkat ini
+    useEffect(() => {
+        const storedActivated = localStorage.getItem('ebookActivated') === 'true';
+        const storedKey = localStorage.getItem('ebookActivationKey'); // Ambil kunci yang tersimpan
+
+        // Jika sudah aktif di localStorage, langsung alihkan
+        if (storedActivated && storedKey) { // Bisa juga tambahkan cek storedKey jika perlu
+            setMessage('E-book sudah aktif di perangkat ini. Mengalihkan...');
+            setTimeout(() => {
+                setCurrentPageKey('daftar-isi'); // Alihkan setelah pesan singkat
+            }, 500);
+        }
+        // Opsional: Untuk keamanan lebih, bisa panggil verifyKeyWithBackend(storedKey) di sini
+        // Tapi ini akan membutuhkan koneksi internet dan memperlambat loading awal.
+        // Untuk offline-first, lebih baik percaya localStorage dan hanya memverifikasi saat input manual.
+    }, []); // Efek ini hanya berjalan sekali saat komponen mount
+
+    // --- Render JSX untuk Layar Aktivasi ---
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
+            <Starfield />
+            <div className="z-10 text-center animate-fade-in bg-black/60 p-8 rounded-xl shadow-lg">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-yellow-300">Aktivasi E-book</h1>
+                <p className="text-lg md:text-xl mb-4 text-gray-300">
+                    Masukkan kunci aktivasi Anda untuk mengakses fitur penuh.
+                </p>
+                <p className="text-sm italic text-gray-400 mb-8">
+                    Setiap kunci aktivasi berlaku untuk jumlah perangkat tertentu yang Anda beli. Jika Anda membutuhkan akses di lebih banyak perangkat, mohon hubungi kami untuk informasi penawaran khusus.
+                </p>
+                <div className="flex flex-col items-center">
+                    <input
+                        type="text"
+                        value={activationKey}
+                        onChange={(e) => setActivationKey(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleActivate()}
+                        className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white uppercase"
+                        placeholder="KUNCI AKTIVASI"
+                        disabled={isLoading}
+                    />
+                    {message && <p className={`mt-4 text-center ${message.includes('Berhasil') ? 'text-green-400' : 'text-red-400'}`}>{message}</p>}
+                    <button
+                        onClick={handleActivate}
+                        disabled={isLoading}
+                        className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
+                    </button>
+                </div>
+            </div>
+            {/* Tombol kembali ke Daftar Isi (jika ada) */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+                <button onClick={() => setCurrentPageKey('daftar-isi')} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    Kembali ke Daftar Isi
+                </button>
+            </div>
+        </div>
+    );
+};
 const { useState, useEffect, useRef, createContext, useContext } = React;
 
 // --- Context untuk State Global ---
@@ -2966,7 +3074,13 @@ const [isDoaLooping, setIsDoaLooping] = useState(false); //<--- ADD THIS NEW STA
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
-    
+    const [isActivated, setIsActivated] = useState(localStorage.getItem('ebookActivated') === 'true');
+     const handleStorageChange = () => {
+            setIsActivated(localStorage.getItem('ebookActivated') === 'true');
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
     const contextValue = {
         themes, themeKey, setThemeKey,
         fontSizes, fontSizeIndex, setFontSizeIndex,
@@ -2983,6 +3097,7 @@ const [isDoaLooping, setIsDoaLooping] = useState(false); //<--- ADD THIS NEW STA
       <Starfield />
         {
             !isCoverUnlocked ? <CoverScreen />
+            : !isActivated ? <ActivationScreen />
             : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
             : currentPageKey === 'affirmation-room' ? <AffirmationRoom /> // <-- TAMBAHKAN INI
             : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
