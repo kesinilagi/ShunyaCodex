@@ -33,7 +33,7 @@ const ActivationScreen = () => {
 
         setIsLoading(true);
         setMessage('Memverifikasi kunci...');
-
+        console.log("Mengirim kunci untuk verifikasi:", activationKey);
         // Verifikasi kunci ke Google Apps Script
         const result = await verifyKeyWithBackend(activationKey); 
 
