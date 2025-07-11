@@ -47,7 +47,7 @@ const ActivationScreen = () => {
 
             // Navigasi setelah sedikit delay untuk pesan
             setTimeout(() => {
-                setCurrentPageKey('daftar-isi'); // Arahkan ke Daftar Isi
+                setCurrentPageKey('kata-pengantar'); // Arahkan ke Daftar Isi
             }, 1500); 
             // --- AKHIR PERUBAHAN ---
 
