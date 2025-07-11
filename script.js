@@ -9,7 +9,7 @@ const ActivationScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT KAMU DI SINI!
-    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyvtJwSHb0rJLX4p1PYHAS9RSdU2H2fBPdyJoYIZygCUz3NSvEuAhB9NefBjpHIbp5u/exec'; 
+    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/library/d/19xIc5wU_cFmZ3cyw8gPXnUWBgQAqSyQzfGHQnsvE2H37i5e5rE-rlITQ/2'; 
 
     // Fungsi untuk memverifikasi kunci dengan Google Apps Script
     const verifyKeyWithBackend = async (keyToVerify) => {
