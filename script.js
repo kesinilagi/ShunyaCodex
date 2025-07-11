@@ -571,14 +571,12 @@ const AffirmationRoom = () => {
 const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     // State untuk mengelola fase saat ini
-    // Mengubah fase awal dari 'password_check' menjadi 'time_check' atau 'intro'
-    // Jika tidak ada batasan waktu, bisa langsung 'intro'
     const [currentPhase, setCurrentPhase] = useState('time_check'); 
     
     // State untuk mengelola audio utama setiap fase
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
-    const audioGratitudeRef = useRef(null); // KOREKSI: ini harusnya useRef(null);
+    const audioGratitudeRef = useRef(null); // <--- KOREKSI INI: CUKUP useRef(null)
 
     // State untuk melacak apakah audio di fase saat ini sedang bermain
     const [isCurrentAudioPlaying, setIsCurrentAudioPlaying] = useState(false);
@@ -602,35 +600,30 @@ const SecretRoomRezeki = () => {
         { 
             name: 'Gamelan Ambient', 
             src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Gamelan%20Ambient.mp3', 
-            // description: 'Melodi gamelan yang menenangkan untuk koneksi dengan energi spiritual Nusantara.' // deskripsi dihapus
         },
         { 
             name: 'Angel Abundance', 
-            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Angel Ambient.mp3', 
-            // description: 'Suara lembut dan harmonis yang membantu membuka diri pada kelimpahan ilahi.'
+            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Angel%20Abundance.mp3', 
         },
         { 
             name: 'Singing Bowl', 
             src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Singing%20Bowl.mp3', 
-            // description: 'Resonansi mangkuk Tibet yang dalam untuk menyeimbangkan energi dan kejernihan batin.'
         },
         { 
-            name: 'Rural Ambience', 
-            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Rural Ambient.mp3', 
-            // description: 'Suasana gurun dan misteri Mesir kuno untuk perjalanan spiritual yang dalam.'
+            name: 'Rural Ambience', // Ganti nama dari Egypt Ambience menjadi Rural Ambience
+            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Rural%20Ambient.mp3', // Ganti URL ini
         },
         { 
             name: 'Hening (Mati)', 
             src: '',
-            // description: 'Tanpa suara latar, fokus sepenuhnya pada audio sesi utama.'
         } 
     ];
 
     // Audio sources untuk setiap fase utama
     const phaseAudios = {
-        release: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Clearing.mp3',
-        manifestation: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Afirmasi.mp3',
-        gratitude: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Gratitude.mp3',
+        release: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Clearing.mp3', // Ganti URL ini
+        manifestation: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Afirmasi.mp3', // Ganti URL ini
+        gratitude: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Gratitude.mp3', // Ganti URL ini
     };
 
     // --- FUNGSI-FUNGSI PEMBANTU ---
@@ -698,9 +691,8 @@ const SecretRoomRezeki = () => {
     // Auto-check waktu saat komponen dimuat
     useEffect(() => {
         if (!handleTimeCheck()) {
-            // Jika waktu tidak valid saat dimuat, mungkin tetap di 'time_check'
-            // Atau alihkan ke halaman lain jika ini adalah entry point utama
-            // Untuk sekarang, kita biarkan pesan error muncul dan tombol tidak bisa diakses
+            // Jika waktu tidak valid saat dimuat, maka tetap di time_check
+            // Pesan error sudah dihandle oleh handleTimeCheck
         } else {
             setCurrentPhase('intro'); // Jika waktu valid, langsung ke intro
         }
@@ -790,7 +782,13 @@ const SecretRoomRezeki = () => {
     const renderPhaseContent = () => {
         // New: Time Check Phase (menggantikan password_check)
         if (currentPhase === 'time_check') {
-            const currentHour = new Date().getHours();
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+
+            const formattedCurrentTime = 
+                `${currentHour < 10 ? '0' : ''}${currentHour}:${currentMinute < 10 ? '0' : ''}${currentMinute}`;
+            
             const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
             const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
             const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
@@ -801,16 +799,18 @@ const SecretRoomRezeki = () => {
                     <p className="mb-4 text-gray-300 text-lg text-center">
                         Ruang Rahasia ini hanya bisa diakses pada waktu tertentu.
                     </p>
-                    <p className="mb-8 text-yellow-300 font-bold text-center">
-                        Waktu Akses: {displayTimeRange} WIB 
+                    <p className="text-xl md:text-2xl font-bold text-yellow-300 mb-2">
+                        Saat ini Pukul: {formattedCurrentTime} WIB
                     </p>
+                    <p className="mb-8 text-gray-400 font-bold text-center">
+                        Waktu Akses: {displayTimeRange} WIB
+                    </p>
+                    
                     {timeError && <p className="text-red-500 mt-2">{timeError}</p>}
+                    
                     <button
-                        // Tombol ini hanya untuk memicu pengecekan ulang atau memberikan pesan
-                        // Jika waktu sudah valid, useEffect di atas sudah mengubah fase ke 'intro'
-                        // Jika waktu tidak valid, tombol tetap non-aktif atau hanya refresh pesan
                         onClick={() => { handleTimeCheck(); }} 
-                        disabled={isTimeValid} // Jika waktu valid, tombol ini disabled
+                        disabled={isTimeValid} 
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
                         {isTimeValid ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
