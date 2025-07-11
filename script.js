@@ -75,8 +75,8 @@ const ActivationScreen = () => {
             <Starfield />
         
             <div className="z-10 text-center animate-fade-in bg-black/60 p-8 rounded-xl shadow-lg">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-yellow-300">Aktivasi E-book</h1>
-        <div className="flex flex-col items-center">
+               
+                 <div className="flex flex-col items-center">
                     <input
                         type="text"
                         value={activationKey}
@@ -86,6 +86,11 @@ const ActivationScreen = () => {
                         placeholder="KUNCI AKTIVASI"
                         disabled={isLoading}
                     />
+                            <button
+                        onClick={handleActivate}
+                        disabled={isLoading}
+                        className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    >
                 <p className="text-lg md:text-xl mb-4 text-gray-300">
                     Masukkan kunci aktivasi Anda untuk mengakses fitur penuh.
                 </p>
@@ -94,11 +99,7 @@ const ActivationScreen = () => {
                 </p>
                 
                     {message && <p className={`mt-4 text-center ${message.includes('Berhasil') ? 'text-green-400' : 'text-red-400'}`}>{message}</p>}
-                    <button
-                        onClick={handleActivate}
-                        disabled={isLoading}
-                        className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
-                    >
+                   
                         {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
                     </button>
                 </div>
