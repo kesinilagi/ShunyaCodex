@@ -11,7 +11,7 @@ const ActivationScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT KAMU DI SINI!
-    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhj7Up5yGqvQOqP-zJSdTEKifeMgYATAY75k4sJP3Jj-9XZLkxyMU3Ejmk2l32JSs9nQtSBWkpGLxDe0QxOqTg4RFbSK2YpFN82uwqlcsv3itladNCgdlmwhGoYgsumeoXlrhhWoXRHloUc5PJkcuLrJkcS7ghTwpWOfJZqt7XEoTww7tO2QdmvmliSonYMIxdgWcH_6Ic_V8i6f3Bbw8hflFqr1ZTw97KUWkf_X7wWBFKPqSwey1Zl86RbeRdFtZCVbbrxofU6XjqTN_Y0OVLZG8EWYA&lib=MXvw5GI5DTbn4hxD_Aeh3UQlYtS0PkaXW'; 
+    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiRzQdn-X-Tq08XOyPNGykN_Sw2BYHoT7bdg2h6JgQ6tLOrwIJTo_AKmBPaw4BJJwm1yA7WPTinXNNM6xsniLtHkIDut8EkUALI61GfdWwHlbVVOo68CzyZoCwfW2u3VwZ5JtlpdJqPpqXns3itm77U637TaUXkDVCGCJhY8Q6lq167PsrrCV2t5AP2D5_9ufwxV0mOkPnwC28RcYC71ZdZqGLb04tXB4x1VnhdcVNSo4kttNfUwTbUaIgM58hTSeNR6qoypK3qnr_9keGu0CrJEHnIHQ&lib=MXvw5GI5DTbn4hxD_Aeh3UQlYtS0PkaXW'; 
 
     const verifyKeyWithBackend = async (keyToVerify) => { 
         try {
