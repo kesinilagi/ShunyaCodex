@@ -2,29 +2,28 @@
 // KODE MASTER FINAL v13 - DISempurnakan DENGAN CONTEXT API & PERBAIKAN STRUKTUR
 // ===================================================================
 // --- KOMPONEN BARU: LAYAR AKTIVASI ---
+// --- KOMPONEN BARU: LAYAR AKTIVASI ---
 const ActivationScreen = () => {
-    const { setCurrentPageKey } = useContext(AppContext);
+    // Ambil setIsActivated dari context, bukan hanya setCurrentPageKey
+    const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
     const [activationKey, setActivationKey] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT KAMU DI SINI!
-    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyvtJwSHb0rJLX4p1PYHAS9RSdU2H2fBPdyJoYIZygCUz3NSvEuAhB9NefBjpHIbp5u/exec'; 
+    const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycxxxxxxxxxxxxxxxxxxx/exec'; 
 
-    // Fungsi untuk memverifikasi kunci dengan Google Apps Script
-    const verifyKeyWithBackend = async (keyToVerify) => {
+    const verifyKeyWithBackend = async (keyToVerify) => { 
         try {
-            // Mengirim request GET ke Apps Script API dengan kunci sebagai parameter query
             const response = await fetch(`${GOOGLE_APPS_SCRIPT_API_URL}?key=${encodeURIComponent(keyToVerify.trim())}`);
-            const data = await response.json(); // Mengubah response menjadi JSON
-            return data; // Mengembalikan seluruh objek data (termasuk success dan message)
+            const data = await response.json(); 
+            return data; 
         } catch (error) {
             console.error("Error verifying key with backend:", error);
             return { success: false, message: "Terjadi kesalahan koneksi. Mohon periksa koneksi internet Anda." };
         }
     };
 
-    // Fungsi yang dipanggil saat tombol "Aktivasi" diklik
     const handleActivate = async () => {
         if (!activationKey.trim()) {
             setMessage('Mohon masukkan kunci aktivasi.');
@@ -33,43 +32,45 @@ const ActivationScreen = () => {
 
         setIsLoading(true);
         setMessage('Memverifikasi kunci...');
-        console.log("Mengirim kunci untuk verifikasi:", activationKey);
-        // Verifikasi kunci ke Google Apps Script
+
         const result = await verifyKeyWithBackend(activationKey); 
 
         if (result.success) {
-            // Jika valid dari backend, simpan status aktivasi di localStorage
+            // Simpan di localStorage agar persisten antar sesi
             localStorage.setItem('ebookActivated', 'true'); 
-            localStorage.setItem('ebookActivationKey', activationKey.trim()); // Opsional: simpan kunci itu sendiri (untuk debugging/referensi)
+            localStorage.setItem('ebookActivationKey', activationKey.trim()); 
+            
+            // --- PERUBAHAN DI SINI ---
+            // Set state isActivated di Context (yang juga akan update state di App)
+            setIsActivated(true); 
             setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
+
+            // Navigasi setelah sedikit delay untuk pesan
             setTimeout(() => {
-                setCurrentPageKey('daftar-isi'); // Arahkan ke Daftar Isi atau halaman utama E-book
-            }, 1500);
+                setCurrentPageKey('daftar-isi'); // Arahkan ke Daftar Isi
+            }, 1500); 
+            // --- AKHIR PERUBAHAN ---
+
         } else {
-            // Jika tidak valid dari backend, tampilkan pesan error dari Apps Script
             setMessage(`Aktivasi Gagal: ${result.message}`);
         }
         setIsLoading(false);
     };
 
-    // Saat komponen dimuat, cek apakah E-book sudah aktif di perangkat ini
+    // Saat komponen dimuat, cek status aktivasi lokal terlebih dahulu
     useEffect(() => {
         const storedActivated = localStorage.getItem('ebookActivated') === 'true';
-        const storedKey = localStorage.getItem('ebookActivationKey'); // Ambil kunci yang tersimpan
-
-        // Jika sudah aktif di localStorage, langsung alihkan
-        if (storedActivated && storedKey) { // Bisa juga tambahkan cek storedKey jika perlu
-            setMessage('E-book sudah aktif di perangkat ini. Mengalihkan...');
-            setTimeout(() => {
-                setCurrentPageKey('daftar-isi'); // Alihkan setelah pesan singkat
-            }, 500);
+        // Tidak perlu cek storedKey di sini, cukup status aktif.
+        // Jika sudah aktif dari localStorage, App komponen yang akan mengalihkan.
+        if (storedActivated) {
+            // Ini akan muncul jika pengguna me-refresh saat sudah aktif
+            setMessage('E-book sudah aktif di perangkat ini.'); 
+            // Tidak perlu setTimeout dan setCurrentPageKey di sini, App yang mengurus routing
+            // berdasarkan isActivated state.
         }
-        // Opsional: Untuk keamanan lebih, bisa panggil verifyKeyWithBackend(storedKey) di sini
-        // Tapi ini akan membutuhkan koneksi internet dan memperlambat loading awal.
-        // Untuk offline-first, lebih baik percaya localStorage dan hanya memverifikasi saat input manual.
-    }, []); // Efek ini hanya berjalan sekali saat komponen mount
+    }, []);
 
-    // --- Render JSX untuk Layar Aktivasi ---
+
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
             <Starfield />
@@ -101,7 +102,7 @@ const ActivationScreen = () => {
                     </button>
                 </div>
             </div>
-            {/* Tombol kembali ke Daftar Isi (jika ada) */}
+            {/* Tombol kembali ke Daftar Isi (opsional, bisa dihapus jika akses hanya via aktivasi) */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
                 <button onClick={() => setCurrentPageKey('daftar-isi')} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
                     Kembali ke Daftar Isi
