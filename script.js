@@ -3177,7 +3177,7 @@ const ZoomingWordBackground = ({ customWords = [], rainColor }) => {
                 text: customWords[Math.floor(Math.random() * customWords.length)], // Mengambil kata acak dari input pengguna
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                fontSize: `${Math.random() * 16 + 12}px`, 
+                fontSize: `${Math.random() * 7 + 12}px`, 
                 animationDuration: `${Math.random() * 4 + 3}s`, // Durasi zoom 3-7 detik
                 animationDelay: `${Math.random() * 5}s`,
             }));
@@ -3620,7 +3620,7 @@ style.innerHTML = `
     /* Flash ke 0.9 selama 1 detik (1/7 dari 7 detik = ~14%) */
     /* Kita bisa buat lebih cepat flashnya */
     0.1% { /* Sangat cepat ke opacity tinggi */
-        opacity: 0.9; /* Kilat penuh yang kamu inginkan (tidak 100% agar tidak terlalu silau) */
+        opacity: 1; /* Kilat penuh yang kamu inginkan (tidak 100% agar tidak terlalu silau) */
     }
     1% { /* Kembali ke opasitas dasar dengan cepat */
         opacity: 0.1; /* Kembali ke opasitas dasar */
