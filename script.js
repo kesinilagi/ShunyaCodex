@@ -645,7 +645,7 @@ const AffirmationRoom = () => {
                 <img 
                     src={uploadedImage} 
                     alt="Gambar Afirmasi" 
-                    className={`custom-affirmation-image ${phase === 'raining' ? 'image-75vh-fade' : ''}`}
+                    className={`custom-affirmation-image ${phase === 'raining' ? 'image-50vh-fade' : ''}`}
                 />
             ) : (
                 // Starfield sebagai latar belakang default jika tidak ada gambar diunggah
