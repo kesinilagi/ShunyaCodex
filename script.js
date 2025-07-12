@@ -3586,24 +3586,57 @@ style.innerHTML = `
         opacity: 0;
     }
 }
+/* --- CSS UNTUK GAMBAR KUSTOM AFIRMASI (Tidak Full Screen, Dengan Flasher yang Jelas) --- */
+
 .custom-affirmation-image {
-    position: fixed;
+    position: fixed; 
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    min-width: 100%; /* Pastikan mengisi seluruh layar */
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: cover; /* Penting: agar gambar menutupi seluruh background */
-    z-index: 0; /* Pastikan di bawah konten utama dan zooming words */
-    opacity: 0.15; /* Transparansi agar kata-kata tetap terlihat */
-    transition: opacity 2s ease-in-out; 
+    transform: translate(-50%, -50%); 
+    
+    width: auto; 
+    height: auto; 
+    max-width: 90vw; 
+    max-height: 90vh; 
+    object-fit: contain; 
+    
+    z-index: 0; 
+    opacity: 0.4; /* Opasitas default di fase input (sesuaikan jika ingin lebih/kurang terlihat) */
+    
+    /* Pastikan transisi ini halus saat beralih dari fase input ke raining */
+    transition: all 1s ease-in-out; 
 }
 
+/* Gaya untuk gambar saat di fase 'raining' (dengan zoom, fade, dan flasher) */
 .custom-affirmation-image.image-zoom-fade {
-    opacity: 0.05; /* Saat raining, bisa lebih transparan dan zoom sedikit */
-    transform: translate(-50%, -50%) scale(1.05); /* Zoom perlahan */
+    /* Properti dasar untuk fase raining */
+    transform: translate(-50%, -50%) scale(0.95); /* Sedikit zoom out */
+    opacity: 0.1; /* Opasitas dasar saat raining, akan di-override oleh animasi */
+    
+    /* Animasi kilatan (flasher) */
+    /* Pastikan ini adalah animasi flasher yang kamu inginkan */
+    animation: imageFlash 7s infinite linear; /* Nama animasi, durasi 7 detik, looping tak terbatas, linear */
+
+    /* Transisi untuk perubahan awal saat masuk ke fase raining. Opacity akan segera dikontrol oleh animasi. */
+    transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
+}
+
+/* --- DEFINISI KEYFRAMES UNTUK EFEK KILATAN GAMBAR --- */
+@keyframes imageFlash {
+    0% {
+        opacity: 0.1; /* Mulai dari opasitas dasar yang rendah (sesuai base di image-zoom-fade) */
+    }
+    /* Flash ke 0.9 selama 1 detik (1/7 dari 7 detik = ~14%) */
+    /* Kita bisa buat lebih cepat flashnya */
+    0.1% { /* Sangat cepat ke opacity tinggi */
+        opacity: 0.9; /* Kilat penuh yang kamu inginkan (tidak 100% agar tidak terlalu silau) */
+    }
+    1% { /* Kembali ke opasitas dasar dengan cepat */
+        opacity: 0.1; /* Kembali ke opasitas dasar */
+    }
+    100% {
+        opacity: 0.1; /* Tetap di opasitas dasar selama sisa siklus (sampai 7 detik) */
+    }
 }
     /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
     .thought-bubble {
