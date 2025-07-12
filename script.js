@@ -89,10 +89,11 @@ const ActivationScreen = () => {
                             <button
                         onClick={handleActivate}
                         disabled={isLoading}
+                        {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
                             </button>
-                             {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
+                             
                 <p className="text-lg md:text-xl mb-4 text-gray-300">
                     Masukkan kunci aktivasi Anda untuk mengakses fitur penuh.
                 </p>
@@ -102,8 +103,6 @@ const ActivationScreen = () => {
                 
                     {message && <p className={`mt-4 text-center ${message.includes('Berhasil') ? 'text-green-400' : 'text-red-400'}`}>{message}</p>}
                    
-                       
-                    
                 </div>
             </div>
                     </div>
