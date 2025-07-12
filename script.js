@@ -356,9 +356,9 @@ const DaftarIsi = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     
     // Style tombol yang lama kita pindah ke sini
-    const tocSectionClasses = "block w-full text-left font-bold text-lg text-black-700 p-2 rounded-lg hover:bg-black-100 transition-colors";
-    const tocChapterClasses = "block w-full text-left text-gray-700 p-2 pl-4 rounded-lg hover:bg-sky-100 transition-colors";
-    const tocFeatureClasses = "block w-full text-left font-bold text-xl p-2 rounded-lg hover:bg-yellow-100 transition-colors";
+    const tocSectionClasses = "block w-full text-left font-bold text-base text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors"; // Judul Bagian: sedikit kecil dari default
+const tocChapterClasses = "block w-full text-left text-gray-700 text-sm p-2 pl-4 rounded-lg hover:bg-sky-100 transition-colors"; // Judul Bab: lebih kecil
+const tocFeatureClasses = "block w-full text-left font-bold text-lg p-2 rounded-lg hover:bg-yellow-100 transition-colors"; // Fitur Khusus: sedang, tidak terlalu besar
 
     return (
         // div pembungkusnya sekarang kita pindah ke ChapterWrapper
