@@ -356,9 +356,9 @@ const DaftarIsi = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     
     // Style tombol yang lama kita pindah ke sini
-    const tocSectionClasses = "block w-full text-left font-bold text-base text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors"; // Judul Bagian: sedikit kecil dari default
-const tocChapterClasses = "block w-full text-left text-gray-700 text-sm p-2 pl-4 rounded-lg hover:bg-sky-100 transition-colors"; // Judul Bab: lebih kecil
-const tocFeatureClasses = "block w-full text-left font-bold text-lg p-2 rounded-lg hover:bg-yellow-100 transition-colors"; // Fitur Khusus: sedang, tidak terlalu besar
+    const tocSectionClasses = "block w-full text-left font-bold text-lg text-black-700 p-2 rounded-lg hover:bg-black-100 transition-colors";
+    const tocChapterClasses = "block w-full text-left text-gray-700 p-2 pl-4 rounded-lg hover:bg-sky-100 transition-colors";
+    const tocFeatureClasses = "block w-full text-left font-bold text-xl p-2 rounded-lg hover:bg-yellow-100 transition-colors";
 
     return (
         // div pembungkusnya sekarang kita pindah ke ChapterWrapper
@@ -645,7 +645,7 @@ const AffirmationRoom = () => {
                 <img 
                     src={uploadedImage} 
                     alt="Gambar Afirmasi" 
-                    className={`custom-affirmation-image ${phase === 'raining' ? 'image-50vh-fade' : ''}`}
+                    className={`custom-affirmation-image ${phase === 'raining' ? 'image-zoom-fade' : ''}`}
                 />
             ) : (
                 // Starfield sebagai latar belakang default jika tidak ada gambar diunggah
@@ -3393,50 +3393,35 @@ const App = () => {
     const [themeKey, setThemeKey] = useState('blue');
     const fontSizes = [ '14px','16px','18px','20px', '22px', '24px','26px', '28px', '30px','32px', '34px', '36px'];
     const [fontSizeIndex, setFontSizeIndex] = useState(1);
-    const [currentPageKey, setCurrentPageKey] = useState('home'); // Default awal bisa 'home'
+    const [currentPageKey, setCurrentPageKey] = useState('home'); // Default ke 'home' atau halaman pertama setelah aktivasi
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80); 
     const [isDoaLooping, setIsDoaLooping] = useState(false); 
 
     // --- State Kunci untuk Fitur Aktivasi ---
+    // Baca status aktivasi dari localStorage saat inisialisasi App
     const [isActivated, setIsActivated] = useState(() => {
         const storedActivation = localStorage.getItem('ebookActivated') === 'true';
         console.log("App startup: isActivated from localStorage =", storedActivation);
         return storedActivation;
     });
 
-    // --- NEW: Efek untuk mengelola routing awal berdasarkan isActivated ---
     useEffect(() => {
-        if (isActivated) {
-            // Jika sudah aktif, atur halaman default ke 'kata-pengantar'
-            // ini akan terjadi setelah CoverScreen terbuka
-            if (currentPageKey === 'home') { // Hanya ubah jika currentPageKey masih default 'home'
-                setCurrentPageKey('kata-pengantar');
-                console.log("[App] User activated, redirecting to 'kata-pengantar'.");
-            }
-        } else {
-            // Jika belum aktif, pastikan selalu diarahkan ke ActivationScreen
-            // Ini mungkin tidak perlu jika routing di bawah sudah handles, tapi untuk robustness
-            if (currentPageKey !== 'activation-screen') {
-                 // Tidak perlu redirect di sini, routing di JSX return sudah handles
-                console.log("[App] User not activated. Waiting for ActivationScreen to be rendered.");
-            }
-        }
-    }, [isActivated, currentPageKey]); // Terpicu saat isActivated atau currentPageKey berubah
-
-    useEffect(() => {
+        // Ambil nilai transparansi yang tersimpan
         const savedOpacity = localStorage.getItem('ebookBgOpacity');
         if (savedOpacity) {
             setBgOpacity(Number(savedOpacity));
         }
     }, []);
 
+    // --- EFEK UNTUK MENGUBAH CSS VARIABEL ---
     useEffect(() => {
         localStorage.setItem('ebookBgOpacity', bgOpacity);
         document.documentElement.style.setProperty('--content-bg-opacity', bgOpacity / 100);
     }, [bgOpacity]);
         
+    // --- Efek untuk PWA Install Prompt ---
     useEffect(() => {
         const handleBeforeInstallPrompt = (event) => {
             event.preventDefault();
@@ -3451,6 +3436,7 @@ const App = () => {
         };
     }, []);
 
+    // --- Efek untuk Memuat Tema Tersimpan ---
     useEffect(() => {
         const savedTheme = localStorage.getItem('ebookThemeKey');
         if (savedTheme && themes[savedTheme]) {
@@ -3458,14 +3444,19 @@ const App = () => {
         }
     }, []);
 
+    // --- Efek untuk Mengatur Ukuran Font Dinamis ---
     useEffect(() => {
         document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
     }, [fontSizeIndex]);
 
+    // --- Efek untuk Scroll ke Atas Saat Halaman Berubah ---
+    // Ini juga akan membantu memicu re-render jika currentPageKey berubah
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
 
+    // --- Efek untuk memantau perubahan localStorage untuk isActivated ---
+    // Ini PENTING agar App bereaksi ketika ActivationScreen mengubah 'ebookActivated'
     useEffect(() => {
         const handleStorageChange = () => {
             const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
@@ -3476,19 +3467,19 @@ const App = () => {
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
-    }, [isActivated]); 
+    }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
 
     // Context Value - isActivated dan setIsActivated sekarang disertakan!
     const contextValue = {
         themes, themeKey, setThemeKey,
         fontSizes, fontSizeIndex, setFontSizeIndex,
-        currentPageKey, setCurrentPageKey, 
+        currentPageKey, setCurrentPageKey, // currentPageKey ini yang akan dikontrol oleh App
         isCoverUnlocked, setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
         isMenuOpen, setIsMenuOpen,
         bgOpacity, setBgOpacity,
         isDoaLooping, setIsDoaLooping,
-        isActivated, setIsActivated 
+        isActivated, setIsActivated // <-- TAMBAHKAN INI KE CONTEXT!
     };
     
     return (
@@ -3496,14 +3487,14 @@ const App = () => {
             <Starfield /> 
             {
                 !isCoverUnlocked ? <CoverScreen /> 
-                // Logika routing utama:
-                : !isActivated ? <ActivationScreen /> // PRIORITAS TERTINGGI: Jika belum aktif, TAMPILKAN LAYAR AKTIVASI
-                // Jika sudah aktif, maka routing berdasarkan currentPageKey
+                // Logika routing berdasarkan isActivated dan currentPageKey
+                // Jika belum aktif, selalu tampilkan ActivationScreen
+                : !isActivated ? <ActivationScreen /> 
+                // Jika sudah aktif, baru routing normal berdasarkan currentPageKey
                 : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
                 : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
                 : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                : currentPageKey === 'activation-screen' ? <ActivationScreen /> // Ini untuk kasus ketika user sudah aktif tapi coba akses ActivationScreen lagi dari menu
-                : <MainLayout /> // Default: jika sudah aktif dan tidak ada halaman spesifik, render MainLayout
+                : <MainLayout /> // MainLayout adalah default jika tidak ada halaman spesifik
             }
         </AppContext.Provider>
     );
