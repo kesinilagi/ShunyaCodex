@@ -89,9 +89,9 @@ const ActivationScreen = () => {
                             <button
                         onClick={handleActivate}
                         disabled={isLoading}
-                        {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
-                    >
+                    > 
+                            {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
                             </button>
                              
                 <p className="text-lg md:text-xl mb-4 text-gray-300">
