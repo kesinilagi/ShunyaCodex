@@ -420,7 +420,7 @@ const DaftarIsi = () => {
                             
                                               </ul>
                     </li>
-              
+              <li><button onClick={() => setCurrentPageKey('bab16')} className={tocSectionClasses}>Bab Tambahan: 369 Tesla × 369 Law of Allah</button></li>
                     <li className="pt-4"><button onClick={() => setCurrentPageKey('pixel-thoughts')} className={`${tocFeatureClasses} golden-background text-yellow-600`}>Ruang Pelepasan (Lepaskan Beban)</button></li>
     <li className="pt-2"><button onClick={()=>setCurrentPageKey('affirmation-room')} className={`${tocFeatureClasses} golden-background text-sky-500`}>Ruang Afirmasi / Manifestasi</button></li>
     <li className="pt-2"><button onClick={() => setCurrentPageKey('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}>Ruang Rahasia </button></li>
@@ -2758,6 +2758,203 @@ const Bab15 = () => (
         </p>
     </div>
 );
+
+// --- KOMPONEN BARU: BAB 16 (369 Tesla x 369 Law of Allah) ---
+
+const Bab16 = () => { // <--- PERUBAHAN: Jadikan fungsi biasa untuk pakai hooks
+    const { setCurrentPageKey } = useContext(AppContext); // <--- TAMBAHKAN BARIS INI!
+
+    return (
+        <div className={`${contentContainerClasses}`}>
+            <h2 className={`${sectionTitleClasses}`}>Bab 16. 369 Tesla × 369 Law of Allah</h2>
+            <p className={`${paragraphClasses}`}>
+                Di abad ke-19, seorang penemu bernama Nikola Tesla berdiri di lorong gelap antara sains, mimpi, dan getaran.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Tesla dikenal gila — atau jenius — karena idenya sering terlalu cepat mendahului zamannya.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Di balik penemuannya tentang listrik, gelombang radio, motor induksi, Tesla sering berbisik:</p>
+              <p className={`${paragraphClasses}`}>
+                <span className={highlightTextClasses,quoteClasses}>“Jika kau paham keagungan angka 3, 6, dan 9, kau akan memegang kunci alam semesta.”</span>
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Orang-orang modern menafsirkan kalimat Tesla dengan beragam cara.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Sebagian bilang Tesla sedang bicara pola alam: <span className={highlightTextClasses}>segitiga (3), heksagon sarang lebah (6), spiral energi (9).</span>
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Sebagian lain menjadikannya teknik manifestasi — lahirlah 369 Tesla Method.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Metodenya sederhana:
+            </p>
+            <ul className="list-disc list-inside mb-4 pl-4">
+                <li className={`${paragraphClasses} !mb-0`}>➡️ Tulis keinginan 3 kali di pagi hari,</li>
+                <li className={`${paragraphClasses} !mb-0`}>➡️ Tegaskan niat 6 kali di siang hari,</li>
+                <li className={`${paragraphClasses} !mb-0`}>➡️ Ulang afirmasi 9 kali di malam hari.</li>
+            </ul>
+            <p className={`${paragraphClasses}`}>
+                Intinya: pikiran adalah magnet. Jika kau ulang-ulang niatmu, kau fokus, kau getarkan, alam semesta menyesuaikan frekuensimu.
+            </p>
+
+            <h3 className={`${subHeadingClasses}`}>☀369 Tesla di Era Modern</h3>
+            <p className={`${paragraphClasses}`}>
+                Di era Law of Attraction (LOA), banyak praktisi menggabungkan 369 Tesla dengan script writing, journaling, visual board, hingga energy ritual.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Ribuan orang di TikTok, Youtube, forum spiritual — mempraktikkan ini.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Bagi sebagian orang, berhasil: dapat jodoh, dapat klien, dapat kerjaan.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Bagi sebagian lain, gagal, lalu kecewa, lalu berhenti.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Kenapa? Karena 369 Tesla hanyalah alat. Ia hanya membantu pikiran sadar → bawah sadar → tindakan → realita. Tanpa niat yang benar, amal yang nyata, dan flow ridho — angka tetap angka.
+            </p>
+
+            <h3 className={`${subHeadingClasses}`}>369 Tidak Berhenti di Tesla</h3>
+            <p className={`${paragraphClasses}`}>
+                Di sinilah 369 Law of Allah lahir — bukan untuk menolak Tesla, tetapi menyempurnakan.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                369 Law of Allah menjemput orang-orang yang sering kehabisan tenaga affirmasi, lalu lupa Siapa Pemilik Getaran.
+            </p>
+            <p className={`${paragraphClasses}`}>
+                Menjemput orang-orang yang menulis ribuan niat, tapi tak pernah merawat wadah yang menampung rezekinya.
+            </p>
+
+            <h3 className={`${subHeadingClasses}`}>369 Law of Allah — Sandi Pengingat Diri</h3>
+            <p className={`${paragraphClasses}`}>
+                369 Law of Allah mengembalikan angka ke dalam syahadat, doa, dan penjagaan hawa nafsu.
+            </p>
+
+            <h4 className="text-xl font-bold text-gray-800 mb-2 mt-4">➊ 3 — mengingatkan bahwa:</h4>
+            {/* Mengoreksi penggunaan <br> dan memusatkan teks */}
+            <div className="triangle-container">
+                <div className="triangle-shape"></div> {/* Bentuk segitiga */}
+                <div className="triangle-text">
+                    <p className={`${paragraphClasses} !mb-0`}>1. Tiada Tuhan selain Allah,</p>
+                    <p className={`${paragraphClasses} !mb-0`}>2. Muhammad adalah Rasulullah, dan</p>
+                    <p className={`${paragraphClasses} !mb-0`}>3. kita hanya saksi /hamba/umat — bukan pemilik semesta.</p>
+                </div>
+            </div>
+            <p className={`${paragraphClasses}`}>
+                Di sinilah niat diluruskan. Tidak memaksa realita, tapi mengetuk pintu langit.
+            </p>
+
+            <h4 className="text-xl font-bold text-gray-800 mb-2 mt-4">➋ 6 — memohon enam jalur rezeki:</h4>
+            <ul className="list-disc list-inside mb-4 pl-4">
+                <li className={`${paragraphClasses} !mb-0`}>Dari langit turunkan.</li>
+                <li className={`${paragraphClasses} !mb-0`}>Dari bumi keluarkan.</li>
+                <li className={`${paragraphClasses} !mb-0`}>Yang jauh didekatkan.</li>
+                <li className={`${paragraphClasses} !mb-0`}>Yang sempit dilapangkan.</li>
+                <li className={`${paragraphClasses} !mb-0`}>Yang sedikit dilipatgandakan.</li>
+                <li className={`${paragraphClasses} !mb-0`}>Yang banyak diberkahi.</li>
+            </ul>
+            <p className={`${paragraphClasses}`}>
+                Ini bukan sekadar afirmasi. Ini doa yang hidup, selaras dengan ayat:
+        </p>
+                <p className={`${paragraphClasses}`}>
+              <span className={quoteClasses}>“Dan di langit ada rezekimu dan apa yang dijanjikan kepadamu.” (QS. Adz-Dzariyat: 22)</span>
+            </p>
+
+            <h4 className="text-xl font-bold text-gray-800 mb-2 mt-4">➌ 9 — menjaga sembilan lubang hawa nafsu, agar wadah rezeki tetap bersih, tidak bocor, tidak cemar.</h4>
+
+            <h3 className={`${subHeadingClasses}`}> 9 Lubang Hawa Nafsu — Sumber Bocor Rezeki</h3>
+            <ul className="list-decimal list-inside mb-4 space-y-3 pl-4">
+                <li>
+                    <p className={`${paragraphClasses}`}>
+                        <span className={highlightTextClasses}>Mata:</span> Pandangan adalah panah pertama syetan. Sekali tatap salah, benih nafsu tumbuh, rasa iri mekar, dan tenang hati pecah. Pandangan yang dijaga, pintu berkah tetap terbuka.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Telinga:</span> Kadang kita tak sengaja mendengar ghibah, fitnah, kabar buruk, atau musik yang melemahkan dzikir. Telinga yang kotor, sulit menangkap panggilan rezeki yang jernih. Telinga yang bersih, hati jadi peka.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Lisan:</span> Lidah tajam, lidah manis, lidah racun. Ghibah, fitnah, debat sia-sia, caci maki — semua menutup pintu rezeki. Lisan yang dijaga, ridho Allah mendekat.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Perut:</span> Apa yang masuk ke perut, membentuk energi dan keberkahan. Makanan haram, syubhat, atau berlebihan, mematikan cahaya hati. Perut yang bersih, hati ringan ibadah.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Tangan:</span> Tangan bisa mengambil yang bukan hak. Bisa menahan nafkah yang seharusnya mengalir. Tangan yang gemar memberi, menarik rezeki baru.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Kaki:</span> Kemana kaki melangkah? Tempat baik, majelis ilmu, masjid — atau tempat maksiat, hiburan sia-sia? Kaki yang lurus, rezeki lurus.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Hati:</span> Sarang iri, dengki, sombong, riya. Hati kotor, rezeki enggan singgah. Hati bersih, pintu langit terbuka.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Pikiran:</span> Husnudzon atau suudzon? Licik atau lurus? Pikiran gelap melahirkan langkah gelap. Pikiran jernih, rezeki lapang.
+                    </p>
+                </li>
+                <li>
+                    <p className={`${paragraphClasses} !mb-0`}>
+                        <span className={highlightTextClasses}>Kemaluan:</span> Zina nyata, zina batin, zina pandang — menghancurkan kehormatan, menghijab rezeki. Menjaga kemaluan, memperkuat benteng rezeki.
+                    </p>
+                </li>
+            </ul>
+
+            {/* --- KOTAK RANGKUMAN HIJAU DI SINI --- */}
+            <div className="summary-green-box">
+                <p>
+                    369 Tesla mengajari manusia fokus.
+                </p>
+                <p>
+                    369 Law of Allah mengajari manusia berserah & merawat.
+                </p>
+                <p>
+                    369 Tesla tidak salah. Ia hanya alat untuk mendekatkan niat.
+                </p>
+                <p>
+                    Tapi 369 Law of Allah hadir untuk menyempurnakan — agar niat tetap terhubung dengan Ridho-Nya, agar rezeki tidak hanya ditarik, tetapi juga ditampung dengan bersih, agar semua yang ditulis, diulang, dan diminta, benar-benar sampai dengan izin Allah.
+                </p>
+                <p>
+                    Karena pada akhirnya, pikiran hanyalah magnet kecil — tapi Ridho Allah adalah penguasa semesta.
+                </p>
+                          </div>
+            {/* --- AKHIR KOTAK RANGKUMAN HIJAU --- */}
+{/* --- PREMIS BARU SEBELUM TOMBOL DOA --- */}
+        <p className={`${paragraphClasses} text-center italic text-gray-700 mt-8`}>
+            Di bawah ini telah kita rangkaikan Doa dengan konsep <span className={highlightTextClasses}>369 Law Of Allah</span>.
+        </p>
+        <p className={`${paragraphClasses} text-center italic text-gray-700 mb-6`}>
+            Doa tanpa memaksa tapi ini seni merayu Allah, dengan Syafaat Rasulullah.
+        </p>
+        {/* --- AKHIR PREMIS BARU --- */}
+            {/* --- TOMBOL MENUJU DOA LOA CODEX --- */}
+            <div className="text-center mt-10">
+                <button
+                    onClick={() => setCurrentPageKey('doa-loa-codex')} 
+                    className="bg-yellow-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-yellow-700 transition-all duration-300 transform hover:scale-105"
+                >
+                    Mulai Doa 369 LoA Codex ✨
+                </button>
+            </div>
+            {/* --- AKHIR TOMBOL --- */}
+
+        </div>
+    );
+};
+
 const DoaHarianPlaylist = () => {
   // Kita buat daftar doa dan link audionya di sini
   const doaHarianData = [
@@ -2798,6 +2995,388 @@ const DoaHarianPlaylist = () => {
     </div>
   );
 };  
+// --- KOMPONEN BARU: DOA LOA CODEX (GAMBAR DAN TOMBOL FIXED) ---
+// Data untuk Doa LoA Codex Categories (PASTE INI DI LUAR KOMPONEN JIKA BANYAK KOMPONEN MEMBUTUHKANNYA, ATAU BIARKAN DI DALAM SEPERTI INI)
+const loaCodexDoaCategories = [
+    {
+        id: 'placeholder', 
+        name: "Pilih Kategori Doa...",
+        audioUrl: "",
+        imageUrl: "" 
+    },
+    {
+        id: 'rezeki',
+        name: "Rezeki",
+        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Rejeki.mp3",
+        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
+    },
+    {
+        id: 'jodoh',
+        name: "Jodoh",
+        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Jodoh.mp3",
+        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
+    },
+    {
+        id: 'promil',
+        name: "Promil",
+        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Promil.mp3",
+        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
+    },
+    {
+        id: 'hutang',
+        name: "Hutang",
+        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Hutang.mp3",
+        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
+    },
+    {
+        id: 'kesembuhan',
+        name: "Kesembuhan",
+        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/loa sembuh.mp3",
+        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
+    }
+];
+
+// URL Gambar Latar Belakang Default untuk Doa LoA Codex
+const DEFAULT_DOA_BACKGROUND_IMAGE = "https://raw.githubusercontent.com/kesinilagi/asetgambar/main/doabg.jpg"; 
+
+// Teks premis niat dan instruksi
+const premisNiatText = `
+    Niat Ya Allah,
+    Aku mohon izin-Mu,
+    untuk membersihkan 9 pintu hawa nafsu ini.
+    Agar wadah rezeki ini Engkau sucikan,
+    Engkau ridhoi,
+    dan Engkau cukupkan.
+
+    TARIK NAFAS & SADAR TUBUH
+    
+    📍 Pejamkan mata.
+    📍 Tarik nafas dalam ➝ lewat hidung ➝ buang perlahan lewat mulut.
+    📍 Ulangi 3–7 kali.
+    📍 Rasakan aliran nafas dari ujung kaki ke ubun-ubun.
+    📍 Rasakan semua beban mengalir keluar lewat hembusan.
+    
+    📍 Jika sudah siap silahkan pilih tujuan anda.
+`;
+
+// URL Musik Latar untuk Doa LoA Codex
+const DOA_LOA_CODEX_AMBIENT_MUSIC = "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lyra.mp3"; // Ganti URL musik latar pilihanmu
+
+const DoaLoaCodex = () => {
+    const { setCurrentPageKey } = useContext(AppContext);
+    const [currentDoaPhase, setCurrentDoaPhase] = useState('premis'); 
+    const [selectedDoa, setSelectedDoa] = useState(null); 
+    const audioPlayerRef = useRef(null); // Elemen audio HTML untuk doa utama
+    const ambientAudioRef = useRef(null); // Elemen audio HTML untuk musik latar (ambient)
+    const [isPlaying, setIsPlaying] = useState(false); 
+
+    // --- STATES UNTUK WEB AUDIO API ---
+    const audioContextRef = useRef(null);
+    const pannerNodeRef = useRef(null);
+    const sourceNodeRef = useRef(null); // MediaElementSourceNode dari audio utama
+    const gainNodeRef = useRef(null); // Untuk mengontrol volume Web Audio API
+
+    // Inisialisasi AudioContext dan PannerNode saat komponen dimuat
+    useEffect(() => {
+        console.log("[DoaLoaCodex Init] Initializing AudioContext and PannerNode.");
+        if (!audioContextRef.current) {
+            try {
+                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+                
+                pannerNodeRef.current = audioContextRef.current.createPanner();
+                pannerNodeRef.current.panningModel = 'HRTF'; // Human Resources Transfer Function, untuk efek 3D
+                pannerNodeRef.current.distanceModel = 'linear'; // Model jarak, bisa 'inverse', 'linear', 'exponential'
+                pannerNodeRef.current.refDistance = 1; // Referensi jarak
+                pannerNodeRef.current.maxDistance = 1000; // Jarak maksimum suara bisa terdengar
+                pannerNodeRef.current.rolloffFactor = 1; // Seberapa cepat volume menurun seiring jarak
+                
+                gainNodeRef.current = audioContextRef.current.createGain(); // Untuk kontrol volume utama Web Audio API
+                gainNodeRef.current.gain.value = 1; // Volume default (max)
+
+                // Hubungkan panner ke gain, lalu gain ke destination
+                pannerNodeRef.current.connect(gainNodeRef.current);
+                gainNodeRef.current.connect(audioContextRef.current.destination);
+
+                console.log("[DoaLoaCodex Init] AudioContext and PannerNode created successfully.");
+            } catch (e) {
+                console.error("[DoaLoaCodex Init] Failed to create AudioContext or PannerNode:", e);
+            }
+        }
+
+        // Cleanup AudioContext saat komponen unmount
+        return () => {
+            if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+                audioContextRef.current.close().then(() => {
+                    console.log("[DoaLoaCodex Init] AudioContext closed on unmount.");
+                });
+            }
+        };
+    }, []); // Array dependensi kosong, hanya berjalan sekali saat mount
+
+
+    // Efek untuk memutar audio utama DENGAN PANNING
+    useEffect(() => {
+        const mainAudio = audioPlayerRef.current; // Elemen audio HTML
+        const ambientAudio = ambientAudioRef.current; // Elemen audio HTML untuk musik latar
+        const audioContext = audioContextRef.current;
+        const pannerNode = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
+
+        let panIntervalId; // Untuk menyimpan ID interval panning
+
+        console.log(`[DoaLoaCodex Play Effect] Current Phase: ${currentDoaPhase}, Selected Doa: ${selectedDoa ? selectedDoa.name : 'None'}`);
+
+        // --- Logika Hentikan Audio & Suspend Context jika tidak di fase 'playing' ---
+        if (!mainAudio || !audioContext || !pannerNode || !selectedDoa || currentDoaPhase !== 'playing') {
+            if (mainAudio) { mainAudio.pause(); mainAudio.currentTime = 0; }
+            if (ambientAudio) { ambientAudio.pause(); ambientAudio.currentTime = 0; }
+            if (audioContext && audioContext.state === 'running') {
+                audioContext.suspend().then(() => console.log("[DoaLoaCodex Play Effect] AudioContext suspended."));
+            }
+            setIsPlaying(false);
+            clearInterval(panIntervalId); // Pastikan interval panning juga berhenti
+            if (sourceNodeRef.current) { // Pastikan sourceNode lama didisconnect
+                sourceNodeRef.current.disconnect();
+                sourceNodeRef.current = null;
+            }
+            return;
+        }
+
+        // --- Lanjutkan AudioContext jika suspended (penting untuk memulai play) ---
+        if (audioContext.state === 'suspended') {
+            audioContext.resume().then(() => console.log("[DoaLoaCodex Play Effect] AudioContext resumed."));
+        }
+
+        // Hentikan semua audio lain di halaman kecuali elemen audio kita yang akan dikontrol oleh Web Audio API
+        document.querySelectorAll('audio').forEach(otherAudio => {
+            if (otherAudio !== mainAudio && otherAudio !== ambientAudio) { 
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+            }
+        });
+
+        // Setel sumber audio elemen HTML
+        mainAudio.src = selectedDoa.audioUrl;
+        mainAudio.load(); // Picu pemuatan audio HTML
+
+        // Buat MediaElementSourceNode baru atau gunakan yang sudah ada, lalu hubungkan
+        if (!sourceNodeRef.current || sourceNodeRef.current.mediaElement !== mainAudio) {
+            if (sourceNodeRef.current) { // Disconnect yang lama jika ada
+                sourceNodeRef.current.disconnect();
+            }
+            sourceNodeRef.current = audioContext.createMediaElementSource(mainAudio);
+            sourceNodeRef.current.connect(pannerNode); // Hubungkan ke PannerNode
+            console.log("[DoaLoaCodex Play Effect] MediaElementSourceNode created and connected to PannerNode.");
+        }
+        
+        // Putar audio utama (elemen audio HTML)
+        mainAudio.play() 
+            .then(() => {
+                setIsPlaying(true);
+                console.log(`[DoaLoaCodex Play Effect] Started playing: ${selectedDoa.name}`);
+
+                // --- Logika Panning ---
+                let panPosition = 0; 
+                const panSpeed = 0.05; // Kecepatan pergerakan panning (sesuaikan)
+                const panRange = 5; // Jarak maksimal panning dari tengah (-5 ke +5), sesuaikan
+
+                // Setel posisi awal panner
+                pannerNode.positionX.value = 0;
+                pannerNode.positionY.value = 0;
+                pannerNode.positionZ.value = 0;
+                
+                panIntervalId = setInterval(() => {
+                    // Pergerakan X (kiri-kanan) dari -panRange ke +panRange
+                    const x = panRange * Math.sin(panPosition); 
+                    // Pergerakan Z (depan-belakang) dari 0 (tengah) ke -panRange/2 (mundur)
+                    const z = -panRange / 2 * Math.cos(panPosition); // Contoh: setengah dari rentang X
+
+                    pannerNode.positionX.value = x;
+                    pannerNode.positionY.value = 0; // Tetap di tengah vertikal
+                    pannerNode.positionZ.value = z;
+                    
+                    panPosition += panSpeed; 
+                    // console.log(`[DoaLoaCodex Panning] X: ${x.toFixed(2)}, Z: ${z.toFixed(2)}`); // Debug posisi
+                }, 100); // Update posisi setiap 100ms
+
+
+                // --- Logika Musik Latar (Ambient) ---
+                if (ambientAudio) {
+                    ambientAudio.src = DOA_LOA_CODEX_AMBIENT_MUSIC;
+                    ambientAudio.loop = true;
+                    ambientAudio.volume = 0.7; // <--- VOLUME AMBIENT SANGAT KECIL (5%)
+                    ambientAudio.play().catch(e => console.error("[DoaLoaCodex Play Effect] Error playing ambient audio:", e));
+                    console.log("[DoaLoaCodex Play Effect] Started playing ambient music.");
+                }
+
+            })
+            .catch(e => { // Catch block untuk mainAudio.play()
+                console.error("[DoaLoaCodex Play Effect] Main Audio Playback Failed:", e);
+                setIsPlaying(false); 
+                alert("Gagal memutar audio utama. Periksa izin autoplay atau koneksi.");
+                setCurrentDoaPhase('premis'); 
+            });
+
+        // Event listeners untuk audio utama
+        const handleMainAudioPlay = () => setIsPlaying(true);
+        const handleMainAudioPause = () => setIsPlaying(false);
+        const handleMainAudioEnded = () => {
+            console.log("[DoaLoaCodex Play Effect] Main audio ended.");
+            setIsPlaying(false); 
+            setCurrentDoaPhase('premis'); 
+        };
+
+        mainAudio.addEventListener('play', handleMainAudioPlay);
+        mainAudio.addEventListener('pause', handleMainAudioPause);
+        mainAudio.addEventListener('ended', handleMainAudioEnded);
+
+        // Cleanup function untuk useEffect ini
+        return () => {
+            console.log("[DoaLoaCodex Play Effect] Cleaning up...");
+            clearInterval(panIntervalId); // Hentikan interval panning
+            if (mainAudio) { mainAudio.pause(); mainAudio.currentTime = 0; } // Hentikan audio HTML element
+            if (ambientAudio) { ambientAudio.pause(); ambientAudio.currentTime = 0; } // Hentikan ambient audio
+            if (audioContext && audioContext.state === 'running') {
+                audioContext.suspend().then(() => console.log("[DoaLoaCodex Play Effect] AudioContext suspended on cleanup."));
+            }
+            if (sourceNodeRef.current) { // Pastikan sourceNode lama didisconnect
+                sourceNodeRef.current.disconnect();
+                sourceNodeRef.current = null; // Reset sourceNodeRef
+            }
+        };
+    }, [selectedDoa, currentDoaPhase, audioContextRef, pannerNodeRef, gainNodeRef, loaCodexDoaCategories]); // Tambahkan semua dependencies yang relevan
+
+
+    const handleDoaCategorySelect = (event) => {
+        const selectedId = event.target.value;
+        if (selectedId === 'placeholder') { 
+            setSelectedDoa(null);
+            return;
+        }
+        const category = loaCodexDoaCategories.find(cat => cat.id === selectedId);
+        if (category) {
+            setSelectedDoa(category);
+            setCurrentDoaPhase('playing'); 
+        }
+    };
+
+    const renderPremisPopup = () => (
+        <div className="popup-animate-in"> 
+            <h1 className="text-xl md:text-2xl font-bold mb-4 text-yellow-300">
+                Persiapan Doa LoA Codex
+            </h1>
+            <div className="doa-text-container bg-black/0 max-h-[45vh] overflow-y-auto mb-6"> 
+                <p className="text-base md:text-lg leading-snug text-justify whitespace-pre-line text-gray-200"> 
+                    {premisNiatText}
+                </p>
+            </div>
+
+            <h3 className="text-base md:text-lg font-bold text-gray-100 mb-4">Pilih Tujuan Doa Anda:</h3> 
+            <div className="relative w-full"> 
+                <select 
+                    onChange={handleDoaCategorySelect} 
+                    value={selectedDoa ? selectedDoa.id : 'placeholder'} 
+                    className="block w-full bg-gray-700 border border-gray-600 text-white py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-gray-600 focus:border-blue-500 appearance-none text-base" 
+                >
+                    {loaCodexDoaCategories.map((category) => (
+                        <option 
+                            key={category.id} 
+                            value={category.id}
+                            disabled={category.id === 'placeholder'} 
+                        >
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+    );
+
+    // Fungsi untuk merender tampilan saat audio sedang diputar (KINI HANYA BACKGROUND + TOMBOL SUDUT)
+    // KONTEN TEKS DAN IKON DI TENGAH DIHAPUS SEPENUHNYA DARI SINI
+    const renderPlayingPhase = () => (
+        // Wrapper utama yang akan menjadi Latar Belakang Penuh Layar untuk fase playing
+        <div className="fixed inset-0 flex flex-col justify-center items-center p-4 overflow-hidden">
+            {/* Gambar Dinamis untuk Fase Playing (ini latar belakang utama) */}
+            {selectedDoa && selectedDoa.imageUrl && (
+                <img 
+                    src={selectedDoa.imageUrl} 
+                    alt={selectedDoa.name} 
+                    className="playing-phase-dynamic-image" 
+                    onLoad={() => console.log(`[DoaLoaCodex] Image loaded: ${selectedDoa.imageUrl}`)}
+                    onError={(e) => console.error(`[DoaLoaCodex] Image failed to load: ${selectedDoa.imageUrl}`, e)}
+                />
+            )}
+            {/* CATATAN: Judul, Icon, Pesan "Doa sedang dibacakan..." DIHAPUS SEPENUHNYA DARI SINI */}
+        </div>
+    );
+
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
+            {/* Elemen audio utama (doa) */}
+            <audio ref={audioPlayerRef} preload="auto" crossOrigin="anonymous"></audio> {/* crossOrigin penting untuk Web Audio API */}
+            {/* Elemen audio latar belakang (ambient) */}
+            <audio id="ambient-music-player" ref={ambientAudioRef} preload="auto" loop crossOrigin="anonymous"></audio> {/* Ref baru dan looping, crossOrigin */}
+
+            {/* Tombol "Kembali ke Bab 16" di pojok kiri atas */}
+            <div className="absolute top-4 left-4 z-50"> 
+                <button
+                    onClick={() => {
+                        if (audioPlayerRef.current) { audioPlayerRef.current.pause(); audioPlayerRef.current.currentTime = 0; } 
+                        if (ambientAudioRef.current) { ambientAudioRef.current.pause(); ambientAudioRef.current.currentTime = 0; } // Hentikan juga ambient
+                        setCurrentPageKey('bab16'); 
+                    }}
+                    className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors text-white"
+                >
+                    ← Kembali ke Bab 16
+                </button>
+            </div>
+            
+            {/* Tombol "Kembali ke Persiapan" di pojok kanan atas - hanya tampil saat playing */}
+            {currentDoaPhase === 'playing' && (
+                <div className="absolute top-4 right-4 z-50"> 
+                    <button
+                        onClick={() => {
+                            if (audioPlayerRef.current) { audioPlayerRef.current.pause(); audioPlayerRef.current.currentTime = 0; }
+                            if (ambientAudioRef.current) { ambientAudioRef.current.pause(); ambientAudioRef.current.currentTime = 0; } // Hentikan juga ambient
+                            setCurrentDoaPhase('premis'); 
+                        }}
+                        className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors text-white"
+                    >
+                        ← Kembali ke Persiapan
+                    </button>
+                </div>
+            )}
+
+            {/* Gambar Latar Belakang Utama Doa LoA Codex (ini background seluruh halaman saat premis) */}
+            {currentDoaPhase === 'premis' && ( 
+                <img 
+                    src={DEFAULT_DOA_BACKGROUND_IMAGE} 
+                    alt="Latar Belakang Doa" 
+                    className="doa-background-image" 
+                />
+            )}
+            
+            {/* Gambar Dinamis untuk Fase Playing (ini akan jadi latar belakang utama saat playing) */}
+            {currentDoaPhase === 'playing' && selectedDoa && selectedDoa.imageUrl && (
+                <img 
+                    src={selectedDoa.imageUrl} 
+                    alt={selectedDoa.name} 
+                    className="playing-phase-dynamic-image" 
+                    onLoad={() => console.log(`[DoaLoaCodex] Image loaded: ${selectedDoa.imageUrl}`)}
+                    onError={(e) => console.error(`[DoaLoaCodex] Image failed to load: ${selectedDoa.imageUrl}`, e)}
+                />
+            )}
+
+            {/* Konten Utama berdasarkan Fase Doa (Pop-up Premis atau renderPlayingPhase) */}
+            {currentDoaPhase === 'premis' && renderPremisPopup()}
+            {currentDoaPhase === 'playing' && renderPlayingPhase()} {/* Render playingPhase div utamanya */}
+        </div>
+    );
+};
 
 const DoaPilihan = () => {
     const { isDoaLooping, setIsDoaLooping } = useContext(AppContext);
@@ -2992,7 +3571,7 @@ const MainLayout = () => {
         const nextIndex = pageIndex + direction;
         if (nextIndex >= 0 && nextIndex < pages.length) {
             const nextPageKey = pages[nextIndex];
-            if (nextPageKey !== 'pixel-thoughts' && nextPageKey !== 'affirmation-room' && nextPageKey !== 'secret-room-rezeki' && nextPageKey !== 'pengaturan' && nextPageKey !== 'kata-pengantar' && nextPageKey !== 'activation-screen' && nextPageKey !== 'doa-harian' && nextPageKey !== 'doapilihan' && nextPageKey !== 'reminder-settings') { 
+            if (nextPageKey !== 'pixel-thoughts' && nextPageKey !== 'affirmation-room' && nextPageKey !== 'secret-room-rezeki' && nextPageKey !== 'pengaturan' && nextPageKey !== 'kata-pengantar' && nextPageKey !== 'activation-screen' && nextPageKey !== 'doa-harian' && nextPageKey !== 'doapilihan' && nextPageKey !== 'reminder-settings'&& nextPageKey !== 'doa-loa-codex') { 
                 setCurrentPageKey(nextPageKey);
             }
         }
@@ -3030,6 +3609,8 @@ const MainLayout = () => {
             case 'bab14a': return <Bab14a />;
             case 'bab14b': return <Bab14b />;
             case 'bab15': return <Bab15 />;
+            case 'bab16': return <Bab16 />;
+            case 'doa-loa-codex': return <DoaLoaCodex />;
             case 'doapilihan': return <DoaPilihan />;
             case 'pengaturan': return <ThemeSettings />;
             case 'doa-harian': return <DoaHarianPlaylist />;
@@ -3093,7 +3674,7 @@ const MainLayout = () => {
                                 <span className="w-8 text-center font-semibold">{parseInt(fontSizes[fontSizeIndex])}</span>
                                 <button onClick={() => changeFontSize(1)} disabled={fontSizeIndex >= fontSizes.length - 1} className="px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20">A+</button>
                             </div>
-                            <button onClick={() => goToPage(1)} disabled={pageIndex >= pages.findIndex(p => p === 'doapilihan')} className="px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20">Berikutnya ›</button>
+                            <button onClick={() => goToPage(1)} disabled={pageIndex >= pages.findIndex(p => p === 'bab16')} className="px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20">Berikutnya ›</button>
                         </div>
                         <div className="mt-3">
                             <RandomQuote />
@@ -3177,7 +3758,7 @@ const ZoomingWordBackground = ({ customWords = [], rainColor }) => {
                 text: customWords[Math.floor(Math.random() * customWords.length)], // Mengambil kata acak dari input pengguna
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                fontSize: `${Math.random() * 7 + 12}px`, 
+                fontSize: `${Math.random() * 16 + 12}px`, 
                 animationDuration: `${Math.random() * 4 + 3}s`, // Durasi zoom 3-7 detik
                 animationDelay: `${Math.random() * 5}s`,
             }));
@@ -3301,6 +3882,7 @@ const SidebarMenu = () => {
                             <li><button onClick={() => handleNavigate('bab15')} className={tocChapterClasses}> 15. Merangkai Semua: Dari Kesadaran Menuju Kehidupan Berkah</button></li>
                         </ul>
                     </li>
+              <li><button onClick={() => handleNavigate('bab16')} className={tocSectionClasses}>Bab Tambahan: 369 Tesla × 369 Law of Allah</button></li>
                 <li className="pt-4"><button onClick={() => handleNavigate('pixel-thoughts')} className={`${tocFeatureClasses} golden-background text-yellow-600`}>Ruang Pelepasan</button></li>
     <li className="pt-2"><button onClick={()=> handleNavigate('affirmation-room')} className={`${tocFeatureClasses} golden-background text-sky-500`}> Ruang Afirmasi</button></li>
     <li className="pt-2"><button onClick={() => handleNavigate('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}> Ruang Rahasia Menarik Rezeki</button></li>
@@ -3371,7 +3953,7 @@ const [isExiting, setIsExiting] = useState(false);
 };
 
 // Daftar halaman untuk navigasi
-const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15','affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan','doa-harian','secret-room-rezeki','activation-screen','reminder-settings' ];
+  const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15','bab16','affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan','doa-harian','secret-room-rezeki','activation-screen','reminder-settings','doa-loa-codex' ];
 
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
@@ -3620,7 +4202,7 @@ style.innerHTML = `
     /* Flash ke 0.9 selama 1 detik (1/7 dari 7 detik = ~14%) */
     /* Kita bisa buat lebih cepat flashnya */
     0.1% { /* Sangat cepat ke opacity tinggi */
-        opacity: 1; /* Kilat penuh yang kamu inginkan (tidak 100% agar tidak terlalu silau) */
+        opacity: 0.9; /* Kilat penuh yang kamu inginkan (tidak 100% agar tidak terlalu silau) */
     }
     1% { /* Kembali ke opasitas dasar dengan cepat */
         opacity: 0.1; /* Kembali ke opasitas dasar */
@@ -3897,5 +4479,140 @@ style.innerHTML = `
     box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
     transform: scale(1.02);
 }
+/* --- CSS untuk Kotak Rangkuman Hijau di Bab 16 --- */
+.summary-green-box {
+    background-color: #34d399; /* Hijau Zamrud */
+    color: #ffffff; /* Teks putih */
+    padding: 1.5rem; /* Padding di dalam kotak */
+    border-radius: 1.5rem; /* Sudut membulat (rounded-3xl) */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bayangan */
+    margin-top: 2.5rem; /* Margin atas agar terpisah dari teks sebelumnya */
+    margin-bottom: 2.5rem; /* Margin bawah */
+    font-weight: bold; /* Teks tebal */
+    text-align: center; /* Teks di tengah */
+    line-height: 1.75; /* Spasi baris agar mudah dibaca */
+}
+.triangle-container {
+    position: relative;
+    width: 100%; /* Wadah agar segitiga bisa responsif */
+    height: 200px; /* Tinggi wadah untuk segitiga, sesuaikan jika perlu */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+.triangle-shape {
+    width: 0;
+    height: 0;
+    border-left: 300px solid transparent; /* Setengah lebar segitiga */
+    border-right: 300px solid transparent; /* Setengah lebar segitiga */
+    border-bottom: 200px solid #FFD700; /* Warna dan tinggi segitiga */
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%); /* Pusatkan segitiga */
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); /* Sedikit bayangan */
+}
+
+.triangle-text {
+    position: absolute;
+    /* Sesuaikan posisi teks agar pas di tengah-tengah bentuk segitiga */
+    top: calc(50% + 20px); /* Geser sedikit ke bawah dari tengah wadah */
+    left: 50%;
+    transform: translate(-50%, -50%); /* Memusatkan teks di dalam wadah */
+    
+    width: 80%; /* Batasi lebar teks agar tidak keluar dari segitiga */
+    color: #4B3B00; /* Warna teks gelap agar kontras dengan emas */
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.4; /* Spasi baris */
+    font-size: 0.9rem; /* Ukuran font, sesuaikan agar pas */
+    z-index: 1; /* Pastikan teks di atas segitiga */
+}
+
+.triangle-text p {
+    margin-bottom: 0.2rem; /* Spasi antar baris paragraf dalam segitiga */
+}
+
+
+/* --- CSS untuk Doa LoA Codex (Gambar Latar Belakang & Teks Scrollable) --- */
+.doa-background-image {
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    
+    min-width: 100vw; 
+    min-height: 100vh; 
+    width: auto;
+    height: auto;
+    object-fit: cover; 
+    
+    z-index: 0; 
+    opacity: 0.2; 
+    transition: opacity 0.5s ease-in-out; 
+}
+
+/* --- CSS untuk Gambar Dinamis Per Doa di Fase 'playing' --- */
+.playing-phase-dynamic-image {
+    position: fixed; /* Gambar ini akan mengisi seluruh viewport */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Pusatkan */
+    
+    width: 100vw; 
+    height: 100vh; 
+    object-fit: contain; /* Gambar akan utuh di dalam, dengan bar hitam jika rasio tidak pas */
+    background-color: black; /* Latar belakang hitam untuk bar yang tidak terisi gambar */
+    
+    z-index: 0; /* KOREKSI: Ini sekarang di lapisan PALING BELAKANG (di bawah semuanya) */
+    opacity: 1; /* Gambar terlihat penuh, tidak transparan */
+    transition: opacity 0.5s ease-in-out; 
+}
+
+/* --- CSS untuk Kotak Konten (Judul, Icon, Pesan) di Fase Playing --- */
+/* KOREKSI: KELAS INI SEKARANG DIHAPUS DARI JSX, TIDAK ADA LAGI KOTAK DI TENGAH */
+/* Karena kamu ingin LATAR BELAKANG GAMBAR CLEAN dan tidak ada overlay */
+/* Jika kamu ingin KONTEN (teks/icon) tampil di tengah, tapi tanpa kotak background,
+   maka kita perlu mengatur positioning mereka secara terpisah di atas gambar */
+/* Untuk saat ini, saya akan SEMBUNYIKAN KELAS INI (display: none)
+   karena JSX untuk renderPlayingPhase sudah saya modifikasi untuk tidak merendernya. */
+.playing-phase-content-overlay {
+    display: none; /* KOREKSI: Sembunyikan sepenuhnya */
+}
+
+
+/* --- CSS untuk Pop-up Premis (Sederhana & Elegan Seperti Reminder) --- */
+.popup-animate-in {
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1); 
+    z-index: 60; 
+    
+    width: 90%; 
+    max-width: 400px; 
+    
+    background-color: #3f3f46; 
+    color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    text-align: center; 
+
+    animation: fadeInScaleUp 0.5s ease-out forwards; 
+}
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9); 
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
 `;
 document.head.appendChild(style);
