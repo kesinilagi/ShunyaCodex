@@ -543,54 +543,40 @@ const AffirmationRoom = () => {
     const audioRef = useRef(null);
     const [isAudioReady, setIsAudioReady] = useState(false);
     
-    // State untuk gambar yang diunggah pengguna (opsional)
+    // uploadedImage dan fileInputRef tetap ada untuk upload manual di Ruang Afirmasi
     const [uploadedImage, setUploadedImage] = useState(null); 
     const fileInputRef = useRef(null); 
 
     const fixedRainColor = '#E6D2B3'; 
 
+    // NEW: State untuk menyimpan daftar Goal dari ReminderSettings
+    // Sekarang hanya akan menyimpan array of strings
+    const [savedGoals, setSavedGoals] = useState([]);
+
+    // NEW: Load saved goals from localStorage when component mounts
     useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
+        setSavedGoals(storedGoals); // Ini akan berupa array of strings
+    }, []);
 
-        const handleAudioEnd = () => setPhase('finished');
-        // Menggunakan 'canplay' agar tombol "Mulai" lebih cepat aktif
-        const handleAudioCanPlay = () => setIsAudioReady(true); 
-        
-        audio.addEventListener('canplay', handleAudioCanPlay); // Diubah dari 'canplaythrough' ke 'canplay'
-        audio.addEventListener('ended', handleAudioEnd);
+    // ... (useEffect untuk audio dan cleanup uploadedImage tidak berubah) ...
 
-        return () => {
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-                audio.removeEventListener('canplay', handleAudioCanPlay); // Hapus listener yang sesuai
-                audio.removeEventListener('ended', handleAudioEnd);
-            }
-            if (uploadedImage) {
-                URL.revokeObjectURL(uploadedImage);
-            }
-        };
-    }, [uploadedImage]); // uploadedImage dependency untuk cleanup URL saja, tidak untuk trigger load audio lagi
-
-    // Fungsi handleStart yang dimodifikasi
     const handleStart = (bypassAudio = false) => { 
         const words = affirmationText.trim().split(/\s+/).filter(Boolean);
         if (words.length === 0) { setError('Mohon masukkan afirmasi Anda.'); return; }
         if (words.length > 15) { setError('Terlalu panjang! Maksimal 15 kata.'); return; }
-        
-        // Hapus validasi !uploadedImage di sini
-        // if (!uploadedImage) { setError('Mohon unggah gambar terlebih dahulu.'); return; } // INI DIHAPUS
-
-        // Jika tidak bypass audio dan audio belum siap, tampilkan error
-        if (!bypassAudio && !isAudioReady) {
-            setError('Audio belum siap dimuat. Mohon tunggu atau gunakan opsi "Lanjutkan Tanpa Audio".');
-            return;
-        }
 
         setError('');
         setPhase('raining'); 
         
+        // Hentikan semua audio lain sebelum memulai afirmasi
+        document.querySelectorAll('audio').forEach(otherAudio => {
+            if (audioRef.current && otherAudio !== audioRef.current) {
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+            }
+        });
+
         if (!bypassAudio && audioRef.current) { 
             audioRef.current.currentTime = 0;
             audioRef.current.play().catch(e => {
@@ -625,22 +611,43 @@ const AffirmationRoom = () => {
                 setUploadedImage(null);
                 return;
             }
+            // Batasan ukuran file (misal 5MB) di sini lebih fleksibel karena tidak disimpan di localStorage
+            if (file.size > 5 * 1024 * 1024) { 
+                setError('Ukuran gambar terlalu besar! Maksimal 5 MB.');
+                setUploadedImage(null);
+                return;
+            }
+
             if (uploadedImage) {
                 URL.revokeObjectURL(uploadedImage);
             }
-            setUploadedImage(URL.createObjectURL(file));
+            setUploadedImage(URL.createObjectURL(file)); // Simpan sebagai Object URL sementara
             setError(''); 
-            // Tidak perlu load audio lagi di sini, audio akan load otomatis saat elemen audio pertama dirender
-            // atau saat sesi dimulai. Kita hanya perlu status isAudioReady yang benar.
         }
     };
 
+    // NEW: Fungsi untuk memuat Goal dari Bucket List (hanya teks)
+    const handleLoadFromGoal = (event) => {
+        const selectedIndex = event.target.value;
+        if (selectedIndex === "") {
+            setAffirmationText(''); // Reset teks jika memilih placeholder
+            setUploadedImage(null); // Pastikan gambar direset
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+        const selectedGoalText = savedGoals[parseInt(selectedIndex)]; // Ambil teksnya saja
+        if (selectedGoalText) {
+            setAffirmationText(selectedGoalText);
+            setUploadedImage(null); // Penting: reset gambar sebelumnya jika ada
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            setError('');
+        }
+    };
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
             <audio ref={audioRef} src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
             
-            {/* Latar belakang gambar kustom yang diunggah, jika ada */}
             {uploadedImage ? (
                 <img 
                     src={uploadedImage} 
@@ -648,14 +655,10 @@ const AffirmationRoom = () => {
                     className={`custom-affirmation-image ${phase === 'raining' ? 'image-zoom-fade' : ''}`}
                 />
             ) : (
-                // Starfield sebagai latar belakang default jika tidak ada gambar diunggah
                 <Starfield /> 
             )}
 
-            {/* Zooming Words Effect */}
             {phase === 'raining' && <ZoomingWordBackground customWords={affirmationText.trim().split(/\s+/).filter(Boolean)} rainColor={fixedRainColor} />}
-            
-            {/* Affirmation Flasher */}
             {phase === 'raining' && <AffirmationFlasher phrase={affirmationText} rainColor={fixedRainColor}/>}
             
             {phase === 'raining' && (
@@ -674,6 +677,24 @@ const AffirmationRoom = () => {
                         <h1 className="text-3xl md:text-5xl font-bold mb-4">Ruang Afirmasi Visual</h1>
                         <p className="mb-6 text-gray-300">Tuliskan doa atau afirmasi positif Anda (maks. 15 kata).</p>
                         
+                        {/* Dropdown untuk memilih dari Bucket List Goal */}
+                        {savedGoals.length > 0 && (
+                            <div className="mb-6">
+                                <label htmlFor="select-goal" className="block text-gray-300 text-lg font-semibold mb-2">Atau Pilih dari Goal Anda:</label>
+                                <select 
+                                    id="select-goal"
+                                    onChange={handleLoadFromGoal}
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white mb-4"
+                                    value="" 
+                                >
+                                    <option value="" disabled>Pilih Goal yang Tersimpan...</option>
+                                    {savedGoals.map((goalText, index) => (
+                                        <option key={index} value={index}>{goalText}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
                         {/* Input File untuk Unggah Gambar (Opsional) */}
                         <div className="mb-6">
                             <label htmlFor="image-upload" className="block text-gray-300 text-lg font-semibold mb-2">Pilih Gambar Afirmasi Anda (Opsional):</label>
@@ -707,13 +728,11 @@ const AffirmationRoom = () => {
                         </p>
                         {error && <p className="text-red-500 mt-2">{error}</p>}
                         
-                        {/* Tombol utama: Hanya disabled jika teks kosong */}
                         <button onClick={() => handleStart(false)} disabled={!affirmationText.trim()} 
                             className="mt-8 w-full max-w-sm bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-sky-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
                             {isAudioReady ? 'Mulai Sesi Afirmasi' : 'Memuat Audio...'}
                         </button>
                         
-                        {/* Tombol Bypass: Muncul jika teks sudah ada, audio belum siap, dan bukan dalam fase raining */}
                         {!isAudioReady && affirmationText.trim() && (
                             <button onClick={() => handleStart(true)} 
                                 className="mt-4 w-full max-w-sm bg-gray-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300">
@@ -1187,15 +1206,21 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
             return; // Hentikan fungsi di sini
         }
 
-        // --- JURUS SAPU BERSIH ---
-        // Sebelum memutar, cari semua elemen audio di halaman dan hentikan.
+        // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO ---
         document.querySelectorAll('audio').forEach(otherAudio => {
-            // Kita pastikan tidak menghentikan diri sendiri jika tidak perlu
-            if (otherAudio !== thisAudio) {
+            // Hentikan elemen audio HTML
+            if (otherAudio !== thisAudio) { // Pastikan tidak menghentikan diri sendiri
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
             }
         });
+
+        // Hentikan juga Web Audio API instances yang mungkin aktif dari InlineAudioIcon
+        // Ini adalah pendekatan yang lebih agresif, tapi efektif untuk memastikan semua audio berhenti.
+        // Idealnya, jika AudioContext dibagi secara global, manajemennya lebih mudah.
+        // Tapi jika tidak, kita bisa mencoba reset panner/gain nodes.
+        // Karena `InlineAudioIcon` sudah punya mekanisme reset di `handlePause`,
+        // cukup dengan memanggil `pause()` pada elemen audionya, event `pause` akan ter-trigger.
 
         // Setelah semua bersih, baru putar audio yang ini.
         thisAudio.play().catch(err => console.error("Audio Error:", err));
@@ -1223,26 +1248,25 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
     }, [src, isLooping]);
 
     return (
-        // Tombolnya sekarang menjadi flex container untuk menampung ikon dan teks
         <div onClick={togglePlay} className="flex items-center justify-center gap-4 my-4 p-4 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
              <audio ref={audioRef} src={src} preload="auto" className="hidden"></audio>
-             
+            
              {/* Ikon yang berubah */}
              <div className="text-white">
                 {isPlaying ? (
                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 animate-pulse text-sky-400" viewBox="0 0 20 20" fill="currentColor">
                        <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
-                    </svg>
+                     </svg>
                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                    </svg>
+                     </svg>
                  )}
              </div>
 
              {/* Teks dinamis yang berubah */}
              <p className={`text-center text-3s font-serif text-white`}>
-                {text}
+                 {text}
              </p>
         </div>
     );
@@ -1250,45 +1274,200 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
 
 
 // ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
+// ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
 const InlineAudioIcon = ({ src, isLooping = false }) => {
     const audioRef = React.useRef(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
 
-    // Fungsi 'Sapu Bersih' dan pemutaran audio
+    // --- Referensi untuk Web Audio API ---
+    const audioContextRef = React.useRef(null);
+    const pannerNodeRef = React.useRef(null);
+    const sourceNodeRef = React.useRef(null);
+    const gainNodeRef = React.useRef(null);
+
+    // Fungsi untuk inisialisasi AudioContext, PannerNode, dan GainNode
+    const initAudioNodes = () => {
+        if (!audioContextRef.current) {
+            try {
+                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+
+                pannerNodeRef.current = audioContextRef.current.createPanner();
+                pannerNodeRef.current.panningModel = 'HRTF';
+                pannerNodeRef.current.distanceModel = 'linear';
+                pannerNodeRef.current.refDistance = 1;
+                pannerNodeRef.current.maxDistance = 1000;
+                pannerNodeRef.current.rolloffFactor = 1;
+
+                gainNodeRef.current = audioContextRef.current.createGain();
+                gainNodeRef.current.gain.value = 1;
+
+                pannerNodeRef.current.connect(gainNodeRef.current);
+                gainNodeRef.current.connect(audioContextRef.current.destination);
+
+                console.log("AudioContext, PannerNode, and GainNode initialized.");
+            } catch (e) {
+                console.error("Failed to create AudioContext or Web Audio nodes:", e);
+                audioContextRef.current = null;
+                pannerNodeRef.current = null;
+                gainNodeRef.current = null;
+            }
+        }
+    };
+
+    React.useEffect(() => {
+        initAudioNodes();
+    }, []);
+
     const togglePlay = (e) => {
-        e.stopPropagation(); // Mencegah klik menyebar ke elemen lain
+        e.stopPropagation();
         if (!audioRef.current) return;
 
         const thisAudio = audioRef.current;
 
-        // Jika audio ini sedang berputar, hentikan saja.
+        // Cek apakah audio ini sedang berputar
         if (isPlaying) {
             thisAudio.pause();
             thisAudio.currentTime = 0;
             setIsPlaying(false);
+            if (panIntervalIdRef.current) {
+                clearInterval(panIntervalIdRef.current);
+                panIntervalIdRef.current = null;
+                if (pannerNodeRef.current && gainNodeRef.current) {
+                    pannerNodeRef.current.positionX.value = 0;
+                    pannerNodeRef.current.positionY.value = 0;
+                    pannerNodeRef.current.positionZ.value = 0;
+                    gainNodeRef.current.gain.value = 1;
+                }
+            }
+            return; // Hentikan fungsi di sini
+        }
+
+        // --- JURUS SAPU BERSIH GLOBAL ---
+        // 1. Hentikan semua elemen <audio> HTML
+        document.querySelectorAll('audio').forEach(otherAudio => {
+            if (otherAudio !== thisAudio) { // Pastikan tidak menghentikan diri sendiri
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+                // Opsional: Jika ada state isPlaying di komponen lain, Anda mungkin perlu cara untuk meresetnya
+                // Tapi untuk elemen audio HTML biasa, pause dan reset time sudah cukup.
+            }
+        });
+
+        // 2. Jika ada instance Web Audio API dari komponen InlineAudioIcon lain yang sedang aktif, hentikan.
+        // Ini agak tricky karena kita tidak punya referensi langsung ke instance lain.
+        // Cara yang lebih robust adalah dengan menggunakan Context API atau event global,
+        // tapi untuk sementara, kita bisa berasumsi bahwa hanya satu InlineAudioIcon yang akan aktif.
+        // Jika Anda memiliki banyak InlineAudioIcon yang bisa diputar bersamaan,
+        // kita perlu desain yang lebih canggih (misal, Context global untuk player aktif).
+        // Untuk saat ini, kita hanya akan fokus menghentikan *interval panning* yang mungkin aktif
+        // dan mereset pannerNode untuk instance lain jika ada. (Ini sudah tercakup di cleanup effect)
+
+        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+            audioContextRef.current.resume().then(() => {
+                console.log("AudioContext resumed.");
+            }).catch(e => console.error("Error resuming AudioContext:", e));
+        }
+
+        if (audioContextRef.current && pannerNodeRef.current && gainNodeRef.current) {
+            // Jika sourceNode sudah ada tapi dari elemen audio yang berbeda, disconnect dulu
+            if (sourceNodeRef.current && sourceNodeRef.current.mediaElement !== thisAudio) {
+                sourceNodeRef.current.disconnect();
+                sourceNodeRef.current = null;
+            }
+            // Buat atau gunakan MediaElementSourceNode yang sesuai
+            if (!sourceNodeRef.current) {
+                sourceNodeRef.current = audioContextRef.current.createMediaElementSource(thisAudio);
+                sourceNodeRef.current.connect(pannerNodeRef.current);
+                console.log("MediaElementSourceNode created and connected.");
+            }
+        } else {
+            console.warn("Web Audio API not available or failed to initialize, playing directly.");
+            thisAudio.play().catch(err => console.error("Audio Playback Error:", err));
+            setIsPlaying(true);
             return;
         }
 
-        // --- JURUS SAPU BERSIH ---
-        // Sebelum memutar, cari semua audio di halaman dan hentikan.
-        document.querySelectorAll('audio').forEach(otherAudio => {
-            otherAudio.pause();
-            otherAudio.currentTime = 0;
-        });
+        thisAudio.loop = isLooping; 
 
-        // Setelah semua bersih, baru putar audio yang ini.
-        thisAudio.play().catch(err => console.error("Audio Error:", err));
+        thisAudio.play().then(() => {
+            setIsPlaying(true);
+            startPanning();
+        }).catch(err => console.error("Audio Playback Error:", err));
     };
 
-    // Efek untuk memantau status audio dari luar
+    const panIntervalIdRef = React.useRef(null);
+
+    const startPanning = () => {
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
+        if (!panner || !gainNode) return;
+
+        let time = 0;
+        const cycleDuration = 10000;
+        const maxZDistance = 15;
+        const maxYDistance = 5;
+        const minVolume = 0.1;
+        const maxVolume = 1.0;
+
+        if (panIntervalIdRef.current) {
+            clearInterval(panIntervalIdRef.current);
+        }
+
+        panIntervalIdRef.current = setInterval(() => {
+            const normalizedTime = (time % cycleDuration) / cycleDuration;
+            
+            const z = -maxZDistance * Math.cos(2 * Math.PI * normalizedTime); 
+            panner.positionZ.value = z;
+
+            const y = maxYDistance * Math.sin(2 * Math.PI * normalizedTime);
+            panner.positionY.value = y;
+            
+            panner.positionX.value = 0; 
+
+            const volumeRange = maxVolume - minVolume;
+            const calculatedVolume = minVolume + ((z + maxZDistance) / (2 * maxZDistance)) * volumeRange;
+            gainNode.gain.value = calculatedVolume;
+
+            time += 50;
+        }, 50);
+    };
+
     React.useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
         
         audio.loop = isLooping;
+
         const handlePlay = () => setIsPlaying(true);
-        const handlePause = () => setIsPlaying(false);
-        const handleEnded = () => { if(!isLooping) setIsPlaying(false); };
+        const handlePause = () => {
+            setIsPlaying(false);
+            if (panIntervalIdRef.current) {
+                clearInterval(panIntervalIdRef.current);
+                panIntervalIdRef.current = null;
+                // Reset panner position and volume when paused manually or by other audio
+                if (pannerNodeRef.current && gainNodeRef.current) {
+                    pannerNodeRef.current.positionX.value = 0;
+                    pannerNodeRef.current.positionY.value = 0;
+                    pannerNodeRef.current.positionZ.value = 0;
+                    gainNodeRef.current.gain.value = 1;
+                }
+            }
+        };
+        const handleEnded = () => { 
+            if(!isLooping) {
+                setIsPlaying(false);
+                if (panIntervalIdRef.current) {
+                    clearInterval(panIntervalIdRef.current);
+                    panIntervalIdRef.current = null;
+                    if (pannerNodeRef.current && gainNodeRef.current) {
+                        pannerNodeRef.current.positionX.value = 0;
+                        pannerNodeRef.current.positionY.value = 0;
+                        pannerNodeRef.current.positionZ.value = 0;
+                        gainNodeRef.current.gain.value = 1;
+                    }
+                }
+            }
+        };
         
         audio.addEventListener('play', handlePlay);
         audio.addEventListener('pause', handlePause);
@@ -1298,26 +1477,43 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             audio.removeEventListener('play', handlePlay);
             audio.removeEventListener('pause', handlePause);
             audio.removeEventListener('ended', handleEnded);
+            
+            // Cleanup on unmount
+            if (panIntervalIdRef.current) {
+                clearInterval(panIntervalIdRef.current);
+            }
+            if (sourceNodeRef.current) {
+                sourceNodeRef.current.disconnect();
+                // sourceNodeRef.current = null; // Don't nullify here, it might be reused
+            }
+            // Disconnect from panner, but don't close context or disconnect panner/gain as they might be shared
+            // This is the tricky part: if we have multiple InlineAudioIcon instances, they *might* share
+            // the same AudioContext and panner/gain. However, for a simple "one-at-a-time" audio,
+            // the current cleanup for `audioRef.current.pause()` and `clearInterval(panIntervalIdRef.current)`
+            // in `handlePause` and `handleEnded` should suffice.
+            // Closing AudioContext in individual components might cause issues if other components use it.
+            // The main App component should manage the AudioContext lifecycle if it's truly global.
+            // For now, let's keep it per-component and rely on the pause/stop logic.
         };
     }, [src, isLooping]);
 
     return (
         <button onClick={togglePlay} className="inline-flex items-center gap-2 ml-3 text-gray-500 hover:text-blue-600 transition-colors" title={isPlaying ? "Hentikan Audio" : "Putar Audio"}>
-             <audio ref={audioRef} src={src} preload="auto" className="hidden"></audio>
-             
-             {isPlaying ? (
-                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+            <audio ref={audioRef} src={src} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
+            
+            {isPlaying ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse text-blue-500" viewBox="0 0 20 20" fill="currentColor">
                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
                 </svg>
-             ) : (
+            ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                 </svg>
-             )}
+            )}
 
-             <span className="text-xs font-semibold">
+            <span className="text-xs font-semibold">
                 {isPlaying ? 'Sedang Mendengar...' : 'Dengarkan'}
-             </span>
+            </span>
         </button>
     );
 };
@@ -3223,7 +3419,7 @@ const DoaLoaCodex = () => {
         const handleMainAudioEnded = () => {
             console.log("[DoaLoaCodex Play Effect] Main audio ended.");
             setIsPlaying(false); 
-            setCurrentDoaPhase('premis'); 
+            setCurrentDoaPhase('finished'); 
         };
 
         mainAudio.addEventListener('play', handleMainAudioPlay);
@@ -3313,7 +3509,38 @@ const DoaLoaCodex = () => {
             {/* CATATAN: Judul, Icon, Pesan "Doa sedang dibacakan..." DIHAPUS SEPENUHNYA DARI SINI */}
         </div>
     );
-
+// --- FUNGSI BARU UNTUK RENDER FASE AKHIR ---
+    const renderFinishedPhase = () => (
+        <div className="popup-animate-in">
+            <h1 className="text-xl md:text-2xl font-bold mb-4 text-yellow-300">
+                Sesi Doa Selesai!
+            </h1>
+            <p className="text-base md:text-lg leading-snug text-center text-gray-200 mb-6">
+                Anda sudah selesai dengan Doa "{selectedDoa ? selectedDoa.name : 'ini'}" kali ini.
+                <br/>Anda sudah menyerahkan kepada Allah segalanya.
+                <br/>Senantiasa jaga **9 lubang hawa nafsu**.
+                <br/>Sedekah minimal **1000 rupiah tiap hari**.
+                <br/>Yakin, **kuasa Allah itu nyata!**
+            </p>
+            <div className="flex flex-col gap-4">
+                <button
+                    onClick={() => {
+                        setSelectedDoa(null); // Reset pilihan doa
+                        setCurrentDoaPhase('premis'); // Kembali ke persiapan
+                    }}
+                    className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-green-700 transition-all duration-300"
+                >
+                    Ulangi Doa LoA Codex
+                </button>
+                <button
+                    onClick={() => setCurrentPageKey('daftar-isi')}
+                    className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300"
+                >
+                    Kembali ke Daftar Isi
+                </button>
+            </div>
+        </div>
+    );
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
             {/* Elemen audio utama (doa) */}
@@ -3374,6 +3601,7 @@ const DoaLoaCodex = () => {
             {/* Konten Utama berdasarkan Fase Doa (Pop-up Premis atau renderPlayingPhase) */}
             {currentDoaPhase === 'premis' && renderPremisPopup()}
             {currentDoaPhase === 'playing' && renderPlayingPhase()} {/* Render playingPhase div utamanya */}
+        {currentDoaPhase === 'finished' && renderFinishedPhase()}
         </div>
     );
 };
