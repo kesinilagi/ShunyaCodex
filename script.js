@@ -646,7 +646,7 @@ const AffirmationRoom = () => {
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
-            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
+            <audio ref={audioRef} src="musik/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
             
             {uploadedImage ? (
                 <img 
@@ -784,18 +784,18 @@ const SecretRoomRezeki = () => {
 
     // Data audio latar
     const ambientSounds = [
-        { name: 'Gamelan Ambient', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Gamelan%20Ambient.mp3' },
-    { name: 'Angel Abundance', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Angel%20Abundance.mp3' },
-    { name: 'Singing Bowl', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Singing%20Bowl.mp3' },
-    { name: 'Rural Ambience', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Rural%20Ambient.mp3' },
+        { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
+    { name: 'Angel Abundance', src: 'musik/AngelAbundance.mp3' },
+    { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
+    { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
     { name: 'Hening (Mati)', src: '' }
     ];
 
     // Audio sources untuk setiap fase utama
     const phaseAudios = {
-        release: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Clearing.mp3',
-    manifestation: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi.mp3',
-    gratitude: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Gratitude.mp3',
+        release: 'musik/Clearing.mp3',
+    manifestation: 'musik/Afirmasi.mp3',
+    gratitude: 'musik/Gratitude.mp3',
     };
 
     // --- FUNGSI-FUNGSI PEMBANTU ---
@@ -2211,7 +2211,7 @@ const Bab2 = () => (
             Jawabannya… hanya hati nurani Anda yang tahu dan bisa merasakannya.
         </p>
         <IntegratedAudioPlayer
-            src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Pendahuluan IA.mp3"
+            src="musik/PendahuluanIA.mp3"
             text="Dengarkan Pembukaan Bab Ini"
             
         />
@@ -2509,7 +2509,7 @@ const Bab9 = () => (
             Latihan Kawrooh ini bisa dilakukan kapan saja dan dalam kondisi emosi apa pun. Baik saat Anda sedang merasakan kemarahan yang membakar, kekecewaan yang mendalam, atau bahkan kebahagiaan yang begitu intens hingga membuat Anda lekat pada dunia. Sebab, bahkan hal-hal yang paling kita cintai pun kadang perlu dilepaskan dengan ikhlas ke langit agar tidak menjadi 'berhala' yang mengikat hati dan menghalangi kedamaian batin.
         </p>
     <IntegratedAudioPlayer
-            src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Pelepasan Emosi Islamic.mp3"
+            src="musik/PelepasanEmosiIslamic.mp3"
             text="Contoh Audio Pelepasan Emosi"
             
         />
@@ -2572,7 +2572,7 @@ const Bab10 = () => {
       {/* Sholawat Munjiyat */}
       <SholawatAccordion
         title="2. Sholawat Munjiyat"
-        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat munjiyat bowl.mp3"
+        audioSrc="musik/Sholawatmunjiyatbowl.mp3"
         arabicText="اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ صَلَاةً تُنَجِّينَا بِهَا مِنْ جَمِيعِ الْأَهْوَالِ وَالآفَاتِ، وَتَقْضِي لَنَا بِهَا جَمِيعَ الْحَاجَاتِ، وَتُطَهِّرُنَا بِهَا مِنْ جَمِيعِ السَّيِّئَاتِ، وَتَرْفَعُنَا بِهَا عِنْدَكَ أَعْلَى الدَّرَجَاتِ..."
         latinText="Allahumma shalli ‘ala sayyidina Muhammadin shalaatan tunajjinaa biha min jamii’il ahwaali wal aafaat, wa taqdhi lanaa biha jamii’al haajaat, wa tutahhirunaa biha min jamii’is sayyi’aat, wa tarfa’unaa biha ‘indaka a’lad darajaat, wa tuballighunaa biha aqshal ghaayaat min jamii’il khayraat fil hayaat wa ba’dal mamaat. Innaka ‘ala kulli syai’in qadiir.*
 "
@@ -2590,7 +2590,7 @@ const Bab10 = () => {
       {/* Sholawat Nuril Anwar */}
        <SholawatAccordion
         title="3. Sholawat Nuril Anwar"
-        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat Nuril Anwar bowl 8d.mp3"
+        audioSrc="musik/SholawatNA8d.mp3"
         arabicText="اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ نُورِ الْأَنْوَارِ، وَسِرِّ الْأَسْرَارِ، وَتِرْيَاقِ الْأَغْيَارِ، وَمِفْتَاحِ بَابِ الْيَسَارِ..."
         latinText="Allahumma shalli ‘ala Sayyidina Muhammad, Nuril Anwar, wa Sirril Asrar, wa Tiryāqil Aghyār, wa Miftāhi Bābil Yasar, Sayyidina wa Maulana Muhammadinil Mukhtar, wa Alihi al-Athar, wa Shahbihi al-Akhyar, 'Adada Ni'amillahi wa Ifdhalihi.*
  "
@@ -2608,7 +2608,7 @@ const Bab10 = () => {
       {/* Sholawat Futuh Rizq */}
        <SholawatAccordion
         title="4. Sholawat Futuh Rizq Wal Afiyah"
-        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat Futuh Rizq wal Afiyah bowl 8d.mp3"
+        audioSrc="musik/SholawatFRWA8d.mp3"
         arabicText="اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ صَلَاةً تَفْتَحُ لَنَا بِهَا أَبْوَابَ الرِّزْقِ وَالْعَافِيَةِ..."
         latinText="Allahumma shalli ‘alâ Sayyidinâ Muhammadin shalâtan taftahu lanâ bihâ abwâbar rizqi wal ‘âfiyah, wa tuskinu bihâ khawfanâ, wa tuyassiru lanâ bihâ kulla amrin ‘asîr, wa tujliya bihâ kulla hamm wa gham, wa taqdhi bihâ jamî’a hawâ’ijinâ fid-dunyâ wal-âkhirah, wa ‘alâ âlihi wa shahbihi wa sallim.*
 "
@@ -3116,9 +3116,9 @@ const DoaHarianPlaylist = () => {
 const loaCodexDoaCategories = [
     { id: 'rezeki', name: "Rezeki", audioUrl: "musik/LoaRejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'jodoh', name: "Jodoh", audioUrl: "musik/LoaJodoh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
-    { id: 'promil', name: "Promil", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Promil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
-    { id: 'hutang', name: "Hutang", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Hutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
-    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/loa%20sembuh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" }
+    { id: 'promil', name: "Promil", audioUrl: "musik/LoaPromil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'hutang', name: "Hutang", audioUrl: "musik/LoaHutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
+    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "musik/LoaSembuh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" }
 ];
 
 // URL Gambar Latar Belakang Default untuk Doa LoA Codex
@@ -3514,7 +3514,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, cukupkanlah aku dengan rezeki halal-Mu dari yang haram, dan jadikanlah aku kaya dengan karunia-Mu dari selain-Mu.\"",
             manfaat: "Memohon kecukupan rezeki yang halal dan kemandirian dari selain Allah.",
             latin: "Allaahumma ikfinii bihalaalika ‘an haraamik, wa aghninii bifadhlika ‘amman siwaak.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma finne.mp3"
+            audioSrc: "musik/Allahumafinne.mp3"
         },
         {
             id: 3,
@@ -3523,7 +3523,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Wahai Yang Maha Hidup, Wahai Yang Maha Berdiri Sendiri! Dengan rahmat-Mu aku memohon pertolongan!\"",
             manfaat: "Memohon pertolongan dan kemudahan dalam segala urusan.",
             latin: "Ya Hayyu Ya Qayyum! Bi rahmatika astagheeth",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/ya%20hayy%20ya%20qayy.mp3"
+            audioSrc: "musik/yahayyyaqayy.mp3"
         },
         {
             id: 4,
@@ -3532,7 +3532,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Tidak ada Tuhan selain Engkau. Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.\"",
             manfaat: "Doa permohonan ampun dan pertolongan dalam keadaan terdesak (Doa Nabi Yunus).",
             latin: "Laa ilaaha illaa anta subhaanaka inni kuntu minazh-zhaalimiin",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Nabi Yunus Perut Ikan Paus.mp3"
+            audioSrc: "musik/NabiYunus.mp3"
         },
         {
             id: 5,
@@ -3541,7 +3541,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Cukuplah Allah bagiku, tiada Tuhan selain Dia. Hanya kepada-Nya aku bertawakal, dan Dia adalah Tuhan pemilik Arsy yang agung.\"",
             manfaat: "Menegaskan tawakal penuh kepada Allah sebagai satu-satunya sandaran.",
             latin: "Hasbiyallaahu laa ilaaha illaa Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arsyil-‘Azhiim.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Hasbiyallah.mp3"
+            audioSrc: "musik/Hasbiyallah.mp3"
         },
         {
             id: 6,
@@ -3550,7 +3550,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah! Wahai penghilang kesedihan... dan bebaskanlah aku dari semua utang.\"",
             manfaat: "Doa spesifik untuk pembebasan dari utang dan memohon rahmat.",
             latin: "Allaahumma yaa faarija al-hamm, wa yaa kaasyifa al-ghamm, farrij hammi wakshif ghummi, warzuqni min haytsu laa ahtasib, yaa arhamar raahimiin.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma ya farijal.mp3"
+            audioSrc: "musik/Allahumayafarijal.mp3"
         },
         {
             id: 7,
@@ -3559,7 +3559,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, kembalikanlah kepada seluruh makhluk-Mu segala kezhaliman mereka yang masih ada padaku — baik yang kecil maupun yang besar — dengan kemudahan dan keselamatan dari-Mu. Dan apa pun yang kekuatanku tak sanggup menyampaikannya, yang tanganku tak sanggup menjangkaunya, yang tubuhku, keyakinanku, dan diriku tak mampu memikulnya — maka tunaikanlah itu dariku dengan limpahan karunia-Mu. Lalu janganlah Engkau kurangi sedikit pun darinya dari (imbalan) kebaikanku, wahai Zat Yang Maha Pengasih di antara para pengasih.\"",
             manfaat: "Permohonan agar Allah melunasi utang yang tak mampu dibayar dari karunia-Nya.",
             latin: "Allaahumma urdud ilaa jamii‘i khalqika mazaalimahum allati qibalii shaghiiruhaa wa kabiiruhaa fii yusrin minka wa ‘aafiyah. Wa maa lam tuballigh-hu quwwatii wa lam tasa‘hu dhaatu yadî wa lam yaqwa ‘alayhi badanii wa yaqînii wa nafsii, fa-addihi ‘annii min jaziili maa ‘indaka min fadhlika, tsumma laa tukhlif ‘alayya minhu syay’an taqdhiihi min hasanaatii, yaa arhamar raahimiin.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma urdud.mp3"
+            audioSrc: "musik/Allahumaurdud.mp3"
         },
         {
             id: 8,
@@ -3568,7 +3568,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, tidak ada kemudahan kecuali apa yang Engkau jadikan mudah, dan Engkaulah yang menjadikan kesedihan (kesulitan) itu mudah jika Engkau kehendaki.\"",
             manfaat: "Memohon kemudahan dari Allah dalam menghadapi segala kesulitan.",
             latin: "Allahumma la sahla illa maa ja‘altahu sahlan, wa anta taj‘alu al-hazna idza syi’ta sahlan.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma sahla.mp3" // This audio seems duplicated, might want a different one.
+            audioSrc: "musik/Allahumasahla.mp3" // This audio seems duplicated, might want a different one.
         },
         {
             id: 9,
@@ -3577,7 +3577,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, cukupkanlah aku dengan apa yang Engkau rezekikan kepadaku, berkahilah ia untukku, dan gantilah setiap yang hilang dariku dengan yang lebih baik.\"",
             manfaat: "Memohon rasa cukup (qana'ah), keberkahan, dan penggantian yang lebih baik.",
             latin: "Allahumma qanni’ni bima razaqtani, wa baarik li fihi, wakhluf ‘alayya kulla gha’ibatin li bikhayr.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma%20qanni.mp3"
+            audioSrc: "musik/Allahumaqanni.mp3"
         },
       {
             id: 10,
@@ -3586,7 +3586,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Katakanlah (Muhammad), ‘Wahai Allah, Pemilik kerajaan, Engkau berikan kerajaan kepada siapa yang Engkau kehendaki, dan Engkau cabut kerajaan dari siapa yang Engkau kehendaki. Engkau muliakan siapa yang Engkau kehendaki, dan Engkau hinakan siapa yang Engkau kehendaki. Di tangan-Mu segala kebajikan. Sungguh, Engkau Mahakuasa atas segala sesuatu. Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau berikan rezeki kepada siapa yang Engkau kehendaki tanpa perhitungan\"",
             manfaat: "memohon dibalikkan keadaan, diangkat derajat, dicukupkan rezeki, dan diberi kemuliaan di dunia & akhirat.",
             latin: "Qulillaahumma maalikal-mulki tu’til-mulka man tasyā’u wa tanzi‘ul-mulka mimman tasyā’, wa tu‘izzu man tasyā’u wa tudzillu man tasyā’, biyadikal-khayr, innaka ‘alā kulli syay’in qadiir. Tuulijul-layla fin-nahāri wa tuulijun-nahāra fil-layl, wa tukhrijul-hayya minal-mayyit, wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyā’u bighayri hisāb.",
-            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Surah Ali Imran ayat 26-27 8D(1).mp3"
+            audioSrc: "musik/Surah2627.mp3"
         },
     ];
 
