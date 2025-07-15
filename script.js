@@ -646,7 +646,7 @@ const AffirmationRoom = () => {
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
-            <audio ref={audioRef} src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
+            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
             
             {uploadedImage ? (
                 <img 
@@ -784,33 +784,18 @@ const SecretRoomRezeki = () => {
 
     // Data audio latar
     const ambientSounds = [
-        { 
-            name: 'Gamelan Ambient', 
-            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Gamelan%20Ambient.mp3', 
-        },
-        { 
-            name: 'Angel Abundance', 
-            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Angel%20Abundance.mp3', 
-        },
-        { 
-            name: 'Singing Bowl', 
-            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Singing%20Bowl.mp3', 
-        },
-        { 
-            name: 'Rural Ambience', // Ganti nama dari Egypt Ambience menjadi Rural Ambience
-            src: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Rural%20Ambient.mp3', // Ganti URL ini
-        },
-        { 
-            name: 'Hening (Mati)', 
-            src: '',
-        } 
+        { name: 'Gamelan Ambient', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Gamelan%20Ambient.mp3' },
+    { name: 'Angel Abundance', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Angel%20Abundance.mp3' },
+    { name: 'Singing Bowl', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Singing%20Bowl.mp3' },
+    { name: 'Rural Ambience', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Rural%20Ambient.mp3' },
+    { name: 'Hening (Mati)', src: '' }
     ];
 
     // Audio sources untuk setiap fase utama
     const phaseAudios = {
-        release: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Clearing.mp3', // Ganti URL ini
-        manifestation: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Afirmasi.mp3', // Ganti URL ini
-        gratitude: 'https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Gratitude.mp3', // Ganti URL ini
+        release: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Clearing.mp3',
+    manifestation: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi.mp3',
+    gratitude: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Gratitude.mp3',
     };
 
     // --- FUNGSI-FUNGSI PEMBANTU ---
@@ -1184,14 +1169,17 @@ const SecretRoomRezeki = () => {
 
 // --- KOMPONEN-KOMPONEN UTILITAS ---
 
-// ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
+// ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU INI ###
 const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
     const audioRef = React.useRef(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
 
     // Fungsi 'Sapu Bersih' dan pemutaran audio
-    const togglePlay = () => {
-        if (!audioRef.current) return;
+    const togglePlay = async () => { // Tambahkan async
+        if (!audioRef.current || !src) { // Pastikan src tidak kosong
+            console.warn("Audio element not ready or src is empty.");
+            return;
+        }
 
         const thisAudio = audioRef.current;
 
@@ -1204,22 +1192,30 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
 
         // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO ---
         document.querySelectorAll('audio').forEach(otherAudio => {
-            // Hentikan elemen audio HTML
-            if (otherAudio !== thisAudio) { // Pastikan tidak menghentikan diri sendiri
+            if (otherAudio !== thisAudio) {
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
             }
         });
 
-        // Hentikan juga Web Audio API instances yang mungkin aktif dari InlineAudioIcon
-        // Ini adalah pendekatan yang lebih agresif, tapi efektif untuk memastikan semua audio berhenti.
-        // Idealnya, jika AudioContext dibagi secara global, manajemennya lebih mudah.
-        // Tapi jika tidak, kita bisa mencoba reset panner/gain nodes.
-        // Karena `InlineAudioIcon` sudah punya mekanisme reset di `handlePause`,
-        // cukup dengan memanggil `pause()` pada elemen audionya, event `pause` akan ter-trigger.
+        // Setel src dan muat audio, lalu coba putar
+        thisAudio.src = src;
+        thisAudio.load(); // Load the audio content
 
-        // Setelah semua bersih, baru putar audio yang ini.
-        thisAudio.play().catch(err => console.error("Audio Error:", err));
+        try {
+            await thisAudio.play();
+            setIsPlaying(true);
+            console.log("Audio played successfully: " + src);
+        } catch (error) {
+            console.error("Audio Playback Error for " + src + ":", error);
+            setIsPlaying(false);
+            // Memberi tahu pengguna jika autoplay diblokir
+            if (error.name === "NotAllowedError" || error.name === "AbortError") {
+                alert("Pemutaran audio diblokir oleh browser. Mohon izinkan autoplay untuk situs ini atau coba interaksi manual.");
+            } else {
+                alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+            }
+        }
     };
 
     // Efek untuk memantau status audio
@@ -1228,6 +1224,7 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
         if (!audio) return;
         
         audio.loop = isLooping;
+
         const handlePlay = () => setIsPlaying(true);
         const handlePause = () => setIsPlaying(false);
         const handleEnded = () => { if(!isLooping) setIsPlaying(false); };
@@ -1236,41 +1233,46 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
         audio.addEventListener('pause', handlePause);
         audio.addEventListener('ended', handleEnded);
 
+        // Cleanup saat komponen unmount
         return () => {
             audio.removeEventListener('play', handlePlay);
             audio.removeEventListener('pause', handlePause);
             audio.removeEventListener('ended', handleEnded);
+            // Hentikan audio saat komponen di-unmount
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
         };
-    }, [src, isLooping]);
+    }, [src, isLooping]); // Tambahkan src ke dependencies agar useEffect re-run saat src berubah
 
     return (
         <div onClick={togglePlay} className="flex items-center justify-center gap-4 my-4 p-4 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
-             <audio ref={audioRef} src={src} preload="auto" className="hidden"></audio>
+            <audio ref={audioRef} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
             
-             {/* Ikon yang berubah */}
-             <div className="text-white">
+            {/* Ikon yang berubah */}
+            <div className="text-white">
                 {isPlaying ? (
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 animate-pulse text-sky-400" viewBox="0 0 20 20" fill="currentColor">
-                       <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
-                     </svg>
-                 ) : (
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
-                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                     </svg>
-                 )}
-             </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 animate-pulse text-sky-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
+                    </svg>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    </svg>
+                )}
+            </div>
 
-             {/* Teks dinamis yang berubah */}
-             <p className={`text-center text-3s font-serif text-white`}>
-                 {text}
-             </p>
+            {/* Teks dinamis yang berubah */}
+            <p className={`text-center text-xl font-serif text-white`}> {text}
+            </p>
         </div>
     );
 };
 
 
 // ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
-// ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
+// ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
 const InlineAudioIcon = ({ src, isLooping = false }) => {
     const audioRef = React.useRef(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
@@ -1278,32 +1280,35 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
     // --- Referensi untuk Web Audio API ---
     const audioContextRef = React.useRef(null);
     const pannerNodeRef = React.useRef(null);
-    const sourceNodeRef = React.useRef(null);
-    const gainNodeRef = React.useRef(null);
+    const sourceNodeRef = React.useRef(null); // MediaElementSourceNode dari audio utama
+    const gainNodeRef = React.useRef(null); // Untuk mengontrol volume Web Audio API
 
     // Fungsi untuk inisialisasi AudioContext, PannerNode, dan GainNode
     const initAudioNodes = () => {
+        // Hanya inisialisasi jika belum ada
         if (!audioContextRef.current) {
             try {
+                // Pastikan AudioContext diinisialisasi oleh interaksi pengguna pertama
                 audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-
+                
                 pannerNodeRef.current = audioContextRef.current.createPanner();
-                pannerNodeRef.current.panningModel = 'HRTF';
-                pannerNodeRef.current.distanceModel = 'linear';
-                pannerNodeRef.current.refDistance = 1;
-                pannerNodeRef.current.maxDistance = 1000;
-                pannerNodeRef.current.rolloffFactor = 1;
+                pannerNodeRef.current.panningModel = 'HRTF'; // Human Resources Transfer Function, untuk efek 3D
+                pannerNodeRef.current.distanceModel = 'linear'; // Model jarak, bisa 'inverse', 'linear', 'exponential'
+                pannerNodeRef.current.refDistance = 1; // Referensi jarak
+                pannerNodeRef.current.maxDistance = 1000; // Jarak maksimum suara bisa terdengar
+                pannerNodeRef.current.rolloffFactor = 1; // Seberapa cepat volume menurun seiring jarak
 
-                gainNodeRef.current = audioContextRef.current.createGain();
-                gainNodeRef.current.gain.value = 1;
+                gainNodeRef.current = audioContextRef.current.createGain(); // Untuk kontrol volume utama Web Audio API
+                gainNodeRef.current.gain.value = 1; // Volume default (max)
 
+                // Hubungkan panner ke gain, lalu gain ke destination
                 pannerNodeRef.current.connect(gainNodeRef.current);
                 gainNodeRef.current.connect(audioContextRef.current.destination);
 
-                console.log("AudioContext, PannerNode, and GainNode initialized.");
+                console.log("[InlineAudioIcon Init] AudioContext and Web Audio nodes initialized.");
             } catch (e) {
-                console.error("Failed to create AudioContext or Web Audio nodes:", e);
-                audioContextRef.current = null;
+                console.error("[InlineAudioIcon Init] Failed to create AudioContext or Web Audio nodes:", e);
+                audioContextRef.current = null; // Set null jika gagal
                 pannerNodeRef.current = null;
                 gainNodeRef.current = null;
             }
@@ -1311,99 +1316,116 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
     };
 
     React.useEffect(() => {
-        initAudioNodes();
+        initAudioNodes(); // Panggil saat komponen mount
     }, []);
 
-    const togglePlay = (e) => {
-        e.stopPropagation();
-        if (!audioRef.current) return;
+    const panIntervalIdRef = React.useRef(null); // Ref untuk menyimpan ID interval panning
+
+    const togglePlay = async (e) => {
+        e.stopPropagation(); // Mencegah event klik menyebar ke akordeon
+
+        if (!audioRef.current || !src) { // Pastikan elemen audio dan src tersedia
+            console.warn("Audio element not ready or src is empty for InlineAudioIcon.");
+            return;
+        }
 
         const thisAudio = audioRef.current;
+        const audioContext = audioContextRef.current;
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
 
-        // Cek apakah audio ini sedang berputar
+        // Jika audio ini sedang berputar, hentikan saja
         if (isPlaying) {
             thisAudio.pause();
             thisAudio.currentTime = 0;
-            setIsPlaying(false);
-            if (panIntervalIdRef.current) {
-                clearInterval(panIntervalIdRef.current);
-                panIntervalIdRef.current = null;
-                if (pannerNodeRef.current && gainNodeRef.current) {
-                    pannerNodeRef.current.positionX.value = 0;
-                    pannerNodeRef.current.positionY.value = 0;
-                    pannerNodeRef.current.positionZ.value = 0;
-                    gainNodeRef.current.gain.value = 1;
-                }
-            }
-            return; // Hentikan fungsi di sini
+            return;
         }
 
-        // --- JURUS SAPU BERSIH GLOBAL ---
-        // 1. Hentikan semua elemen <audio> HTML
+        // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO LAIN ---
+        // Hentikan semua elemen <audio> HTML di halaman
         document.querySelectorAll('audio').forEach(otherAudio => {
             if (otherAudio !== thisAudio) { // Pastikan tidak menghentikan diri sendiri
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
-                // Opsional: Jika ada state isPlaying di komponen lain, Anda mungkin perlu cara untuk meresetnya
-                // Tapi untuk elemen audio HTML biasa, pause dan reset time sudah cukup.
             }
         });
+        // Pastikan juga semua interval panning dari InlineAudioIcon lain berhenti
+        // Ini tricky tanpa Context API global, jadi kita rely on cleanup effect.
 
-        // 2. Jika ada instance Web Audio API dari komponen InlineAudioIcon lain yang sedang aktif, hentikan.
-        // Ini agak tricky karena kita tidak punya referensi langsung ke instance lain.
-        // Cara yang lebih robust adalah dengan menggunakan Context API atau event global,
-        // tapi untuk sementara, kita bisa berasumsi bahwa hanya satu InlineAudioIcon yang akan aktif.
-        // Jika Anda memiliki banyak InlineAudioIcon yang bisa diputar bersamaan,
-        // kita perlu desain yang lebih canggih (misal, Context global untuk player aktif).
-        // Untuk saat ini, kita hanya akan fokus menghentikan *interval panning* yang mungkin aktif
-        // dan mereset pannerNode untuk instance lain jika ada. (Ini sudah tercakup di cleanup effect)
-
-        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-            audioContextRef.current.resume().then(() => {
-                console.log("AudioContext resumed.");
-            }).catch(e => console.error("Error resuming AudioContext:", e));
+        // Pastikan AudioContext dalam kondisi 'running'
+        if (audioContext && audioContext.state === 'suspended') {
+            try {
+                await audioContext.resume();
+                console.log("AudioContext resumed for InlineAudioIcon.");
+            } catch (e) {
+                console.error("Error resuming AudioContext for InlineAudioIcon:", e);
+                alert("Gagal melanjutkan pemutaran audio. Mohon berikan izin audio.");
+                return;
+            }
         }
 
-        if (audioContextRef.current && pannerNodeRef.current && gainNodeRef.current) {
-            // Jika sourceNode sudah ada tapi dari elemen audio yang berbeda, disconnect dulu
-            if (sourceNodeRef.current && sourceNodeRef.current.mediaElement !== thisAudio) {
-                sourceNodeRef.current.disconnect();
-                sourceNodeRef.current = null;
-            }
+        // Setel src dan muat audio
+        thisAudio.src = src;
+        thisAudio.load();
+
+        if (audioContext && panner && gainNode) {
             // Buat atau gunakan MediaElementSourceNode yang sesuai
-            if (!sourceNodeRef.current) {
-                sourceNodeRef.current = audioContextRef.current.createMediaElementSource(thisAudio);
-                sourceNodeRef.current.connect(pannerNodeRef.current);
-                console.log("MediaElementSourceNode created and connected.");
+            if (!sourceNodeRef.current || sourceNodeRef.current.mediaElement !== thisAudio) {
+                if (sourceNodeRef.current) { // Disconnect yang lama jika ada
+                    sourceNodeRef.current.disconnect();
+                    sourceNodeRef.current = null;
+                }
+                sourceNodeRef.current = audioContext.createMediaElementSource(thisAudio);
+                sourceNodeRef.current.connect(panner); // Hubungkan ke PannerNode
+                console.log("[InlineAudioIcon] MediaElementSourceNode created and connected.");
             }
+            
+            thisAudio.loop = isLooping;
+
+            try {
+                await thisAudio.play();
+                setIsPlaying(true);
+                // Mulai panning hanya jika isPlaying
+                if (isPlaying) { // Check again after play() promise resolves
+                    startPanning();
+                }
+            } catch (error) {
+                console.error("Audio Playback Error for InlineAudioIcon " + src + ":", error);
+                setIsPlaying(false);
+                if (error.name === "NotAllowedError" || error.name === "AbortError") {
+                    alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
+                } else {
+                    alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+                }
+            }
+
         } else {
-            console.warn("Web Audio API not available or failed to initialize, playing directly.");
-            thisAudio.play().catch(err => console.error("Audio Playback Error:", err));
-            setIsPlaying(true);
-            return;
+            console.warn("Web Audio API not fully available or failed to initialize, playing directly via HTMLAudioElement.");
+            thisAudio.loop = isLooping;
+            try {
+                await thisAudio.play();
+                setIsPlaying(true);
+            } catch (error) {
+                console.error("Direct HTML Audio Playback Error for " + src + ":", error);
+                setIsPlaying(false);
+                if (error.name === "NotAllowedError" || error.name === "AbortError") {
+                    alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
+                } else {
+                    alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+                }
+            }
         }
-
-        thisAudio.loop = isLooping; 
-
-        thisAudio.play().then(() => {
-            setIsPlaying(true);
-            startPanning();
-        }).catch(err => console.error("Audio Playback Error:", err));
     };
 
-    const panIntervalIdRef = React.useRef(null);
-
+    // Fungsi untuk memulai efek panning 8D
     const startPanning = () => {
         const panner = pannerNodeRef.current;
         const gainNode = gainNodeRef.current;
         if (!panner || !gainNode) return;
 
         let time = 0;
-        const cycleDuration = 10000;
-        const maxZDistance = 15;
-        const maxYDistance = 5;
-        const minVolume = 0.1;
-        const maxVolume = 1.0;
+        const cycleDuration = 10000; // Siklus penuh 10 detik
+        const maxDistance = 15; // Jarak maksimal untuk efek 3D
 
         if (panIntervalIdRef.current) {
             clearInterval(panIntervalIdRef.current);
@@ -1412,56 +1434,56 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
         panIntervalIdRef.current = setInterval(() => {
             const normalizedTime = (time % cycleDuration) / cycleDuration;
             
-            const z = -maxZDistance * Math.cos(2 * Math.PI * normalizedTime); 
+            // Gerakan X (kiri-kanan) dan Z (depan-belakang)
+            const x = maxDistance * Math.sin(2 * Math.PI * normalizedTime);
+            const z = -maxDistance * Math.cos(2 * Math.PI * normalizedTime);
+
+            panner.positionX.value = x;
+            panner.positionY.value = 0; // Tetap di tengah vertikal
             panner.positionZ.value = z;
 
-            const y = maxYDistance * Math.sin(2 * Math.PI * normalizedTime);
-            panner.positionY.value = y;
-            
-            panner.positionX.value = 0; 
+            // Volume disesuaikan dengan posisi Z (lebih jauh lebih pelan)
+            // Ini akan membuat efek suara terasa "mendekat" dan "menjauh"
+            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance)); // Dari 0.5 sampai 1.0
+            gainNode.gain.value = volume;
 
-            const volumeRange = maxVolume - minVolume;
-            const calculatedVolume = minVolume + ((z + maxZDistance) / (2 * maxZDistance)) * volumeRange;
-            gainNode.gain.value = calculatedVolume;
-
-            time += 50;
+            time += 50; // Update setiap 50ms
         }, 50);
     };
 
+    // Efek untuk memantau status audio
     React.useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
         
         audio.loop = isLooping;
 
-        const handlePlay = () => setIsPlaying(true);
+        const handlePlay = () => {
+            setIsPlaying(true);
+            // Mulai panning jika ini adalah audio 8D (Web Audio API aktif)
+            if (audioContextRef.current && pannerNodeRef.current) {
+                startPanning();
+            }
+        };
+
         const handlePause = () => {
             setIsPlaying(false);
             if (panIntervalIdRef.current) {
                 clearInterval(panIntervalIdRef.current);
                 panIntervalIdRef.current = null;
-                // Reset panner position and volume when paused manually or by other audio
+                // Reset panner position and volume when paused
                 if (pannerNodeRef.current && gainNodeRef.current) {
                     pannerNodeRef.current.positionX.value = 0;
                     pannerNodeRef.current.positionY.value = 0;
                     pannerNodeRef.current.positionZ.value = 0;
-                    gainNodeRef.current.gain.value = 1;
+                    gainNodeRef.current.gain.value = 1; // Reset volume ke normal
                 }
             }
         };
+
         const handleEnded = () => { 
             if(!isLooping) {
-                setIsPlaying(false);
-                if (panIntervalIdRef.current) {
-                    clearInterval(panIntervalIdRef.current);
-                    panIntervalIdRef.current = null;
-                    if (pannerNodeRef.current && gainNodeRef.current) {
-                        pannerNodeRef.current.positionX.value = 0;
-                        pannerNodeRef.current.positionY.value = 0;
-                        pannerNodeRef.current.positionZ.value = 0;
-                        gainNodeRef.current.gain.value = 1;
-                    }
-                }
+                handlePause(); // Panggil handlePause untuk membersihkan panning
             }
         };
         
@@ -1469,29 +1491,28 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
         audio.addEventListener('pause', handlePause);
         audio.addEventListener('ended', handleEnded);
 
+        // Cleanup saat komponen di-unmount
         return () => {
             audio.removeEventListener('play', handlePlay);
             audio.removeEventListener('pause', handlePause);
             audio.removeEventListener('ended', handleEnded);
-            
-            // Cleanup on unmount
+            // Hentikan audio dan bersihkan panning saat komponen unmount
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
             if (panIntervalIdRef.current) {
                 clearInterval(panIntervalIdRef.current);
+                panIntervalIdRef.current = null;
             }
+            // Disconnect source node jika ada
             if (sourceNodeRef.current) {
                 sourceNodeRef.current.disconnect();
-                // sourceNodeRef.current = null; // Don't nullify here, it might be reused
+                sourceNodeRef.current = null;
             }
-            // Disconnect from panner, but don't close context or disconnect panner/gain as they might be shared
-            // This is the tricky part: if we have multiple InlineAudioIcon instances, they *might* share
-            // the same AudioContext and panner/gain. However, for a simple "one-at-a-time" audio,
-            // the current cleanup for `audioRef.current.pause()` and `clearInterval(panIntervalIdRef.current)`
-            // in `handlePause` and `handleEnded` should suffice.
-            // Closing AudioContext in individual components might cause issues if other components use it.
-            // The main App component should manage the AudioContext lifecycle if it's truly global.
-            // For now, let's keep it per-component and rely on the pause/stop logic.
+            // Jangan tutup AudioContext di sini, karena mungkin dipakai komponen lain
         };
-    }, [src, isLooping]);
+    }, [src, isLooping]); // Tambahkan src ke dependencies agar useEffect re-run saat src berubah
 
     return (
         <button onClick={togglePlay} className="inline-flex items-center gap-2 ml-3 text-gray-500 hover:text-blue-600 transition-colors" title={isPlaying ? "Hentikan Audio" : "Putar Audio"}>
@@ -1499,11 +1520,11 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             
             {isPlaying ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                   <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
+                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
                 </svg>
             ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                 </svg>
             )}
 
@@ -1941,7 +1962,7 @@ const PixelThoughts = () => {
 
   return React.createElement("div", { className: "fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20" },
     React.createElement(Starfield, null),
-    React.createElement("audio", { ref: audioRef, src: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Afirmasi Pelepasan Panning 3d.mp3", loop: true }),
+    React.createElement("audio", { ref: audioRef, src: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi Pelepasan Panning 3d.mp3", loop: true }),
 
     // Tombol kembali kita pindah ke bawah agar tidak mengganggu
     React.createElement("div", { className: "absolute bottom-8 left-1/2 -translate-x-1/2 z-10" },
@@ -2298,7 +2319,7 @@ const Bab2 = () => (
             Jawabannya… hanya hati nurani Anda yang tahu dan bisa merasakannya.
         </p>
         <IntegratedAudioPlayer
-            src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Pendahuluan IA.mp3"
+            src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Pendahuluan IA.mp3"
             text="Dengarkan Pembukaan Bab Ini"
             
         />
@@ -2596,7 +2617,7 @@ const Bab9 = () => (
             Latihan Kawrooh ini bisa dilakukan kapan saja dan dalam kondisi emosi apa pun. Baik saat Anda sedang merasakan kemarahan yang membakar, kekecewaan yang mendalam, atau bahkan kebahagiaan yang begitu intens hingga membuat Anda lekat pada dunia. Sebab, bahkan hal-hal yang paling kita cintai pun kadang perlu dilepaskan dengan ikhlas ke langit agar tidak menjadi 'berhala' yang mengikat hati dan menghalangi kedamaian batin.
         </p>
     <IntegratedAudioPlayer
-            src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Pelepasan Emosi Islamic.mp3"
+            src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Pelepasan Emosi Islamic.mp3"
             text="Contoh Audio Pelepasan Emosi"
             
         />
@@ -3201,42 +3222,11 @@ const DoaHarianPlaylist = () => {
 // --- KOMPONEN BARU: DOA LOA CODEX (GAMBAR DAN TOMBOL FIXED) ---
 // Data untuk Doa LoA Codex Categories (PASTE INI DI LUAR KOMPONEN JIKA BANYAK KOMPONEN MEMBUTUHKANNYA, ATAU BIARKAN DI DALAM SEPERTI INI)
 const loaCodexDoaCategories = [
-    {
-        id: 'placeholder', 
-        name: "Pilih Kategori Doa...",
-        audioUrl: "",
-        imageUrl: "" 
-    },
-    {
-        id: 'rezeki',
-        name: "Rezeki",
-        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Rejeki.mp3",
-        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
-    },
-    {
-        id: 'jodoh',
-        name: "Jodoh",
-        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Jodoh.mp3",
-        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
-    },
-    {
-        id: 'promil',
-        name: "Promil",
-        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Promil.mp3",
-        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
-    },
-    {
-        id: 'hutang',
-        name: "Hutang",
-        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Loa Hutang.mp3",
-        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
-    },
-    {
-        id: 'kesembuhan',
-        name: "Kesembuhan",
-        audioUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/loa sembuh.mp3",
-        imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" 
-    }
+    { id: 'rezeki', name: "Rezeki", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Rejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'jodoh', name: "Jodoh", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Jodoh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'promil', name: "Promil", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Promil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'hutang', name: "Hutang", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Hutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
+    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/loa%20sembuh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" }
 ];
 
 // URL Gambar Latar Belakang Default untuk Doa LoA Codex
@@ -3263,7 +3253,7 @@ const premisNiatText = `
 `;
 
 // URL Musik Latar untuk Doa LoA Codex
-const DOA_LOA_CODEX_AMBIENT_MUSIC = "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lyra.mp3"; // Ganti URL musik latar pilihanmu
+const DOA_LOA_CODEX_AMBIENT_MUSIC = "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/lyra.mp3"; // Ganti URL musik latar pilihanmu
 
 const DoaLoaCodex = () => {
     const { setCurrentPageKey } = useContext(AppContext);
@@ -3623,7 +3613,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, sesungguhnya aku berlindung kepada-Mu dari rasa gelisah dan sedih, dari kelemahan dan kemalasan, dari sifat kikir dan penakut, serta dari lilitan hutang dan tekanan orang-orang.\"",
             manfaat: "Memohon perlindungan dari berbagai kesulitan hidup, termasuk beban utang.",
             latin: "Allaahumma innii a’uudzu bika minal-hammi wal-hazan, wal-‘ajzi wal-kasal, wal-bukhli wal-jubn, wa dhala’id-dayni wa ghalabatir-rijaal",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma inne audzubika.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma inne audzubika.mp3"
         },
         {
             id: 2,
@@ -3632,7 +3622,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, cukupkanlah aku dengan rezeki halal-Mu dari yang haram, dan jadikanlah aku kaya dengan karunia-Mu dari selain-Mu.\"",
             manfaat: "Memohon kecukupan rezeki yang halal dan kemandirian dari selain Allah.",
             latin: "Allaahumma ikfinii bihalaalika ‘an haraamik, wa aghninii bifadhlika ‘amman siwaak.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma finne.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma finne.mp3"
         },
         {
             id: 3,
@@ -3641,7 +3631,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Wahai Yang Maha Hidup, Wahai Yang Maha Berdiri Sendiri! Dengan rahmat-Mu aku memohon pertolongan!\"",
             manfaat: "Memohon pertolongan dan kemudahan dalam segala urusan.",
             latin: "Ya Hayyu Ya Qayyum! Bi rahmatika astagheeth",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/ya%20hayy%20ya%20qayy.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/ya%20hayy%20ya%20qayy.mp3"
         },
         {
             id: 4,
@@ -3650,7 +3640,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Tidak ada Tuhan selain Engkau. Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.\"",
             manfaat: "Doa permohonan ampun dan pertolongan dalam keadaan terdesak (Doa Nabi Yunus).",
             latin: "Laa ilaaha illaa anta subhaanaka inni kuntu minazh-zhaalimiin",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Nabi Yunus Perut Ikan Paus.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Nabi Yunus Perut Ikan Paus.mp3"
         },
         {
             id: 5,
@@ -3659,7 +3649,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Cukuplah Allah bagiku, tiada Tuhan selain Dia. Hanya kepada-Nya aku bertawakal, dan Dia adalah Tuhan pemilik Arsy yang agung.\"",
             manfaat: "Menegaskan tawakal penuh kepada Allah sebagai satu-satunya sandaran.",
             latin: "Hasbiyallaahu laa ilaaha illaa Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arsyil-‘Azhiim.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Hasbiyallah.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Hasbiyallah.mp3"
         },
         {
             id: 6,
@@ -3668,7 +3658,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah! Wahai penghilang kesedihan... dan bebaskanlah aku dari semua utang.\"",
             manfaat: "Doa spesifik untuk pembebasan dari utang dan memohon rahmat.",
             latin: "Allaahumma yaa faarija al-hamm, wa yaa kaasyifa al-ghamm, farrij hammi wakshif ghummi, warzuqni min haytsu laa ahtasib, yaa arhamar raahimiin.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma ya farijal.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma ya farijal.mp3"
         },
         {
             id: 7,
@@ -3677,7 +3667,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, kembalikanlah kepada seluruh makhluk-Mu segala kezhaliman mereka yang masih ada padaku — baik yang kecil maupun yang besar — dengan kemudahan dan keselamatan dari-Mu. Dan apa pun yang kekuatanku tak sanggup menyampaikannya, yang tanganku tak sanggup menjangkaunya, yang tubuhku, keyakinanku, dan diriku tak mampu memikulnya — maka tunaikanlah itu dariku dengan limpahan karunia-Mu. Lalu janganlah Engkau kurangi sedikit pun darinya dari (imbalan) kebaikanku, wahai Zat Yang Maha Pengasih di antara para pengasih.\"",
             manfaat: "Permohonan agar Allah melunasi utang yang tak mampu dibayar dari karunia-Nya.",
             latin: "Allaahumma urdud ilaa jamii‘i khalqika mazaalimahum allati qibalii shaghiiruhaa wa kabiiruhaa fii yusrin minka wa ‘aafiyah. Wa maa lam tuballigh-hu quwwatii wa lam tasa‘hu dhaatu yadî wa lam yaqwa ‘alayhi badanii wa yaqînii wa nafsii, fa-addihi ‘annii min jaziili maa ‘indaka min fadhlika, tsumma laa tukhlif ‘alayya minhu syay’an taqdhiihi min hasanaatii, yaa arhamar raahimiin.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma urdud.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma urdud.mp3"
         },
         {
             id: 8,
@@ -3686,7 +3676,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, tidak ada kemudahan kecuali apa yang Engkau jadikan mudah, dan Engkaulah yang menjadikan kesedihan (kesulitan) itu mudah jika Engkau kehendaki.\"",
             manfaat: "Memohon kemudahan dari Allah dalam menghadapi segala kesulitan.",
             latin: "Allahumma la sahla illa maa ja‘altahu sahlan, wa anta taj‘alu al-hazna idza syi’ta sahlan.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma sahla.mp3" // This audio seems duplicated, might want a different one.
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma sahla.mp3" // This audio seems duplicated, might want a different one.
         },
         {
             id: 9,
@@ -3695,7 +3685,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, cukupkanlah aku dengan apa yang Engkau rezekikan kepadaku, berkahilah ia untukku, dan gantilah setiap yang hilang dariku dengan yang lebih baik.\"",
             manfaat: "Memohon rasa cukup (qana'ah), keberkahan, dan penggantian yang lebih baik.",
             latin: "Allahumma qanni’ni bima razaqtani, wa baarik li fihi, wakhluf ‘alayya kulla gha’ibatin li bikhayr.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Allahuma%20qanni.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma%20qanni.mp3"
         },
       {
             id: 10,
@@ -3704,7 +3694,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Katakanlah (Muhammad), ‘Wahai Allah, Pemilik kerajaan, Engkau berikan kerajaan kepada siapa yang Engkau kehendaki, dan Engkau cabut kerajaan dari siapa yang Engkau kehendaki. Engkau muliakan siapa yang Engkau kehendaki, dan Engkau hinakan siapa yang Engkau kehendaki. Di tangan-Mu segala kebajikan. Sungguh, Engkau Mahakuasa atas segala sesuatu. Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau berikan rezeki kepada siapa yang Engkau kehendaki tanpa perhitungan\"",
             manfaat: "memohon dibalikkan keadaan, diangkat derajat, dicukupkan rezeki, dan diberi kemuliaan di dunia & akhirat.",
             latin: "Qulillaahumma maalikal-mulki tu’til-mulka man tasyā’u wa tanzi‘ul-mulka mimman tasyā’, wa tu‘izzu man tasyā’u wa tudzillu man tasyā’, biyadikal-khayr, innaka ‘alā kulli syay’in qadiir. Tuulijul-layla fin-nahāri wa tuulijun-nahāra fil-layl, wa tukhrijul-hayya minal-mayyit, wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyā’u bighayri hisāb.",
-            audioSrc: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Surah Ali Imran ayat 26-27 8D(1).mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Surah Ali Imran ayat 26-27 8D(1).mp3"
         },
     ];
 
