@@ -1273,86 +1273,175 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
 
 // ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
 // ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
+// ### VERSI INI MENINGKATKAN KESTABILAN PEMUTARAN UNTUK INLINE AUDIO ICON ###
+// ### DAN MENGATUR INITALISASI AUDIO CONTEXT DENGAN LEBIH HATI-HATI ###
 const InlineAudioIcon = ({ src, isLooping = false }) => {
     const audioRef = React.useRef(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
+    const [isLoaded, setIsLoaded] = React.useState(false); // State untuk melacak apakah audio sudah siap
 
     // --- Referensi untuk Web Audio API ---
+    // Gunakan AudioContext global jika memungkinkan, atau atur dengan hati-hati per instance.
+    // Untuk kesederhanaan dan menghindari konflik global yang tidak disengaja,
+    // kita akan tetap inisialisasi per instance, tetapi dengan `once` flag
+    // dan `resume` yang hati-hati.
     const audioContextRef = React.useRef(null);
     const pannerNodeRef = React.useRef(null);
-    const sourceNodeRef = React.useRef(null); // MediaElementSourceNode dari audio utama
-    const gainNodeRef = React.useRef(null); // Untuk mengontrol volume Web Audio API
+    const sourceNodeRef = React.useRef(null);
+    const gainNodeRef = React.useRef(null);
+    const panIntervalIdRef = React.useRef(null); // Ref untuk menyimpan ID interval panning
 
-    // Fungsi untuk inisialisasi AudioContext, PannerNode, dan GainNode
-    const initAudioNodes = () => {
-        // Hanya inisialisasi jika belum ada
-        if (!audioContextRef.current) {
-            try {
-                // Pastikan AudioContext diinisialisasi oleh interaksi pengguna pertama
-                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-                
-                pannerNodeRef.current = audioContextRef.current.createPanner();
-                pannerNodeRef.current.panningModel = 'HRTF'; // Human Resources Transfer Function, untuk efek 3D
-                pannerNodeRef.current.distanceModel = 'linear'; // Model jarak, bisa 'inverse', 'linear', 'exponential'
-                pannerNodeRef.current.refDistance = 1; // Referensi jarak
-                pannerNodeRef.current.maxDistance = 1000; // Jarak maksimum suara bisa terdengar
-                pannerNodeRef.current.rolloffFactor = 1; // Seberapa cepat volume menurun seiring jarak
+    // Inisialisasi AudioContext dan nodes. Hanya panggil sekali per instance.
+    const initAudioNodes = React.useCallback(() => {
+        if (audioContextRef.current) return; // Sudah diinisialisasi
 
-                gainNodeRef.current = audioContextRef.current.createGain(); // Untuk kontrol volume utama Web Audio API
-                gainNodeRef.current.gain.value = 1; // Volume default (max)
-
-                // Hubungkan panner ke gain, lalu gain ke destination
-                pannerNodeRef.current.connect(gainNodeRef.current);
-                gainNodeRef.current.connect(audioContextRef.current.destination);
-
-                console.log("[InlineAudioIcon Init] AudioContext and Web Audio nodes initialized.");
-            } catch (e) {
-                console.error("[InlineAudioIcon Init] Failed to create AudioContext or Web Audio nodes:", e);
-                audioContextRef.current = null; // Set null jika gagal
-                pannerNodeRef.current = null;
-                gainNodeRef.current = null;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) {
+                console.warn("Web Audio API not supported in this browser.");
+                return;
             }
+            audioContextRef.current = new AudioContext();
+
+            pannerNodeRef.current = audioContextRef.current.createPanner();
+            pannerNodeRef.current.panningModel = 'HRTF';
+            pannerNodeRef.current.distanceModel = 'linear';
+            pannerNodeRef.current.refDistance = 1;
+            pannerNodeRef.current.maxDistance = 1000;
+            pannerNodeRef.current.rolloffFactor = 1;
+
+            gainNodeRef.current = audioContextRef.current.createGain();
+            gainNodeRef.current.gain.value = 1; // Default volume
+
+            pannerNodeRef.current.connect(gainNodeRef.current);
+            gainNodeRef.current.connect(audioContextRef.current.destination);
+
+            console.log("[InlineAudioIcon Init] AudioContext, PannerNode, and GainNode initialized.");
+        } catch (e) {
+            console.error("[InlineAudioIcon Init] Failed to create AudioContext or Web Audio nodes:", e);
+            audioContextRef.current = null; // Set null jika gagal
+            pannerNodeRef.current = null;
+            gainNodeRef.current = null;
         }
-    };
+    }, []); // useCallback dengan dependencies kosong agar tidak dibuat ulang
 
     React.useEffect(() => {
         initAudioNodes(); // Panggil saat komponen mount
-    }, []);
+    }, [initAudioNodes]); // Tergantung pada initAudioNodes (yang memoized)
 
-    const panIntervalIdRef = React.useRef(null); // Ref untuk menyimpan ID interval panning
-
-    const togglePlay = async (e) => {
-        e.stopPropagation(); // Mencegah event klik menyebar ke akordeon
-
-        if (!audioRef.current || !src) { // Pastikan elemen audio dan src tersedia
-            console.warn("Audio element not ready or src is empty for InlineAudioIcon.");
+    // Fungsi untuk memulai efek panning 8D
+    const startPanning = React.useCallback(() => {
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
+        if (!panner || !gainNode) {
+            console.warn("Panner or GainNode not available for panning.");
             return;
         }
 
+        let time = 0;
+        const cycleDuration = 10000; // Siklus penuh 10 detik
+        const maxDistance = 15; // Jarak maksimal untuk efek 3D
+
+        if (panIntervalIdRef.current) {
+            clearInterval(panIntervalIdRef.current);
+        }
+
+        panIntervalIdRef.current = setInterval(() => {
+            const normalizedTime = (time % cycleDuration) / cycleDuration;
+            
+            const x = maxDistance * Math.sin(2 * Math.PI * normalizedTime);
+            const z = -maxDistance * Math.cos(2 * Math.PI * normalizedTime);
+
+            panner.positionX.value = x;
+            panner.positionY.value = 0; // Tetap di tengah vertikal
+            panner.positionZ.value = z;
+
+            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance)); // Dari 0.5 sampai 1.0
+            gainNode.gain.value = volume;
+
+            time += 50; // Update setiap 50ms
+        }, 50);
+    }, []); // useCallback dengan dependencies kosong
+
+    // Fungsi untuk menghentikan panning
+    const stopPanning = React.useCallback(() => {
+        if (panIntervalIdRef.current) {
+            clearInterval(panIntervalIdRef.current);
+            panIntervalIdRef.current = null;
+            if (pannerNodeRef.current && gainNodeRef.current) {
+                pannerNodeRef.current.positionX.value = 0;
+                pannerNodeRef.current.positionY.value = 0;
+                pannerNodeRef.current.positionZ.value = 0;
+                gainNodeRef.current.gain.value = 1; // Reset volume ke normal
+            }
+        }
+    }, []);
+
+    // Fungsi utama toggle play/pause
+    const togglePlay = async (e) => {
+        e.stopPropagation(); // Mencegah event klik menyebar ke akordeon
+
         const thisAudio = audioRef.current;
-        const audioContext = audioContextRef.current;
-        const panner = pannerNodeRef.current;
-        const gainNode = gainNodeRef.current;
+        if (!thisAudio || !src) {
+            console.warn("Audio element not ready or src is empty for InlineAudioIcon. Skipping play.");
+            return;
+        }
 
         // Jika audio ini sedang berputar, hentikan saja
         if (isPlaying) {
             thisAudio.pause();
             thisAudio.currentTime = 0;
+            stopPanning(); // Hentikan panning
             return;
         }
 
         // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO LAIN ---
-        // Hentikan semua elemen <audio> HTML di halaman
         document.querySelectorAll('audio').forEach(otherAudio => {
-            if (otherAudio !== thisAudio) { // Pastikan tidak menghentikan diri sendiri
+            if (otherAudio !== thisAudio) {
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
+                // Jika ada komponen React lain, ini mungkin tidak mereset state `isPlaying` mereka.
+                // Untuk kasus ini, karena `InlineAudioIcon` adalah komponen terpisah, ini cukup.
             }
         });
-        // Pastikan juga semua interval panning dari InlineAudioIcon lain berhenti
-        // Ini tricky tanpa Context API global, jadi kita rely on cleanup effect.
+        
+        // Atur SRC dan load, lalu tunggu hingga siap diputar
+        thisAudio.src = src;
+        thisAudio.load(); // Load the audio content
 
-        // Pastikan AudioContext dalam kondisi 'running'
+        // Tunggu hingga audio bisa diputar (event canplaythrough)
+        // Jika sudah loaded, promise ini akan langsung resolve
+        try {
+            await new Promise((resolve, reject) => {
+                // Jika sudah siap atau tidak ada src, langsung resolve
+                if (thisAudio.readyState >= 3) { // HAVE_FUTURE_DATA atau HAVE_ENOUGH_DATA
+                    resolve();
+                } else {
+                    const handleCanPlayThrough = () => {
+                        thisAudio.removeEventListener('canplaythrough', handleCanPlayThrough);
+                        thisAudio.removeEventListener('error', handleError);
+                        resolve();
+                    };
+                    const handleError = () => {
+                        thisAudio.removeEventListener('canplaythrough', handleCanPlayThrough);
+                        thisAudio.removeEventListener('error', handleError);
+                        reject(new Error("Failed to load audio."));
+                    };
+                    thisAudio.addEventListener('canplaythrough', handleCanPlayThrough);
+                    thisAudio.addEventListener('error', handleError);
+                }
+            });
+            setIsLoaded(true); // Tandai bahwa audio sudah siap dimuat
+            console.log(`Audio for ${src} is ready to play.`);
+        } catch (loadError) {
+            console.error(`Error preparing audio for ${src}:`, loadError);
+            alert("Gagal memuat audio. Pastikan format file cocok atau koneksi stabil.");
+            setIsLoaded(false);
+            return;
+        }
+
+        // Lanjutkan AudioContext jika suspended (penting untuk memulai play)
+        const audioContext = audioContextRef.current;
         if (audioContext && audioContext.state === 'suspended') {
             try {
                 await audioContext.resume();
@@ -1364,9 +1453,8 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             }
         }
 
-        // Setel src dan muat audio
-        thisAudio.src = src;
-        thisAudio.load();
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
 
         if (audioContext && panner && gainNode) {
             // Buat atau gunakan MediaElementSourceNode yang sesuai
@@ -1385,17 +1473,25 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             try {
                 await thisAudio.play();
                 setIsPlaying(true);
-                // Mulai panning hanya jika isPlaying
-                if (isPlaying) { // Check again after play() promise resolves
-                    startPanning();
-                }
+                startPanning(); // Mulai panning
+                console.log("Web Audio API playback started for: " + src);
             } catch (error) {
-                console.error("Audio Playback Error for InlineAudioIcon " + src + ":", error);
+                console.error("Web Audio API Playback Error for InlineAudioIcon " + src + ":", error);
                 setIsPlaying(false);
+                stopPanning(); // Hentikan panning jika play gagal
                 if (error.name === "NotAllowedError" || error.name === "AbortError") {
                     alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
                 } else {
-                    alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+                    alert("Gagal memutar audio 8D. Mencoba memutar audio biasa.");
+                    // Fallback ke pemutaran HTML audio biasa
+                    try {
+                        thisAudio.play();
+                        setIsPlaying(true);
+                        console.log("Fallback to direct HTML audio playback for: " + src);
+                    } catch (fallbackError) {
+                        console.error("Fallback HTML Audio Playback Error:", fallbackError);
+                        alert("Gagal memutar audio. Coba lagi.");
+                    }
                 }
             }
 
@@ -1405,6 +1501,7 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             try {
                 await thisAudio.play();
                 setIsPlaying(true);
+                console.log("Direct HTML audio playback started for: " + src);
             } catch (error) {
                 console.error("Direct HTML Audio Playback Error for " + src + ":", error);
                 setIsPlaying(false);
@@ -1417,40 +1514,6 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
         }
     };
 
-    // Fungsi untuk memulai efek panning 8D
-    const startPanning = () => {
-        const panner = pannerNodeRef.current;
-        const gainNode = gainNodeRef.current;
-        if (!panner || !gainNode) return;
-
-        let time = 0;
-        const cycleDuration = 10000; // Siklus penuh 10 detik
-        const maxDistance = 15; // Jarak maksimal untuk efek 3D
-
-        if (panIntervalIdRef.current) {
-            clearInterval(panIntervalIdRef.current);
-        }
-
-        panIntervalIdRef.current = setInterval(() => {
-            const normalizedTime = (time % cycleDuration) / cycleDuration;
-            
-            // Gerakan X (kiri-kanan) dan Z (depan-belakang)
-            const x = maxDistance * Math.sin(2 * Math.PI * normalizedTime);
-            const z = -maxDistance * Math.cos(2 * Math.PI * normalizedTime);
-
-            panner.positionX.value = x;
-            panner.positionY.value = 0; // Tetap di tengah vertikal
-            panner.positionZ.value = z;
-
-            // Volume disesuaikan dengan posisi Z (lebih jauh lebih pelan)
-            // Ini akan membuat efek suara terasa "mendekat" dan "menjauh"
-            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance)); // Dari 0.5 sampai 1.0
-            gainNode.gain.value = volume;
-
-            time += 50; // Update setiap 50ms
-        }, 50);
-    };
-
     // Efek untuk memantau status audio
     React.useEffect(() => {
         const audio = audioRef.current;
@@ -1458,53 +1521,49 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
         
         audio.loop = isLooping;
 
-        const handlePlay = () => {
-            setIsPlaying(true);
-            // Mulai panning jika ini adalah audio 8D (Web Audio API aktif)
-            if (audioContextRef.current && pannerNodeRef.current) {
-                startPanning();
-            }
-        };
-
-        const handlePause = () => {
+        const handlePlay = () => setIsPlaying(true);
+        const handlePause = () => { // Handle pause dan stop panning
             setIsPlaying(false);
-            if (panIntervalIdRef.current) {
-                clearInterval(panIntervalIdRef.current);
-                panIntervalIdRef.current = null;
-                // Reset panner position and volume when paused
-                if (pannerNodeRef.current && gainNodeRef.current) {
-                    pannerNodeRef.current.positionX.value = 0;
-                    pannerNodeRef.current.positionY.value = 0;
-                    pannerNodeRef.current.positionZ.value = 0;
-                    gainNodeRef.current.gain.value = 1; // Reset volume ke normal
-                }
-            }
+            stopPanning();
         };
-
         const handleEnded = () => { 
             if(!isLooping) {
                 handlePause(); // Panggil handlePause untuk membersihkan panning
             }
         };
-        
+        const handleLoadedData = () => { // Event saat metadata dan cukup data termuat
+            setIsLoaded(true);
+            console.log(`Audio ${src} loaded data.`);
+        };
+        const handleError = (e) => { // Tangani error loading/network
+            console.error(`Audio error for ${src}:`, e.target.error);
+            setIsLoaded(false);
+            setIsPlaying(false);
+            stopPanning();
+            // Optional: alert(`Error memuat audio ${src}. Coba periksa URL atau koneksi.`)
+        };
+
         audio.addEventListener('play', handlePlay);
         audio.addEventListener('pause', handlePause);
         audio.addEventListener('ended', handleEnded);
+        audio.addEventListener('loadeddata', handleLoadedData); // Tambahkan listener ini
+        audio.addEventListener('error', handleError); // Tambahkan listener ini
 
         // Cleanup saat komponen di-unmount
         return () => {
             audio.removeEventListener('play', handlePlay);
             audio.removeEventListener('pause', handlePause);
             audio.removeEventListener('ended', handleEnded);
+            audio.removeEventListener('loadeddata', handleLoadedData);
+            audio.removeEventListener('error', handleError);
+            
             // Hentikan audio dan bersihkan panning saat komponen unmount
             if (audio) {
                 audio.pause();
                 audio.currentTime = 0;
             }
-            if (panIntervalIdRef.current) {
-                clearInterval(panIntervalIdRef.current);
-                panIntervalIdRef.current = null;
-            }
+            stopPanning(); // Pastikan panning berhenti
+            
             // Disconnect source node jika ada
             if (sourceNodeRef.current) {
                 sourceNodeRef.current.disconnect();
@@ -1512,11 +1571,11 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             }
             // Jangan tutup AudioContext di sini, karena mungkin dipakai komponen lain
         };
-    }, [src, isLooping]); // Tambahkan src ke dependencies agar useEffect re-run saat src berubah
+    }, [src, isLooping, startPanning, stopPanning]); // Tambahkan startPanning/stopPanning ke dependencies jika perlu (karena useCallback)
 
     return (
         <button onClick={togglePlay} className="inline-flex items-center gap-2 ml-3 text-gray-500 hover:text-blue-600 transition-colors" title={isPlaying ? "Hentikan Audio" : "Putar Audio"}>
-            <audio ref={audioRef} src={src} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
+            <audio ref={audioRef} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
             
             {isPlaying ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse text-blue-500" viewBox="0 0 20 20" fill="currentColor">
@@ -1529,7 +1588,7 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             )}
 
             <span className="text-xs font-semibold">
-                {isPlaying ? 'Sedang Mendengar...' : 'Dengarkan'}
+                {isPlaying ? 'Sedang Mendengar...' : (isLoaded ? 'Dengarkan' : 'Memuat...')}
             </span>
         </button>
     );
