@@ -674,8 +674,17 @@ const AffirmationRoom = () => {
             <div className="relative z-10 w-full max-w-3xl text-center flex flex-col justify-center items-center">
                 {phase === 'input' && (
                     <div className="animate-fade-in w-full px-4">
-                        <h1 className="text-3xl md:text-5xl font-bold mb-4">Ruang Afirmasi Visual</h1>
-                        <p className="mb-6 text-gray-300">Tuliskan doa atau afirmasi positif Anda (maks. 15 kata).</p>
+                        <h1 className="text-3xl md:text-5xl font-bold mb-4">Ruang Manifestasi Visual</h1>
+                        <p className="mb-6 text-gray-300">Tuliskan doa atau Manifestasi Anda (maks. 15 kata).</p>
+                        <textarea value={affirmationText} onChange={(e) => setAffirmationText(e.target.value)}
+                             className="w-full max-w-md h-24 bg-gray-800 border border-gray-700 rounded-lg text-xl p-4 focus:outline-none focus:ring-2 focus:ring-sky-500 force-uppercase"
+    placeholder="Contoh: Rezeki berlimpah ">
+</textarea>
+                        <p className={`text-sm mt-2 ${affirmationText.trim().split(/\s+/).filter(Boolean).length > 15 ? 'text-red-500' : 'text-gray-400'}`}>
+                            Jumlah Kata: {affirmationText.trim().split(/\s+/).filter(Boolean).length} / 15
+                        </p>
+                        {error && <p className="text-red-500 mt-2">{error}</p>}
+                        
                         
                         {/* Dropdown untuk memilih dari Bucket List Goal */}
                         {savedGoals.length > 0 && (
@@ -684,7 +693,7 @@ const AffirmationRoom = () => {
                                 <select 
                                     id="select-goal"
                                     onChange={handleLoadFromGoal}
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white mb-4"
+                                    className="w-full max-w-md h-24 bg-gray-800 border border-gray-700 rounded-lg text-xl p-4 focus:outline-none focus:ring-2 focus:ring-sky-500 force-uppercase"
                                     value="" 
                                 >
                                     <option value="" disabled>Pilih Goal yang Tersimpan...</option>
@@ -697,7 +706,7 @@ const AffirmationRoom = () => {
 
                         {/* Input File untuk Unggah Gambar (Opsional) */}
                         <div className="mb-6">
-                            <label htmlFor="image-upload" className="block text-gray-300 text-lg font-semibold mb-2">Pilih Gambar Afirmasi Anda (Opsional):</label>
+                            <label htmlFor="image-upload" className="block text-gray-300 text-lg font-semibold mb-2">Pilih Gambar Manifestasi Anda (Opsional):</label>
                             <input
                                 type="file"
                                 id="image-upload"
@@ -719,25 +728,13 @@ const AffirmationRoom = () => {
                                     className="mt-2 text-red-400 hover:text-red-500 text-sm">Hapus Gambar</button>
                             )}
                         </div>
-
-                        <textarea value={affirmationText} onChange={(e) => setAffirmationText(e.target.value)}
-                            className="w-full h-32 bg-gray-800 border border-gray-700 rounded-lg text-xl p-4 focus:outline-none focus:ring-2 focus:ring-sky-500 force-uppercase"
-                            placeholder="Contoh: Rezeki berlimpah datang padaku dengan mudah dan menyenangkan..."></textarea>
-                        <p className={`text-sm mt-2 ${affirmationText.trim().split(/\s+/).filter(Boolean).length > 15 ? 'text-red-500' : 'text-gray-400'}`}>
-                            Jumlah Kata: {affirmationText.trim().split(/\s+/).filter(Boolean).length} / 15
-                        </p>
-                        {error && <p className="text-red-500 mt-2">{error}</p>}
-                        
-                        <button onClick={() => handleStart(false)} disabled={!affirmationText.trim()} 
+<button onClick={() => handleStart(false)} disabled={!affirmationText.trim()} 
                             className="mt-8 w-full max-w-sm bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-sky-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
                             {isAudioReady ? 'Mulai Sesi Afirmasi' : 'Memuat Audio...'}
                         </button>
                         
-                        {!isAudioReady && affirmationText.trim() && (
-                            <button onClick={() => handleStart(true)} 
-                                className="mt-4 w-full max-w-sm bg-gray-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300">
-                                Lanjutkan Tanpa Audio (Hanya Visual)
-                            </button>
+                        
+                        
                         )}
                     </div>
                 )}
