@@ -735,7 +735,7 @@ const AffirmationRoom = () => {
                         
                         
                         
-                        )}
+                        
                     </div>
                 )}
                 
@@ -2036,6 +2036,7 @@ const LoginScreen = () => {
 };
 
 // --- KOMPONEN BARU: PENGATURAN PESAN REMINDER KUSTOM ---
+// --- KOMPONEN BARU: PENGATURAN PESAN REMINDER KUSTOM ---
 const ReminderSettings = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     // State untuk menyimpan pesan kustom dari localStorage
@@ -2063,7 +2064,7 @@ const ReminderSettings = () => {
 
         if (editIndex !== null) {
             // Mode Edit
-            const updatedReminders = customReminders.map((reminder, index) => 
+            const updatedReminders = customReminders.map((reminder, index) =>
                 index === editIndex ? trimmedText : reminder
             );
             setCustomReminders(updatedReminders);
@@ -2100,7 +2101,7 @@ const ReminderSettings = () => {
         <div className={contentContainerClasses}>
             <h2 className={`${sectionTitleClasses} text-left`}>📝 LIST GOAL</h2>
             <p className={`${paragraphClasses}`}>
-                Anda dapat membuat hingga 5 Daftar Goal. 
+                Anda dapat membuat hingga 5 Daftar Goal.
             </p>
 
             <div className="mb-6">
@@ -2161,7 +2162,17 @@ const ReminderSettings = () => {
                 </ul>
             )}
 
-            <div className="text-center mt-10">
+            <div className="text-center mt-10 flex flex-col gap-4"> {/* Menggunakan flex-col dan gap-4 untuk tombol */}
+                {/* Tombol Akses Ruang Afirmasi */}
+                {customReminders.length > 0 && (
+                    <button
+                        onClick={() => setCurrentPageKey('affirmation-room')}
+                        className="bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-sky-700 transition-all duration-300 transform hover:scale-105"
+                    >
+                        Akses Ruang Afirmasi Anda ✨
+                    </button>
+                )}
+
                 <button
                     onClick={() => setCurrentPageKey('daftar-isi')}
                     className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
