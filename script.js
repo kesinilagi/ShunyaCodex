@@ -720,9 +720,8 @@ const AffirmationRoom = () => {
                                 file:bg-violet-50 file:text-violet-700
                                 hover:file:bg-violet-100"
                             />
-                            {uploadedImage && (
-                                <img src={uploadedImage} alt="Preview Gambar" className="mt-4 max-h-48 object-contain mx-auto border border-gray-700 rounded-lg shadow-md" />
-                            )}
+                            
+                            
                             {uploadedImage && (
                                 <button onClick={() => { URL.revokeObjectURL(uploadedImage); setUploadedImage(null); if(fileInputRef.current) fileInputRef.current.value = ""; }}
                                     className="mt-2 text-red-400 hover:text-red-500 text-sm">Hapus Gambar</button>
