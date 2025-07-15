@@ -1456,7 +1456,7 @@ const SecretRoomRezeki = () => {
     // Data audio latar
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
-    { name: 'Angel Abundance', src: 'musik/AngelAbundance.mp3' },
+    { name: 'Angel Abundance', src: 'musik/AngelAmbient.mp3' },
     { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
     { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
     { name: 'Hening (Mati)', src: '' }
@@ -3680,7 +3680,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, tidak ada kemudahan kecuali apa yang Engkau jadikan mudah, dan Engkaulah yang menjadikan kesedihan (kesulitan) itu mudah jika Engkau kehendaki.\"",
             manfaat: "Memohon kemudahan dari Allah dalam menghadapi segala kesulitan.",
             latin: "Allahumma la sahla illa maa ja‘altahu sahlan, wa anta taj‘alu al-hazna idza syi’ta sahlan.",
-            audioSrc: "musik/Allahumasahla.mp3" // This audio seems duplicated, might want a different one.
+            audioSrc: "musik/Allahumasahla.mp3" 
         },
         {
             id: 9,
@@ -3698,7 +3698,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Katakanlah (Muhammad), ‘Wahai Allah, Pemilik kerajaan, Engkau berikan kerajaan kepada siapa yang Engkau kehendaki, dan Engkau cabut kerajaan dari siapa yang Engkau kehendaki. Engkau muliakan siapa yang Engkau kehendaki, dan Engkau hinakan siapa yang Engkau kehendaki. Di tangan-Mu segala kebajikan. Sungguh, Engkau Mahakuasa atas segala sesuatu. Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau berikan rezeki kepada siapa yang Engkau kehendaki tanpa perhitungan\"",
             manfaat: "memohon dibalikkan keadaan, diangkat derajat, dicukupkan rezeki, dan diberi kemuliaan di dunia & akhirat.",
             latin: "Qulillaahumma maalikal-mulki tu’til-mulka man tasyā’u wa tanzi‘ul-mulka mimman tasyā’, wa tu‘izzu man tasyā’u wa tudzillu man tasyā’, biyadikal-khayr, innaka ‘alā kulli syay’in qadiir. Tuulijul-layla fin-nahāri wa tuulijun-nahāra fil-layl, wa tukhrijul-hayya minal-mayyit, wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyā’u bighayri hisāb.",
-            audioSrc: "musik/Surah2627.mp3"
+            audioSrc: "Surah2627.mp3"
         },
     ];
 
