@@ -3114,7 +3114,7 @@ const DoaHarianPlaylist = () => {
 // --- KOMPONEN BARU: DOA LOA CODEX (GAMBAR DAN TOMBOL FIXED) ---
 // Data untuk Doa LoA Codex Categories (PASTE INI DI LUAR KOMPONEN JIKA BANYAK KOMPONEN MEMBUTUHKANNYA, ATAU BIARKAN DI DALAM SEPERTI INI)
 const loaCodexDoaCategories = [
-    { id: 'rezeki', name: "Rezeki", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Rejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'rezeki', name: "Rezeki", audioUrl: "musik/Loa%20Rejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'jodoh', name: "Jodoh", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Jodoh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'promil', name: "Promil", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Promil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'hutang', name: "Hutang", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Hutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
@@ -3145,7 +3145,7 @@ const premisNiatText = `
 `;
 
 // URL Musik Latar untuk Doa LoA Codex
-const DOA_LOA_CODEX_AMBIENT_MUSIC = "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/lyra.mp3"; // Ganti URL musik latar pilihanmu
+const DOA_LOA_CODEX_AMBIENT_MUSIC = "musik/lyra.mp3"; // Ganti URL musik latar pilihanmu
 
 const DoaLoaCodex = () => {
     const { setCurrentPageKey } = useContext(AppContext);
