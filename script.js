@@ -752,35 +752,6 @@ const AffirmationRoom = () => {
         </div>
     );
 };
-
-
-// --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
-const SecretRoomRezeki = () => {
-    const { setCurrentPageKey } = useContext(AppContext);
-    // State untuk mengelola fase saat ini
-    const [currentPhase, setCurrentPhase] = useState('time_check'); 
-    
-    // State untuk mengelola audio utama setiap fase
-    const audioReleaseRef = useRef(null);
-    const audioManifestationRef = useRef(null);
-    const audioGratitudeRef = useRef(null); // <--- KOREKSI INI: CUKUP useRef(null)
-
-    // State untuk melacak apakah audio di fase saat ini sedang bermain
-    const [isCurrentAudioPlaying, setIsCurrentAudioPlaying] = useState(false);
-
-    // State untuk audio latar (background ambient sound)
-    const backgroundAudioRef = useRef(null);
-    const [selectedBackgroundSound, setSelectedBackgroundSound] = useState(''); // URL audio latar
-    const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(false);
-    const [isCandleLit, setIsCandleLit] = useState(false); // State baru untuk lilin menyala
-
-    // States for Password & Time Check
-    // passwordInput, passwordError, CORRECT_PASSWORD dihapus
-    const [timeError, setTimeError] = useState('');
-
-    // Allowed time: 12 AM (0) to 4 AM (4). Note: JavaScript uses 0-23 for hours.
-    const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
-    const ALLOW_END_HOUR = 4;   // 04:00 (4 AM) -- Mengembalikan ke jam 4 pagi sesuai instruksi awal
 // --- KOMPONEN BARU: AmbientSoundAccordion untuk Ruang Rahasia ---
 const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
     const audioPreviewRef = useRef(null);
@@ -892,6 +863,35 @@ const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBack
         </div>
     );
 };
+
+// --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
+const SecretRoomRezeki = () => {
+    const { setCurrentPageKey } = useContext(AppContext);
+    // State untuk mengelola fase saat ini
+    const [currentPhase, setCurrentPhase] = useState('time_check'); 
+    
+    // State untuk mengelola audio utama setiap fase
+    const audioReleaseRef = useRef(null);
+    const audioManifestationRef = useRef(null);
+    const audioGratitudeRef = useRef(null); // <--- KOREKSI INI: CUKUP useRef(null)
+
+    // State untuk melacak apakah audio di fase saat ini sedang bermain
+    const [isCurrentAudioPlaying, setIsCurrentAudioPlaying] = useState(false);
+
+    // State untuk audio latar (background ambient sound)
+    const backgroundAudioRef = useRef(null);
+    const [selectedBackgroundSound, setSelectedBackgroundSound] = useState(''); // URL audio latar
+    const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(false);
+    const [isCandleLit, setIsCandleLit] = useState(false); // State baru untuk lilin menyala
+
+    // States for Password & Time Check
+    // passwordInput, passwordError, CORRECT_PASSWORD dihapus
+    const [timeError, setTimeError] = useState('');
+
+    // Allowed time: 12 AM (0) to 4 AM (4). Note: JavaScript uses 0-23 for hours.
+    const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
+    const ALLOW_END_HOUR = 4;   // 04:00 (4 AM) -- Mengembalikan ke jam 4 pagi sesuai instruksi awal
+
     // Data audio latar
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
