@@ -3114,7 +3114,7 @@ const DoaHarianPlaylist = () => {
 // --- KOMPONEN BARU: DOA LOA CODEX (GAMBAR DAN TOMBOL FIXED) ---
 // Data untuk Doa LoA Codex Categories (PASTE INI DI LUAR KOMPONEN JIKA BANYAK KOMPONEN MEMBUTUHKANNYA, ATAU BIARKAN DI DALAM SEPERTI INI)
 const loaCodexDoaCategories = [
-    { id: 'rezeki', name: "Rezeki", audioUrl: "musik/Loa%20Rejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'rezeki', name: "Rezeki", audioUrl: "musik/Lyra.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'jodoh', name: "Jodoh", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Jodoh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'promil', name: "Promil", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Promil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
     { id: 'hutang', name: "Hutang", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Hutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
