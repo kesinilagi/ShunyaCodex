@@ -781,7 +781,117 @@ const SecretRoomRezeki = () => {
     // Allowed time: 12 AM (0) to 4 AM (4). Note: JavaScript uses 0-23 for hours.
     const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
     const ALLOW_END_HOUR = 4;   // 04:00 (4 AM) -- Mengembalikan ke jam 4 pagi sesuai instruksi awal
+// --- KOMPONEN BARU: AmbientSoundAccordion untuk Ruang Rahasia ---
+const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
+    const audioPreviewRef = useRef(null);
+    const [isPlayingPreview, setIsPlayingPreview] = useState(false);
 
+    const togglePreview = (e) => {
+        e.stopPropagation(); // Mencegah akordeon tertutup saat tombol diklik
+        const audio = audioPreviewRef.current;
+        if (!audio) return;
+
+        // Hentikan semua audio preview lainnya
+        document.querySelectorAll('audio[id="preview-audio"]').forEach(otherAudio => {
+            if (otherAudio !== audio && !otherAudio.paused) {
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+            }
+        });
+
+        // Jika suara ambient ini yang sedang diputar sebagai background utama, hentikan
+        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
+            setSelectedBackgroundSound(''); // Hentikan background utama
+            setIsPlayingPreview(false); // Pastikan status preview juga mati
+            return;
+        }
+
+        // Jika audio ini sedang diputar sebagai preview, pause
+        if (isPlayingPreview) {
+            audio.pause();
+            audio.currentTime = 0;
+        } else {
+            // Jika belum diputar, set src dan play
+            audio.src = sound.src;
+            audio.load(); // Penting untuk memuat ulang jika src berubah
+            audio.play().then(() => {
+                setIsPlayingPreview(true);
+            }).catch(e => {
+                console.error("Error playing ambient preview audio:", e);
+                alert("Gagal memutar preview audio. Mohon izinkan autoplay.");
+            });
+        }
+    };
+
+    useEffect(() => {
+        const audio = audioPreviewRef.current;
+        if (!audio) return;
+
+        const handlePlay = () => setIsPlayingPreview(true);
+        const handlePause = () => setIsPlayingPreview(false);
+        const handleEnded = () => setIsPlayingPreview(false);
+
+        audio.addEventListener('play', handlePlay);
+        audio.addEventListener('pause', handlePause);
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.removeEventListener('play', handlePlay);
+            audio.removeEventListener('pause', handlePause);
+            audio.removeEventListener('ended', handleEnded);
+            if (audio) { audio.pause(); audio.currentTime = 0; } // Bersihkan saat unmount
+        };
+    }, [sound.src]); // Re-run effect if sound.src changes
+
+    // Update isPlayingPreview berdasarkan selectedBackgroundSound
+    useEffect(() => {
+        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
+            setIsPlayingPreview(true);
+        } else {
+            setIsPlayingPreview(false);
+        }
+    }, [selectedBackgroundSound, isBackgroundPlaying, sound.src]);
+
+
+    return (
+        <div className="bg-gray-700 rounded-lg shadow-md mb-2">
+            <div className="p-3 flex justify-between items-center text-left">
+                <span className="text-lg font-semibold text-white">{sound.name}</span>
+                <div className="flex items-center gap-2">
+                    {sound.src && ( // Hanya tampilkan tombol preview jika ada src audio
+                        <button
+                            onClick={togglePreview}
+                            className="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded-full transition-colors"
+                            title={isPlayingPreview ? "Hentikan Preview" : "Dengarkan Preview"}
+                        >
+                            {isPlayingPreview ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                            <audio id="preview-audio" ref={audioPreviewRef} preload="auto" loop></audio> {/* Gunakan id agar bisa di-selectAll */}
+                        </button>
+                    )}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBackgroundSound(sound.src); // Setel ini sebagai background utama
+                            onStartSession(); // Lanjutkan ke fase berikutnya
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-semibold transition-colors"
+                        disabled={sound.src === selectedBackgroundSound && isBackgroundPlaying} // Disable jika sudah aktif
+                    >
+                        {sound.src === selectedBackgroundSound && isBackgroundPlaying ? 'Aktif' : 'Pilih & Mulai'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
     // Data audio latar
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
