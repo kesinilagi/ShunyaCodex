@@ -1271,27 +1271,25 @@ const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
 };
 
 
-// ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
 // ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
 // ### VERSI INI MENINGKATKAN KESTABILAN PEMUTARAN UNTUK INLINE AUDIO ICON ###
-// ### DAN MENGATUR INITALISASI AUDIO CONTEXT DENGAN LEBIH HATI-HATI ###
+// ### DENGAN FOKUS PADA PENGELOLAAN AUTOPLAY POLICY DAN AUDIO CONTEXT ###
 const InlineAudioIcon = ({ src, isLooping = false }) => {
     const audioRef = React.useRef(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
-    const [isLoaded, setIsLoaded] = React.useState(false); // State untuk melacak apakah audio sudah siap
+    const [isAudioLoadedAndReady, setIsAudioLoadedAndReady] = React.useState(false); // Melacak kesiapan audio
+    const [showUserInteractionPrompt, setShowUserInteractionPrompt] = React.useState(false); // Untuk tombol "Aktifkan Audio"
 
     // --- Referensi untuk Web Audio API ---
-    // Gunakan AudioContext global jika memungkinkan, atau atur dengan hati-hati per instance.
-    // Untuk kesederhanaan dan menghindari konflik global yang tidak disengaja,
-    // kita akan tetap inisialisasi per instance, tetapi dengan `once` flag
-    // dan `resume` yang hati-hati.
     const audioContextRef = React.useRef(null);
     const pannerNodeRef = React.useRef(null);
     const sourceNodeRef = React.useRef(null);
     const gainNodeRef = React.useRef(null);
-    const panIntervalIdRef = React.useRef(null); // Ref untuk menyimpan ID interval panning
+    const panIntervalIdRef = React.useRef(null);
 
-    // Inisialisasi AudioContext dan nodes. Hanya panggil sekali per instance.
+    // Inisialisasi AudioContext dan nodes
+    // Kita buat ini jadi `React.useMemo` agar instance-nya tidak berubah antar render
+    // tapi tetap diinisialisasi oleh interaksi pertama kali.
     const initAudioNodes = React.useCallback(() => {
         if (audioContextRef.current) return; // Sudah diinisialisasi
 
@@ -1302,6 +1300,7 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
                 return;
             }
             audioContextRef.current = new AudioContext();
+            console.log("[InlineAudioIcon Init] AudioContext created (state:", audioContextRef.current.state + ").");
 
             pannerNodeRef.current = audioContextRef.current.createPanner();
             pannerNodeRef.current.panningModel = 'HRTF';
@@ -1311,36 +1310,33 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             pannerNodeRef.current.rolloffFactor = 1;
 
             gainNodeRef.current = audioContextRef.current.createGain();
-            gainNodeRef.current.gain.value = 1; // Default volume
+            gainNodeRef.current.gain.value = 1;
 
             pannerNodeRef.current.connect(gainNodeRef.current);
             gainNodeRef.current.connect(audioContextRef.current.destination);
 
-            console.log("[InlineAudioIcon Init] AudioContext, PannerNode, and GainNode initialized.");
+            console.log("[InlineAudioIcon Init] PannerNode and GainNode initialized.");
+
         } catch (e) {
             console.error("[InlineAudioIcon Init] Failed to create AudioContext or Web Audio nodes:", e);
-            audioContextRef.current = null; // Set null jika gagal
+            audioContextRef.current = null;
             pannerNodeRef.current = null;
             gainNodeRef.current = null;
         }
-    }, []); // useCallback dengan dependencies kosong agar tidak dibuat ulang
-
-    React.useEffect(() => {
-        initAudioNodes(); // Panggil saat komponen mount
-    }, [initAudioNodes]); // Tergantung pada initAudioNodes (yang memoized)
+    }, []); // Dependencies kosong, jadi memoized
 
     // Fungsi untuk memulai efek panning 8D
     const startPanning = React.useCallback(() => {
         const panner = pannerNodeRef.current;
         const gainNode = gainNodeRef.current;
         if (!panner || !gainNode) {
-            console.warn("Panner or GainNode not available for panning.");
+            console.warn("Panner or GainNode not available for panning. Cannot start 8D effect.");
             return;
         }
 
         let time = 0;
-        const cycleDuration = 10000; // Siklus penuh 10 detik
-        const maxDistance = 15; // Jarak maksimal untuk efek 3D
+        const cycleDuration = 10000;
+        const maxDistance = 15;
 
         if (panIntervalIdRef.current) {
             clearInterval(panIntervalIdRef.current);
@@ -1348,20 +1344,20 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
 
         panIntervalIdRef.current = setInterval(() => {
             const normalizedTime = (time % cycleDuration) / cycleDuration;
-            
             const x = maxDistance * Math.sin(2 * Math.PI * normalizedTime);
             const z = -maxDistance * Math.cos(2 * Math.PI * normalizedTime);
 
             panner.positionX.value = x;
-            panner.positionY.value = 0; // Tetap di tengah vertikal
+            panner.positionY.value = 0;
             panner.positionZ.value = z;
 
-            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance)); // Dari 0.5 sampai 1.0
+            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance));
             gainNode.gain.value = volume;
 
-            time += 50; // Update setiap 50ms
+            time += 50;
         }, 50);
-    }, []); // useCallback dengan dependencies kosong
+        console.log("8D Panning started.");
+    }, []);
 
     // Fungsi untuk menghentikan panning
     const stopPanning = React.useCallback(() => {
@@ -1372,8 +1368,9 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
                 pannerNodeRef.current.positionX.value = 0;
                 pannerNodeRef.current.positionY.value = 0;
                 pannerNodeRef.current.positionZ.value = 0;
-                gainNodeRef.current.gain.value = 1; // Reset volume ke normal
+                gainNodeRef.current.gain.value = 1;
             }
+            console.log("8D Panning stopped and reset.");
         }
     }, []);
 
@@ -1391,7 +1388,7 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
         if (isPlaying) {
             thisAudio.pause();
             thisAudio.currentTime = 0;
-            stopPanning(); // Hentikan panning
+            stopPanning();
             return;
         }
 
@@ -1400,20 +1397,36 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             if (otherAudio !== thisAudio) {
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
-                // Jika ada komponen React lain, ini mungkin tidak mereset state `isPlaying` mereka.
-                // Untuk kasus ini, karena `InlineAudioIcon` adalah komponen terpisah, ini cukup.
             }
         });
         
-        // Atur SRC dan load, lalu tunggu hingga siap diputar
-        thisAudio.src = src;
-        thisAudio.load(); // Load the audio content
+        // Pastikan AudioContext diinisialisasi
+        initAudioNodes(); // Coba inisialisasi/ambil lagi AudioContext
+        const audioContext = audioContextRef.current;
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
 
-        // Tunggu hingga audio bisa diputar (event canplaythrough)
-        // Jika sudah loaded, promise ini akan langsung resolve
+        // Penting: Resume AudioContext jika suspended
+        if (audioContext && audioContext.state === 'suspended') {
+            try {
+                await audioContext.resume();
+                console.log("AudioContext resumed by user interaction for InlineAudioIcon.");
+            } catch (e) {
+                console.error("Error resuming AudioContext for InlineAudioIcon:", e);
+                // Tampilkan prompt ke pengguna untuk interaksi lebih lanjut jika diperlukan
+                setShowUserInteractionPrompt(true); // Tampilkan tombol interaksi
+                alert("Browser memblokir pemutaran audio otomatis. Mohon klik OK atau sentuh layar untuk mengaktifkan audio.");
+                return; // Berhenti di sini, menunggu interaksi tambahan
+            }
+        }
+        
+        // Setel SRC dan muat audio, lalu tunggu hingga siap diputar
+        thisAudio.src = src;
+        thisAudio.load(); 
+
         try {
+            // Tunggu hingga audio bisa diputar sepenuhnya
             await new Promise((resolve, reject) => {
-                // Jika sudah siap atau tidak ada src, langsung resolve
                 if (thisAudio.readyState >= 3) { // HAVE_FUTURE_DATA atau HAVE_ENOUGH_DATA
                     resolve();
                 } else {
@@ -1422,97 +1435,81 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
                         thisAudio.removeEventListener('error', handleError);
                         resolve();
                     };
-                    const handleError = () => {
+                    const handleError = (e) => {
                         thisAudio.removeEventListener('canplaythrough', handleCanPlayThrough);
                         thisAudio.removeEventListener('error', handleError);
-                        reject(new Error("Failed to load audio."));
+                        console.error("Audio loading error event:", e);
+                        reject(new Error("Failed to load audio resource."));
                     };
                     thisAudio.addEventListener('canplaythrough', handleCanPlayThrough);
                     thisAudio.addEventListener('error', handleError);
                 }
             });
-            setIsLoaded(true); // Tandai bahwa audio sudah siap dimuat
-            console.log(`Audio for ${src} is ready to play.`);
-        } catch (loadError) {
-            console.error(`Error preparing audio for ${src}:`, loadError);
-            alert("Gagal memuat audio. Pastikan format file cocok atau koneksi stabil.");
-            setIsLoaded(false);
-            return;
-        }
+            setIsAudioLoadedAndReady(true);
+            console.log(`Audio for ${src} is fully loaded and ready.`);
 
-        // Lanjutkan AudioContext jika suspended (penting untuk memulai play)
-        const audioContext = audioContextRef.current;
-        if (audioContext && audioContext.state === 'suspended') {
-            try {
-                await audioContext.resume();
-                console.log("AudioContext resumed for InlineAudioIcon.");
-            } catch (e) {
-                console.error("Error resuming AudioContext for InlineAudioIcon:", e);
-                alert("Gagal melanjutkan pemutaran audio. Mohon berikan izin audio.");
-                return;
-            }
-        }
-
-        const panner = pannerNodeRef.current;
-        const gainNode = gainNodeRef.current;
-
-        if (audioContext && panner && gainNode) {
-            // Buat atau gunakan MediaElementSourceNode yang sesuai
-            if (!sourceNodeRef.current || sourceNodeRef.current.mediaElement !== thisAudio) {
-                if (sourceNodeRef.current) { // Disconnect yang lama jika ada
-                    sourceNodeRef.current.disconnect();
-                    sourceNodeRef.current = null;
+            // Coba putar audio dengan Web Audio API
+            if (audioContext && panner && gainNode) {
+                if (!sourceNodeRef.current || sourceNodeRef.current.mediaElement !== thisAudio) {
+                    if (sourceNodeRef.current) {
+                        sourceNodeRef.current.disconnect();
+                        sourceNodeRef.current = null;
+                    }
+                    sourceNodeRef.current = audioContext.createMediaElementSource(thisAudio);
+                    sourceNodeRef.current.connect(panner);
+                    console.log("[InlineAudioIcon] MediaElementSourceNode created and connected to panner.");
                 }
-                sourceNodeRef.current = audioContext.createMediaElementSource(thisAudio);
-                sourceNodeRef.current.connect(panner); // Hubungkan ke PannerNode
-                console.log("[InlineAudioIcon] MediaElementSourceNode created and connected.");
-            }
-            
-            thisAudio.loop = isLooping;
-
-            try {
+                thisAudio.loop = isLooping;
                 await thisAudio.play();
                 setIsPlaying(true);
-                startPanning(); // Mulai panning
+                startPanning();
                 console.log("Web Audio API playback started for: " + src);
-            } catch (error) {
-                console.error("Web Audio API Playback Error for InlineAudioIcon " + src + ":", error);
-                setIsPlaying(false);
-                stopPanning(); // Hentikan panning jika play gagal
-                if (error.name === "NotAllowedError" || error.name === "AbortError") {
-                    alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
-                } else {
-                    alert("Gagal memutar audio 8D. Mencoba memutar audio biasa.");
-                    // Fallback ke pemutaran HTML audio biasa
-                    try {
-                        thisAudio.play();
-                        setIsPlaying(true);
-                        console.log("Fallback to direct HTML audio playback for: " + src);
-                    } catch (fallbackError) {
-                        console.error("Fallback HTML Audio Playback Error:", fallbackError);
-                        alert("Gagal memutar audio. Coba lagi.");
-                    }
-                }
-            }
-
-        } else {
-            console.warn("Web Audio API not fully available or failed to initialize, playing directly via HTMLAudioElement.");
-            thisAudio.loop = isLooping;
-            try {
+            } else { // Fallback jika Web Audio API tidak berfungsi
+                console.warn("Web Audio API not fully initialized or supported, falling back to direct HTML audio.");
+                thisAudio.loop = isLooping;
                 await thisAudio.play();
                 setIsPlaying(true);
                 console.log("Direct HTML audio playback started for: " + src);
-            } catch (error) {
-                console.error("Direct HTML Audio Playback Error for " + src + ":", error);
-                setIsPlaying(false);
-                if (error.name === "NotAllowedError" || error.name === "AbortError") {
-                    alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
-                } else {
-                    alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
-                }
+            }
+            setShowUserInteractionPrompt(false); // Sembunyikan prompt jika sukses
+
+        } catch (error) {
+            console.error("Audio Playback/Load Error for InlineAudioIcon " + src + ":", error);
+            setIsPlaying(false);
+            stopPanning();
+            if (error.name === "NotAllowedError" || error.name === "AbortError" || error.message === "Failed to load audio resource.") {
+                // Ini adalah error akibat autoplay policy atau gagal load
+                setShowUserInteractionPrompt(true); // Tampilkan prompt agar user klik
+                alert("Gagal memutar audio. Browser memblokir pemutaran otomatis atau file tidak dapat dimuat. Mohon klik 'Aktifkan Audio' jika muncul.");
+            } else {
+                alert("Terjadi kesalahan tak terduga saat memutar audio. Silakan coba lagi.");
             }
         }
     };
+
+    // Global listener untuk mengaktifkan AudioContext jika suspended
+    // Ini adalah fallback jika `resume()` di `togglePlay` gagal
+    React.useEffect(() => {
+        const handleFirstInteraction = () => {
+            if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+                audioContextRef.current.resume().then(() => {
+                    console.log("Global AudioContext resumed by first document click/touch.");
+                }).catch(e => console.error("Error resuming global AudioContext:", e));
+            }
+            // Hapus listener setelah interaksi pertama
+            document.removeEventListener('click', handleFirstInteraction);
+            document.removeEventListener('touchstart', handleFirstInteraction);
+        };
+
+        document.addEventListener('click', handleFirstInteraction);
+        document.addEventListener('touchstart', handleFirstInteraction);
+
+        return () => {
+            document.removeEventListener('click', handleFirstInteraction);
+            document.removeEventListener('touchstart', handleFirstInteraction);
+        };
+    }, []);
+
 
     // Efek untuk memantau status audio
     React.useEffect(() => {
@@ -1521,57 +1518,41 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
         
         audio.loop = isLooping;
 
-        const handlePlay = () => setIsPlaying(true);
-        const handlePause = () => { // Handle pause dan stop panning
+        const handlePlayEvent = () => setIsPlaying(true);
+        const handlePauseEvent = () => { setIsPlaying(false); stopPanning(); };
+        const handleEndedEvent = () => { 
+            if(!isLooping) handlePauseEvent(); 
+        };
+        const handleLoadedDataEvent = () => { setIsAudioLoadedAndReady(true); };
+        const handleErrorEvent = (e) => { 
+            console.error(`Audio event error for ${src}:`, e.target.error);
+            setIsAudioLoadedAndReady(false);
             setIsPlaying(false);
             stopPanning();
-        };
-        const handleEnded = () => { 
-            if(!isLooping) {
-                handlePause(); // Panggil handlePause untuk membersihkan panning
-            }
-        };
-        const handleLoadedData = () => { // Event saat metadata dan cukup data termuat
-            setIsLoaded(true);
-            console.log(`Audio ${src} loaded data.`);
-        };
-        const handleError = (e) => { // Tangani error loading/network
-            console.error(`Audio error for ${src}:`, e.target.error);
-            setIsLoaded(false);
-            setIsPlaying(false);
-            stopPanning();
-            // Optional: alert(`Error memuat audio ${src}. Coba periksa URL atau koneksi.`)
         };
 
-        audio.addEventListener('play', handlePlay);
-        audio.addEventListener('pause', handlePause);
-        audio.addEventListener('ended', handleEnded);
-        audio.addEventListener('loadeddata', handleLoadedData); // Tambahkan listener ini
-        audio.addEventListener('error', handleError); // Tambahkan listener ini
+        audio.addEventListener('play', handlePlayEvent);
+        audio.addEventListener('pause', handlePauseEvent);
+        audio.addEventListener('ended', handleEndedEvent);
+        audio.addEventListener('loadeddata', handleLoadedDataEvent);
+        audio.addEventListener('error', handleErrorEvent);
 
         // Cleanup saat komponen di-unmount
         return () => {
-            audio.removeEventListener('play', handlePlay);
-            audio.removeEventListener('pause', handlePause);
-            audio.removeEventListener('ended', handleEnded);
-            audio.removeEventListener('loadeddata', handleLoadedData);
-            audio.removeEventListener('error', handleError);
+            audio.removeEventListener('play', handlePlayEvent);
+            audio.removeEventListener('pause', handlePauseEvent);
+            audio.removeEventListener('ended', handleEndedEvent);
+            audio.removeEventListener('loadeddata', handleLoadedDataEvent);
+            audio.removeEventListener('error', handleErrorEvent);
             
-            // Hentikan audio dan bersihkan panning saat komponen unmount
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-            stopPanning(); // Pastikan panning berhenti
-            
-            // Disconnect source node jika ada
+            if (audio) { audio.pause(); audio.currentTime = 0; }
+            stopPanning();
             if (sourceNodeRef.current) {
                 sourceNodeRef.current.disconnect();
                 sourceNodeRef.current = null;
             }
-            // Jangan tutup AudioContext di sini, karena mungkin dipakai komponen lain
         };
-    }, [src, isLooping, startPanning, stopPanning]); // Tambahkan startPanning/stopPanning ke dependencies jika perlu (karena useCallback)
+    }, [src, isLooping, stopPanning, startPanning]); // Dependencies yang lengkap
 
     return (
         <button onClick={togglePlay} className="inline-flex items-center gap-2 ml-3 text-gray-500 hover:text-blue-600 transition-colors" title={isPlaying ? "Hentikan Audio" : "Putar Audio"}>
@@ -1588,170 +1569,22 @@ const InlineAudioIcon = ({ src, isLooping = false }) => {
             )}
 
             <span className="text-xs font-semibold">
-                {isPlaying ? 'Sedang Mendengar...' : (isLoaded ? 'Dengarkan' : 'Memuat...')}
+                {isPlaying ? 'Sedang Mendengar...' : (isAudioLoadedAndReady ? 'Dengarkan' : 'Memuat...')}
             </span>
+
+            {/* Tombol Prompt Interaksi Pengguna (Opsional, jika masalah autoplay parah) */}
+            {/* Ini akan muncul di dalam ikon play/pause jika audio diblokir */}
+            {showUserInteractionPrompt && (
+                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 rounded-full text-xs text-white z-10 p-1"
+                    onClick={(e) => { // Mencegah klik menyebar ke togglePlay lagi
+                        e.stopPropagation();
+                        togglePlay(e); // Coba play lagi setelah klik prompt
+                        setShowUserInteractionPrompt(false);
+                    }}>
+                    Klik!
+                </div>
+            )}
         </button>
-    );
-};
-
-
-// --- KOMPONEN BARU: AKORDEON SUARA LATAR INDIVIDUAL YANG LEBIH RINGKAS ---
-const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const previewAudioRef = useRef(null);
-    const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
-
-    // Efek untuk mengelola preview audio saat akordeon dibuka/ditutup
-    useEffect(() => {
-        const audio = previewAudioRef.current;
-        if (!audio) return;
-
-        // Jika akordeon dibuka DAN ada sumber suara DAN suara ini BUKAN suara latar utama
-        // DAN preview belum bermain, kita bisa mulai play
-        if (isOpen && sound.src && sound.src !== selectedBackgroundSound && !isPreviewPlaying) {
-             // Stop any other preview audio first
-            document.querySelectorAll('audio').forEach(otherAudio => {
-                if (otherAudio !== audio && otherAudio.id === "preview-audio") { // Only stop other preview audios
-                    otherAudio.pause();
-                    otherAudio.currentTime = 0;
-                }
-            });
-            audio.volume = 0.5; // Preview agak pelan
-            audio.loop = true; // Preview looping
-            audio.play().then(() => setIsPreviewPlaying(true)).catch(e => console.error(`Error playing preview for ${sound.name}:`, e));
-        } else if (!isOpen || sound.src === selectedBackgroundSound) { // Jika akordeon ditutup atau suara ini sudah jadi background utama
-            audio.pause();
-            audio.currentTime = 0;
-            setIsPreviewPlaying(false);
-        }
-
-        return () => {
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-                setIsPreviewPlaying(false);
-            }
-        };
-    }, [isOpen, sound.src, selectedBackgroundSound]);
-
-    // Event listener untuk saat preview audio selesai (jika tidak looping)
-    useEffect(() => {
-        const audio = previewAudioRef.current;
-        if (!audio) return;
-        const handleEnded = () => setIsPreviewPlaying(false);
-        audio.addEventListener('ended', handleEnded);
-        return () => audio.removeEventListener('ended', handleEnded);
-    }, []);
-
-
-    // Fungsi untuk toggle play/pause preview manual
-    const togglePreviewPlay = (e) => {
-        e.stopPropagation(); // Mencegah klik menyebar ke tombol akordeon
-        const audio = previewAudioRef.current;
-        if (!audio) return;
-
-        if (isPreviewPlaying) {
-            audio.pause();
-            audio.currentTime = 0;
-            setIsPreviewPlaying(false);
-        } else {
-             // Stop any other preview audio first
-            document.querySelectorAll('audio').forEach(otherAudio => {
-                if (otherAudio !== audio && otherAudio.id === "preview-audio") { // Only stop other preview audios
-                    otherAudio.pause();
-                    otherAudio.currentTime = 0;
-                }
-            });
-            audio.play().then(() => setIsPreviewPlaying(true)).catch(e => console.error(`Error playing preview for ${sound.name}:`, e));
-        }
-    };
-
-
-    const isCurrentlySelected = selectedBackgroundSound === sound.src;
-
-    return (
-        <div className="bg-gray-800 rounded-lg mb-2 overflow-hidden border border-gray-700"> {/* Ringkas: bg-gray-800 */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`w-full p-3 flex justify-between items-center text-left transition-colors duration-200
-                    ${isCurrentlySelected ? 'bg-blue-700 text-white font-semibold' : 'text-gray-200 hover:bg-gray-700'}`}
-            >
-                <span className="text-base md:text-lg">
-                    {sound.name}
-                    {isCurrentlySelected && <span className="ml-2 text-xs opacity-75">(Terpilih)</span>}
-                    {isBackgroundPlaying && isCurrentlySelected && <span className="ml-2 animate-pulse text-yellow-300">🔊</span>}
-                </span>
-                <div className="flex items-center">
-                    {/* Tombol Play/Pause Preview hanya muncul jika ada src suara */}
-                    {sound.src && (
-                        <button 
-                            onClick={togglePreviewPlay} 
-                            className="p-1 rounded-full hover:bg-gray-600 focus:outline-none"
-                            title={isPreviewPlaying ? "Hentikan Preview" : "Putar Preview"}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isPreviewPlaying ? 'text-red-400' : 'text-gray-400'}`} fill="currentColor" viewBox="0 0 20 20">
-                                {isPreviewPlaying ? (
-                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                ) : (
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                )}
-                            </svg>
-                            <audio id="preview-audio" ref={previewAudioRef} src={sound.src} preload="auto" loop></audio>
-                        </button>
-                    )}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={`h-5 w-5 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-            </button>
-            <div 
-                className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
-            >
-                <div className="overflow-hidden">
-                    {/* HAPUS BAGIAN INI UNTUK MENGHILANGKAN KETERANGAN */}
-                    {/*
-                    <div className="p-3 pt-0 text-sm text-gray-400"> 
-                        <p className="mb-2 italic">{sound.description}</p>
-                        {isCurrentlySelected ? (
-                            <p className="text-blue-300">Suara ini sedang dipilih sebagai latar utama.</p>
-                        ) : (
-                            <button
-                                onClick={() => { setSelectedBackgroundSound(sound.src); setIsOpen(false); }}
-                                className="bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded hover:bg-blue-700 transition-colors"
-                            >
-                                Pilih Sebagai Latar Utama
-                            </button>
-                        )}
-                        {!sound.src && <p className="text-gray-500">Tidak ada suara untuk pilihan ini.</p>}
-                    </div>
-                    */}
-
-                    {/* GANTI DENGAN BLOK INI (HANYA TOMBOL MULAI SESI JIKA DIPERLUKAN SAAT AKORDEON DIBUKA) */}
-                    {isOpen && ( // Hanya tampilkan tombol ini saat akordeon terbuka
-                         <div className="p-3 pt-0 text-center">
-                            <button
-                                onClick={() => { 
-                                    setSelectedBackgroundSound(sound.src); // Pilih suara latar
-                                    onStartSession(); // Langsung panggil fungsi mulai sesi
-                                    setIsOpen(false); // Tutup akordeon
-                                }}
-                                disabled={!sound.src} 
-                                className="bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed"
-                            >
-                                Mulai Sesi {sound.name === 'Hening (Mati)' ? 'Tanpa Suara' : sound.name}
-                            </button>
-                            {!sound.src && <p className="text-gray-500 mt-2">Tidak ada suara untuk pilihan ini.</p>}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
     );
 };
 
