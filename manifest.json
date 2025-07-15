@@ -1,25 +1,25 @@
-// public/manifest.json
+// manifest.json (di folder ROOT aplikasi Anda)
 {
-  "name": "LOA Codex - Law Of Allah Framework", // Nama lengkap aplikasi
-  "short_name": "LOA Codex", // Nama pendek untuk ikon di layar utama
-  "description": "E-book Interaktif LOA Codex: Law Of Allah Framework untuk ketenangan hati dan kelimpahan rezeki.", // Deskripsi aplikasi
-  "start_url": ".", // URL saat aplikasi dibuka dari ikon
-  "display": "standalone", // Tampilan seperti aplikasi native (tanpa address bar browser)
-  "background_color": "#111827", // Warna latar belakang saat startup
-  "theme_color": "#4F46E5", // Warna tema untuk UI browser/system
+  "name": "LOA Codex - Law Of Allah Framework",
+  "short_name": "LOA Codex",
+  "description": "E-book Interaktif LOA Codex: Law Of Allah Framework untuk ketenangan hati dan kelimpahan rezeki.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#4F46E5",
   "icons": [
     {
-      "src": "icons/icon-192x192.png", // Path ke ikon
+      "src": "icons/icon-192x192.png", // <--- Pastikan path ini benar!
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icons/icon-512x512.png", // Path ke ikon yang lebih besar
+      "src": "icons/icon-512x512.png", // <--- Pastikan path ini benar!
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "icons/icon-maskable-192x192.png", // Maskable icon untuk Android (opsional, tapi bagus)
+      "src": "icons/icon-maskable-192x192.png", // Opsional: Maskable icon
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
