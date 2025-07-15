@@ -1111,7 +1111,7 @@ const SecretRoomRezeki = () => {
                         Mari mulai dengan menyalakan lilin untuk fokus dan ketenangan.
                     </p>
                     <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
-                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        <img src="icons/lilin.png" alt="Batang Lilin" className="candle-image" />
                         {isCandleLit && <div className="flame animate-flicker"></div>}
                     </div>
                     <button
@@ -3224,11 +3224,11 @@ const DoaHarianPlaylist = () => {
 // --- KOMPONEN BARU: DOA LOA CODEX (GAMBAR DAN TOMBOL FIXED) ---
 // Data untuk Doa LoA Codex Categories (PASTE INI DI LUAR KOMPONEN JIKA BANYAK KOMPONEN MEMBUTUHKANNYA, ATAU BIARKAN DI DALAM SEPERTI INI)
 const loaCodexDoaCategories = [
-    { id: 'rezeki', name: "Rezeki", audioUrl: "musik/LoaRejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
-    { id: 'jodoh', name: "Jodoh", audioUrl: "musik/LoaJodoh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
-    { id: 'promil', name: "Promil", audioUrl: "musik/LoaPromil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
-    { id: 'hutang', name: "Hutang", audioUrl: "musik/LoaHutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
-    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "musik/LoaSembuh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" }
+    { id: 'rezeki', name: "Rezeki", audioUrl: "musik/LoaRejeki.mp3", imageUrl: "icons/Coverijo.png" },
+    { id: 'jodoh', name: "Jodoh", audioUrl: "musik/LoaJodoh.mp3", imageUrl: "icons/Coverijo.png" },
+    { id: 'promil', name: "Promil", audioUrl: "musik/LoaPromil.mp3", imageUrl: "icons/Coverijo.png" },
+    { id: 'hutang', name: "Hutang", audioUrl: "musik/LoaHutang.mp3", imageUrl: "icons/Coverijo.png" },
+    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "musik/LoaSembuh.mp3", imageUrl: "icons/Coverijo.png" }
 ];
 
 // URL Gambar Latar Belakang Default untuk Doa LoA Codex
@@ -4535,7 +4535,7 @@ style.innerHTML = `
     aspect-ratio: 2 / 3; /* Menjaga rasio buku */
     max-height: 85vh
     background-color: #382e28; /* Warna dasar kulit coklat tua */
-    background-image: url('https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png');
+    background-image: url('icons/Coverijo.png');
     background-size: cover;      /* Membuat gambar menutupi seluruh area tanpa merusak rasio */
     background-position: center; /* Memposisikan gambar pas di tengah */
     background-repeat: no-repeat;  /* Mencegah gambar diulang-ulang */
