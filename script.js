@@ -2,6 +2,10 @@
 // KODE MASTER FINAL v13 - DISempurnakan DENGAN CONTEXT API & PERBAIKAN STRUKTUR
 // ===================================================================
 // --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
+const { useState, useEffect, useRef, createContext, useContext } = React;
+// --- Context untuk State Global ---
+// Ini akan menjadi "pusat data" untuk aplikasi kita.
+const AppContext = createContext();
 const ActivationScreen = () => {
     // Ambil setIsActivated dari context, bukan hanya setCurrentPageKey
     const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
@@ -281,11 +285,9 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
         </div>
     );
 };
-const { useState, useEffect, useRef, createContext, useContext } = React;
 
-// --- Context untuk State Global ---
-// Ini akan menjadi "pusat data" untuk aplikasi kita.
-const AppContext = createContext();
+
+
 
 // --- FUNGSI PEMBANTU UNTUK FULLSCREEN ---
 const openFullscreen = (elem) => {
@@ -752,530 +754,7 @@ const AffirmationRoom = () => {
         </div>
     );
 };
-// --- KOMPONEN BARU: AmbientSoundAccordion untuk Ruang Rahasia ---
-const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
-    const audioPreviewRef = useRef(null);
-    const [isPlayingPreview, setIsPlayingPreview] = useState(false);
 
-    const togglePreview = (e) => {
-        e.stopPropagation(); // Mencegah akordeon tertutup saat tombol diklik
-        const audio = audioPreviewRef.current;
-        if (!audio) return;
-
-        // Hentikan semua audio preview lainnya
-        document.querySelectorAll('audio[id="preview-audio"]').forEach(otherAudio => {
-            if (otherAudio !== audio && !otherAudio.paused) {
-                otherAudio.pause();
-                otherAudio.currentTime = 0;
-            }
-        });
-
-        // Jika suara ambient ini yang sedang diputar sebagai background utama, hentikan
-        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
-            setSelectedBackgroundSound(''); // Hentikan background utama
-            setIsPlayingPreview(false); // Pastikan status preview juga mati
-            return;
-        }
-
-        // Jika audio ini sedang diputar sebagai preview, pause
-        if (isPlayingPreview) {
-            audio.pause();
-            audio.currentTime = 0;
-        } else {
-            // Jika belum diputar, set src dan play
-            audio.src = sound.src;
-            audio.load(); // Penting untuk memuat ulang jika src berubah
-            audio.play().then(() => {
-                setIsPlayingPreview(true);
-            }).catch(e => {
-                console.error("Error playing ambient preview audio:", e);
-                alert("Gagal memutar preview audio. Mohon izinkan autoplay.");
-            });
-        }
-    };
-
-    useEffect(() => {
-        const audio = audioPreviewRef.current;
-        if (!audio) return;
-
-        const handlePlay = () => setIsPlayingPreview(true);
-        const handlePause = () => setIsPlayingPreview(false);
-        const handleEnded = () => setIsPlayingPreview(false);
-
-        audio.addEventListener('play', handlePlay);
-        audio.addEventListener('pause', handlePause);
-        audio.addEventListener('ended', handleEnded);
-
-        return () => {
-            audio.removeEventListener('play', handlePlay);
-            audio.removeEventListener('pause', handlePause);
-            audio.removeEventListener('ended', handleEnded);
-            if (audio) { audio.pause(); audio.currentTime = 0; } // Bersihkan saat unmount
-        };
-    }, [sound.src]); // Re-run effect if sound.src changes
-
-    // Update isPlayingPreview berdasarkan selectedBackgroundSound
-    useEffect(() => {
-        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
-            setIsPlayingPreview(true);
-        } else {
-            setIsPlayingPreview(false);
-        }
-    }, [selectedBackgroundSound, isBackgroundPlaying, sound.src]);
-
-
-    return (
-        <div className="bg-gray-700 rounded-lg shadow-md mb-2">
-            <div className="p-3 flex justify-between items-center text-left">
-                <span className="text-lg font-semibold text-white">{sound.name}</span>
-                <div className="flex items-center gap-2">
-                    {sound.src && ( // Hanya tampilkan tombol preview jika ada src audio
-                        <button
-                            onClick={togglePreview}
-                            className="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded-full transition-colors"
-                            title={isPlayingPreview ? "Hentikan Preview" : "Dengarkan Preview"}
-                        >
-                            {isPlayingPreview ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                            <audio id="preview-audio" ref={audioPreviewRef} preload="auto" loop></audio> {/* Gunakan id agar bisa di-selectAll */}
-                        </button>
-                    )}
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedBackgroundSound(sound.src); // Setel ini sebagai background utama
-                            onStartSession(); // Lanjutkan ke fase berikutnya
-                        }}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-semibold transition-colors"
-                        disabled={sound.src === selectedBackgroundSound && isBackgroundPlaying} // Disable jika sudah aktif
-                    >
-                        {sound.src === selectedBackgroundSound && isBackgroundPlaying ? 'Aktif' : 'Pilih & Mulai'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
-const SecretRoomRezeki = () => {
-    const { setCurrentPageKey } = useContext(AppContext);
-    // State untuk mengelola fase saat ini
-    const [currentPhase, setCurrentPhase] = useState('time_check'); 
-    
-    // State untuk mengelola audio utama setiap fase
-    const audioReleaseRef = useRef(null);
-    const audioManifestationRef = useRef(null);
-    const audioGratitudeRef = useRef(null); // <--- KOREKSI INI: CUKUP useRef(null)
-
-    // State untuk melacak apakah audio di fase saat ini sedang bermain
-    const [isCurrentAudioPlaying, setIsCurrentAudioPlaying] = useState(false);
-
-    // State untuk audio latar (background ambient sound)
-    const backgroundAudioRef = useRef(null);
-    const [selectedBackgroundSound, setSelectedBackgroundSound] = useState(''); // URL audio latar
-    const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(false);
-    const [isCandleLit, setIsCandleLit] = useState(false); // State baru untuk lilin menyala
-
-    // States for Password & Time Check
-    // passwordInput, passwordError, CORRECT_PASSWORD dihapus
-    const [timeError, setTimeError] = useState('');
-
-    // Allowed time: 12 AM (0) to 4 AM (4). Note: JavaScript uses 0-23 for hours.
-    const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
-    const ALLOW_END_HOUR = 4;   // 04:00 (4 AM) -- Mengembalikan ke jam 4 pagi sesuai instruksi awal
-
-    // Data audio latar
-    const ambientSounds = [
-        { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
-    { name: 'Angel Abundance', src: 'musik/AngelAbundance.mp3' },
-    { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
-    { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
-    { name: 'Hening (Mati)', src: '' }
-    ];
-
-    // Audio sources untuk setiap fase utama
-    const phaseAudios = {
-        release: 'musik/Clearing.mp3',
-    manifestation: 'musik/Afirmasi.mp3',
-    gratitude: 'musik/Gratitude.mp3',
-    };
-
-    // --- FUNGSI-FUNGSI PEMBANTU ---
-
-    // Fungsi untuk menghentikan semua audio utama
-    const stopAllPhaseAudios = () => {
-        [audioReleaseRef, audioManifestationRef, audioGratitudeRef].forEach(ref => {
-            if (ref.current) {
-                ref.current.pause();
-                ref.current.currentTime = 0;
-            }
-        });
-        setIsCurrentAudioPlaying(false);
-    };
-
-    // Fungsi untuk memulai audio fase tertentu (atau memutar ulang)
-    const startOrRestartPhaseAudio = (phaseName) => {
-        stopAllPhaseAudios();
-        
-        const audioToPlay = phaseAudios[phaseName];
-        let currentAudioRef;
-
-        switch (phaseName) {
-            case 'release': currentAudioRef = audioReleaseRef; break;
-            case 'manifestation': currentAudioRef = audioManifestationRef; break;
-            case 'gratitude': currentAudioRef = audioGratitudeRef; break;
-            default: return;
-        }
-
-        if (currentAudioRef && currentAudioRef.current && audioToPlay) {
-            currentAudioRef.current.src = audioToPlay;
-            currentAudioRef.current.load();
-            currentAudioRef.current.play()
-                .then(() => setIsCurrentAudioPlaying(true))
-                .catch(e => console.error(`Error playing ${phaseName} audio:`, e));
-        }
-    };
-
-    // Fungsi untuk transisi ke fase berikutnya
-    const goToNextPhase = (nextPhase) => {
-        stopAllPhaseAudios();
-        setCurrentPhase(nextPhase);
-        if (nextPhase !== 'finished') {
-            startOrRestartPhaseAudio(nextPhase);
-        }
-    };
-
-    // Fungsi untuk memeriksa waktu akses
-    const handleTimeCheck = () => {
-        const currentHour = new Date().getHours(); 
-
-        const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
-
-        setTimeError(''); // Reset error messages
-
-        if (!isTimeValid) {
-            const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
-            const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
-            setTimeError(`Ruangan ini hanya bisa diakses antara pukul ${formattedStartTime}:00 hingga ${formattedEndTime}:00 WIB.`);
-            return false; // Mengembalikan false jika waktu tidak valid
-        }
-        return true; // Mengembalikan true jika waktu valid
-    };
-
-    // Auto-check waktu saat komponen dimuat
-    useEffect(() => {
-        if (!handleTimeCheck()) {
-            // Jika waktu tidak valid saat dimuat, maka tetap di time_check
-            // Pesan error sudah dihandle oleh handleTimeCheck
-        } else {
-            setCurrentPhase('intro'); // Jika waktu valid, langsung ke intro
-        }
-    }, []); // Hanya berjalan sekali saat komponen dimount
-    
-    // --- AKHIR FUNGSI-FUNGSI PEMBANTU ---
-
-    // Effect untuk mengelola audio latar
-    useEffect(() => {
-        const audio = backgroundAudioRef.current;
-        if (!audio) return;
-
-        audio.loop = true;
-        audio.volume = 0.4;
-
-        if (selectedBackgroundSound) {
-            audio.src = selectedBackgroundSound;
-            audio.play().then(() => setIsBackgroundPlaying(true)).catch(e => console.error("Error playing background audio:", e));
-        } else {
-            audio.pause();
-            setIsBackgroundPlaying(false);
-        }
-
-        return () => {
-            if (audio) audio.pause();
-        };
-    }, [selectedBackgroundSound]);
-
-    // Efek untuk memantau status audio dari REF saat ini dan mengatur isCurrentAudioPlaying
-    // Serta memicu tampilan tombol "Lanjut" saat audio selesai
-    useEffect(() => {
-        const refs = {
-            'release': audioReleaseRef,
-            'manifestation': audioManifestationRef,
-            'gratitude': audioGratitudeRef
-        };
-
-        const currentRef = refs[currentPhase];
-        if (!currentRef || !currentRef.current) return;
-
-        const audio = currentRef.current;
-
-        const handlePlaying = () => setIsCurrentAudioPlaying(true);
-        const handlePaused = () => setIsCurrentAudioPlaying(false);
-        const handleEnded = () => {
-            setIsCurrentAudioPlaying(false);
-        };
-
-        audio.addEventListener('play', handlePlaying);
-        audio.addEventListener('pause', handlePaused);
-        audio.addEventListener('ended', handleEnded);
-
-        return () => {
-            audio.removeEventListener('play', handlePlaying);
-            audio.removeEventListener('pause', handlePaused);
-            audio.removeEventListener('ended', handleEnded);
-        };
-    }, [currentPhase]); 
-
-
-    const resetSession = () => {
-        stopAllPhaseAudios();
-        setCurrentPhase('time_check'); // Kembali ke time_check (atau intro jika tanpa time check)
-        setIsCandleLit(false);
-        setTimeError(''); // Reset error waktu
-        if (backgroundAudioRef.current) {
-            backgroundAudioRef.current.pause();
-            backgroundAudioRef.current.currentTime = 0;
-            setSelectedBackgroundSound('');
-            setIsBackgroundPlaying(false);
-        }
-    };
-
-    const getPhaseTitle = () => {
-        switch (currentPhase) {
-            case 'time_check': return "Akses Ruang Rahasia"; // Judul untuk pengecekan waktu
-            case 'intro': return "Sambutan Malam Kelimpahan";
-            case 'idle': return "Pilih Suasana Sesi Anda";
-            case 'release': return "Fase 1: Pelepasan Beban";
-            case 'manifestation': return "Fase 2: Manifestasi Impian";
-            case 'gratitude': return "Fase 3: Syukur Mendalam";
-            case 'finished': return "Sesi Selesai. Selamat, Kelimpahan Menanti!";
-            default: return "";
-        }
-    };
-
-    const renderPhaseContent = () => {
-        // New: Time Check Phase (menggantikan password_check)
-        if (currentPhase === 'time_check') {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-
-            const formattedCurrentTime = 
-                `${currentHour < 10 ? '0' : ''}${currentHour}:${currentMinute < 10 ? '0' : ''}${currentMinute}`;
-            
-            const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
-            const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
-            const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
-            const displayTimeRange = `${formattedStartTime}:00 - ${formattedEndTime}:00`;
-
-            return (
-                <div className="animate-fade-in flex flex-col items-center">
-                    <p className="mb-4 text-gray-300 text-lg text-center">
-                        Ruang Rahasia ini hanya bisa diakses pada waktu tertentu.
-                    </p>
-                    <p className="text-xl md:text-2xl font-bold text-yellow-300 mb-2">
-                        Saat ini Pukul: {formattedCurrentTime} WIB
-                    </p>
-                    <p className="mb-8 text-gray-400 font-bold text-center">
-                        Waktu Akses: {displayTimeRange} WIB
-                    </p>
-                    
-                    {timeError && <p className="text-red-500 mt-2">{timeError}</p>}
-                    
-                    <button
-                        onClick={() => { handleTimeCheck(); }} 
-                        disabled={isTimeValid} 
-                        className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
-                    >
-                        {isTimeValid ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
-                    </button>
-                    {!isTimeValid && <p className="text-gray-400 mt-4">Mohon tunggu hingga waktu akses yang ditentukan.</p>}
-                </div>
-            );
-        }
-
-        if (currentPhase === 'intro') {
-            return (
-                <div className="animate-fade-in flex flex-col items-center">
-                    <p className="mb-8 text-gray-300 text-lg">
-                        Selamat datang di Ruang Rahasia Menarik Rezeki Malam Hari.
-                        Di sini, kita akan menyelaraskan energi untuk kelimpahan.
-                        Mari mulai dengan menyalakan lilin untuk fokus dan ketenangan.
-                    </p>
-                    <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
-                        <img src="icons/lilin.png" alt="Batang Lilin" className="candle-image" />
-                        {isCandleLit && <div className="flame animate-flicker"></div>}
-                    </div>
-                    <button
-                        onClick={() => { setIsCandleLit(true); setCurrentPhase('idle'); }}
-                        className="bg-yellow-500 text-black font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-yellow-600 transition-all duration-300"
-                    >
-                        Nyalakan Lilin ✨
-                    </button>
-                </div>
-            );
-        }
-
-        if (currentPhase === 'idle') {
-            return (
-                <div className="animate-fade-in flex flex-col items-center">
-                    <div className={`candle-container ${isCandleLit ? 'lit' : ''} mb-8`}>
-                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
-                        {isCandleLit && <div className="flame animate-flicker"></div>}
-                    </div>
-                    <p className="mb-4 text-gray-300">Lilin sudah menyala. Sekarang, pilih suasana sesi Anda:</p>
-                    {/* Menggunakan komponen AmbientSoundAccordion */}
-                    <div className="w-full max-w-sm space-y-3">
-                        {ambientSounds.map(sound => (
-                            <AmbientSoundAccordion
-                                key={sound.name}
-                                sound={sound}
-                                selectedBackgroundSound={selectedBackgroundSound}
-                                setSelectedBackgroundSound={setSelectedBackgroundSound}
-                                isBackgroundPlaying={isBackgroundPlaying}
-                                onStartSession={() => { 
-                                    document.querySelectorAll('audio[id="preview-audio"]').forEach(audio => {
-                                        audio.pause();
-                                        audio.currentTime = 0;
-                                    });
-                                    goToNextPhase('release'); 
-                                }}
-                            />
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-
-        if (currentPhase === 'release' || currentPhase === 'manifestation' || currentPhase === 'gratitude') {
-            return (
-                <div className="flex flex-col items-center justify-center h-full w-full">
-                    <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
-                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
-                        {isCandleLit && <div className="flame animate-flicker"></div>}
-                    </div>
-
-                    <p className="text-sm text-gray-400 mt-8 animate-pulse mb-4">
-                        {isCurrentAudioPlaying ? (
-                            <>
-                                {getPhaseTitle().split(': ')[1]} sedang diputar...
-                                <br/>
-                                (Audio akan berhenti otomatis saat selesai.)
-                            </>
-                        ) : (
-                            <>
-                                Audio selesai.
-                            </>
-                        )}
-                    </p>
-
-                    {!isCurrentAudioPlaying && currentPhase !== 'gratitude' && (
-                        <button
-                            onClick={() => startOrRestartPhaseAudio(currentPhase)}
-                            className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300"
-                        >
-                            Ulangi {getPhaseTitle().split(': ')[1]}
-                        </button>
-                    )}
-
-                    {!isCurrentAudioPlaying && (
-                        <>
-                            {currentPhase === 'release' && (
-                                <button
-                                    onClick={() => goToNextPhase('manifestation')}
-                                    className="bg-blue-500 text-white font-bold py-3 px-8 mt-4 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300"
-                                >
-                                    Lanjut ke Manifestasi ✨
-                                </button>
-                            )}
-                            {currentPhase === 'manifestation' && (
-                                <button
-                                    onClick={() => goToNextPhase('gratitude')}
-                                    className="bg-blue-500 text-white font-bold py-3 px-8 mt-4 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300"
-                                >
-                                    Lanjut ke Syukur ❤️
-                                </button>
-                            )}
-                            {currentPhase === 'gratitude' && (
-                                <button
-                                    onClick={() => goToNextPhase('finished')}
-                                    className="bg-green-500 text-white font-bold py-3 px-8 mt-4 rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300"
-                                >
-                                    Selesai Sesi Malam Ini ✅
-                                </button>
-                            )}
-                        </>
-                    )}
-                </div>
-            );
-        }
-
-        if (currentPhase === 'finished') {
-            return (
-                <div className="animate-fade-in flex flex-col items-center">
-                    <p className="text-xl mb-6 text-yellow-300">Sesi Telah Selesai! Anda kini selaras dengan Kelimpahan.</p>
-                    <div className="flex flex-col md:flex-row gap-4 justify-center">
-                        <button
-                            onClick={resetSession}
-                            className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-600 transition-colors"
-                        >
-                            Mulai Sesi Baru
-                        </button>
-                        <button
-                            onClick={() => { resetSession(); setCurrentPageKey('daftar-isi'); }}
-                            className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Kembali ke Daftar Isi
-                        </button>
-                    </div>
-                </div>
-            );
-        }
-
-        return null;
-    };
-
-    return (
-        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
-            {/* Latar belakang bintang hanya muncul jika sesi selesai atau saat waktu tidak tepat */}
-            {(currentPhase === 'time_check' || currentPhase === 'finished') && <Starfield />}
-
-            {/* Cahaya lilin sebagai overlay */}
-            {isCandleLit && (currentPhase !== 'finished' && currentPhase !== 'time_check') && <div className="candle-light-overlay"></div>}
-            
-            <audio ref={audioReleaseRef} preload="auto"></audio>
-            <audio ref={audioManifestationRef} preload="auto"></audio>
-            <audio ref={audioGratitudeRef} preload="auto"></audio>
-            <audio ref={backgroundAudioRef} preload="auto"></audio>
-
-            <div className="absolute top-4 right-4 z-20">
-                <button onClick={() => { resetSession(); setCurrentPageKey('daftar-isi'); }} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
-                    Kembali ke Daftar Isi &rarr;
-                </button>
-            </div>
-
-            <div className={`relative z-10 w-full max-w-3xl text-center flex flex-col justify-center items-center p-8 rounded-xl shadow-lg
-                ${(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'finished' || currentPhase === 'time_check') ? 'bg-black/50' : 'bg-black/0'}`}>
-                
-                {(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'finished' || currentPhase === 'time_check') && (
-                    <h1 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300">
-                        {getPhaseTitle()}
-                    </h1>
-                )}
-                
-                {renderPhaseContent()}
-            </div>
-        </div>
-    );
-};
 
 // --- KOMPONEN-KOMPONEN UTILITAS ---
 
@@ -1834,7 +1313,530 @@ const Starfield = () => {
     }, []);
     return <canvas id="starfield" ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}></canvas>;
 };
+// --- KOMPONEN BARU: AmbientSoundAccordion untuk Ruang Rahasia ---
+const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
+    const audioPreviewRef = useRef(null);
+    const [isPlayingPreview, setIsPlayingPreview] = useState(false);
 
+    const togglePreview = (e) => {
+        e.stopPropagation(); // Mencegah akordeon tertutup saat tombol diklik
+        const audio = audioPreviewRef.current;
+        if (!audio) return;
+
+        // Hentikan semua audio preview lainnya
+        document.querySelectorAll('audio[id="preview-audio"]').forEach(otherAudio => {
+            if (otherAudio !== audio && !otherAudio.paused) {
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+            }
+        });
+
+        // Jika suara ambient ini yang sedang diputar sebagai background utama, hentikan
+        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
+            setSelectedBackgroundSound(''); // Hentikan background utama
+            setIsPlayingPreview(false); // Pastikan status preview juga mati
+            return;
+        }
+
+        // Jika audio ini sedang diputar sebagai preview, pause
+        if (isPlayingPreview) {
+            audio.pause();
+            audio.currentTime = 0;
+        } else {
+            // Jika belum diputar, set src dan play
+            audio.src = sound.src;
+            audio.load(); // Penting untuk memuat ulang jika src berubah
+            audio.play().then(() => {
+                setIsPlayingPreview(true);
+            }).catch(e => {
+                console.error("Error playing ambient preview audio:", e);
+                alert("Gagal memutar preview audio. Mohon izinkan autoplay.");
+            });
+        }
+    };
+
+    useEffect(() => {
+        const audio = audioPreviewRef.current;
+        if (!audio) return;
+
+        const handlePlay = () => setIsPlayingPreview(true);
+        const handlePause = () => setIsPlayingPreview(false);
+        const handleEnded = () => setIsPlayingPreview(false);
+
+        audio.addEventListener('play', handlePlay);
+        audio.addEventListener('pause', handlePause);
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.removeEventListener('play', handlePlay);
+            audio.removeEventListener('pause', handlePause);
+            audio.removeEventListener('ended', handleEnded);
+            if (audio) { audio.pause(); audio.currentTime = 0; } // Bersihkan saat unmount
+        };
+    }, [sound.src]); // Re-run effect if sound.src changes
+
+    // Update isPlayingPreview berdasarkan selectedBackgroundSound
+    useEffect(() => {
+        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
+            setIsPlayingPreview(true);
+        } else {
+            setIsPlayingPreview(false);
+        }
+    }, [selectedBackgroundSound, isBackgroundPlaying, sound.src]);
+
+
+    return (
+        <div className="bg-gray-700 rounded-lg shadow-md mb-2">
+            <div className="p-3 flex justify-between items-center text-left">
+                <span className="text-lg font-semibold text-white">{sound.name}</span>
+                <div className="flex items-center gap-2">
+                    {sound.src && ( // Hanya tampilkan tombol preview jika ada src audio
+                        <button
+                            onClick={togglePreview}
+                            className="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded-full transition-colors"
+                            title={isPlayingPreview ? "Hentikan Preview" : "Dengarkan Preview"}
+                        >
+                            {isPlayingPreview ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                            <audio id="preview-audio" ref={audioPreviewRef} preload="auto" loop></audio> {/* Gunakan id agar bisa di-selectAll */}
+                        </button>
+                    )}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBackgroundSound(sound.src); // Setel ini sebagai background utama
+                            onStartSession(); // Lanjutkan ke fase berikutnya
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-semibold transition-colors"
+                        disabled={sound.src === selectedBackgroundSound && isBackgroundPlaying} // Disable jika sudah aktif
+                    >
+                        {sound.src === selectedBackgroundSound && isBackgroundPlaying ? 'Aktif' : 'Pilih & Mulai'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
+const SecretRoomRezeki = () => {
+    const { setCurrentPageKey } = useContext(AppContext);
+    // State untuk mengelola fase saat ini
+    const [currentPhase, setCurrentPhase] = useState('time_check'); 
+    
+    // State untuk mengelola audio utama setiap fase
+    const audioReleaseRef = useRef(null);
+    const audioManifestationRef = useRef(null);
+    const audioGratitudeRef = useRef(null); // <--- KOREKSI INI: CUKUP useRef(null)
+
+    // State untuk melacak apakah audio di fase saat ini sedang bermain
+    const [isCurrentAudioPlaying, setIsCurrentAudioPlaying] = useState(false);
+
+    // State untuk audio latar (background ambient sound)
+    const backgroundAudioRef = useRef(null);
+    const [selectedBackgroundSound, setSelectedBackgroundSound] = useState(''); // URL audio latar
+    const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(false);
+    const [isCandleLit, setIsCandleLit] = useState(false); // State baru untuk lilin menyala
+
+    // States for Password & Time Check
+    // passwordInput, passwordError, CORRECT_PASSWORD dihapus
+    const [timeError, setTimeError] = useState('');
+
+    // Allowed time: 12 AM (0) to 4 AM (4). Note: JavaScript uses 0-23 for hours.
+    const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
+    const ALLOW_END_HOUR = 4;   // 04:00 (4 AM) -- Mengembalikan ke jam 4 pagi sesuai instruksi awal
+
+    // Data audio latar
+    const ambientSounds = [
+        { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
+    { name: 'Angel Abundance', src: 'musik/AngelAbundance.mp3' },
+    { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
+    { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
+    { name: 'Hening (Mati)', src: '' }
+    ];
+
+    // Audio sources untuk setiap fase utama
+    const phaseAudios = {
+        release: 'musik/Clearing.mp3',
+    manifestation: 'musik/Afirmasi.mp3',
+    gratitude: 'musik/Gratitude.mp3',
+    };
+
+    // --- FUNGSI-FUNGSI PEMBANTU ---
+
+    // Fungsi untuk menghentikan semua audio utama
+    const stopAllPhaseAudios = () => {
+        [audioReleaseRef, audioManifestationRef, audioGratitudeRef].forEach(ref => {
+            if (ref.current) {
+                ref.current.pause();
+                ref.current.currentTime = 0;
+            }
+        });
+        setIsCurrentAudioPlaying(false);
+    };
+
+    // Fungsi untuk memulai audio fase tertentu (atau memutar ulang)
+    const startOrRestartPhaseAudio = (phaseName) => {
+        stopAllPhaseAudios();
+        
+        const audioToPlay = phaseAudios[phaseName];
+        let currentAudioRef;
+
+        switch (phaseName) {
+            case 'release': currentAudioRef = audioReleaseRef; break;
+            case 'manifestation': currentAudioRef = audioManifestationRef; break;
+            case 'gratitude': currentAudioRef = audioGratitudeRef; break;
+            default: return;
+        }
+
+        if (currentAudioRef && currentAudioRef.current && audioToPlay) {
+            currentAudioRef.current.src = audioToPlay;
+            currentAudioRef.current.load();
+            currentAudioRef.current.play()
+                .then(() => setIsCurrentAudioPlaying(true))
+                .catch(e => console.error(`Error playing ${phaseName} audio:`, e));
+        }
+    };
+
+    // Fungsi untuk transisi ke fase berikutnya
+    const goToNextPhase = (nextPhase) => {
+        stopAllPhaseAudios();
+        setCurrentPhase(nextPhase);
+        if (nextPhase !== 'finished') {
+            startOrRestartPhaseAudio(nextPhase);
+        }
+    };
+
+    // Fungsi untuk memeriksa waktu akses
+    const handleTimeCheck = () => {
+        const currentHour = new Date().getHours(); 
+
+        const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
+
+        setTimeError(''); // Reset error messages
+
+        if (!isTimeValid) {
+            const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
+            const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
+            setTimeError(`Ruangan ini hanya bisa diakses antara pukul ${formattedStartTime}:00 hingga ${formattedEndTime}:00 WIB.`);
+            return false; // Mengembalikan false jika waktu tidak valid
+        }
+        return true; // Mengembalikan true jika waktu valid
+    };
+
+    // Auto-check waktu saat komponen dimuat
+    useEffect(() => {
+        if (!handleTimeCheck()) {
+            // Jika waktu tidak valid saat dimuat, maka tetap di time_check
+            // Pesan error sudah dihandle oleh handleTimeCheck
+        } else {
+            setCurrentPhase('intro'); // Jika waktu valid, langsung ke intro
+        }
+    }, []); // Hanya berjalan sekali saat komponen dimount
+    
+    // --- AKHIR FUNGSI-FUNGSI PEMBANTU ---
+
+    // Effect untuk mengelola audio latar
+    useEffect(() => {
+        const audio = backgroundAudioRef.current;
+        if (!audio) return;
+
+        audio.loop = true;
+        audio.volume = 0.4;
+
+        if (selectedBackgroundSound) {
+            audio.src = selectedBackgroundSound;
+            audio.play().then(() => setIsBackgroundPlaying(true)).catch(e => console.error("Error playing background audio:", e));
+        } else {
+            audio.pause();
+            setIsBackgroundPlaying(false);
+        }
+
+        return () => {
+            if (audio) audio.pause();
+        };
+    }, [selectedBackgroundSound]);
+
+    // Efek untuk memantau status audio dari REF saat ini dan mengatur isCurrentAudioPlaying
+    // Serta memicu tampilan tombol "Lanjut" saat audio selesai
+    useEffect(() => {
+        const refs = {
+            'release': audioReleaseRef,
+            'manifestation': audioManifestationRef,
+            'gratitude': audioGratitudeRef
+        };
+
+        const currentRef = refs[currentPhase];
+        if (!currentRef || !currentRef.current) return;
+
+        const audio = currentRef.current;
+
+        const handlePlaying = () => setIsCurrentAudioPlaying(true);
+        const handlePaused = () => setIsCurrentAudioPlaying(false);
+        const handleEnded = () => {
+            setIsCurrentAudioPlaying(false);
+        };
+
+        audio.addEventListener('play', handlePlaying);
+        audio.addEventListener('pause', handlePaused);
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.removeEventListener('play', handlePlaying);
+            audio.removeEventListener('pause', handlePaused);
+            audio.removeEventListener('ended', handleEnded);
+        };
+    }, [currentPhase]); 
+
+
+    const resetSession = () => {
+        stopAllPhaseAudios();
+        setCurrentPhase('time_check'); // Kembali ke time_check (atau intro jika tanpa time check)
+        setIsCandleLit(false);
+        setTimeError(''); // Reset error waktu
+        if (backgroundAudioRef.current) {
+            backgroundAudioRef.current.pause();
+            backgroundAudioRef.current.currentTime = 0;
+            setSelectedBackgroundSound('');
+            setIsBackgroundPlaying(false);
+        }
+    };
+
+    const getPhaseTitle = () => {
+        switch (currentPhase) {
+            case 'time_check': return "Akses Ruang Rahasia"; // Judul untuk pengecekan waktu
+            case 'intro': return "Sambutan Malam Kelimpahan";
+            case 'idle': return "Pilih Suasana Sesi Anda";
+            case 'release': return "Fase 1: Pelepasan Beban";
+            case 'manifestation': return "Fase 2: Manifestasi Impian";
+            case 'gratitude': return "Fase 3: Syukur Mendalam";
+            case 'finished': return "Sesi Selesai. Selamat, Kelimpahan Menanti!";
+            default: return "";
+        }
+    };
+
+    const renderPhaseContent = () => {
+        // New: Time Check Phase (menggantikan password_check)
+        if (currentPhase === 'time_check') {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+
+            const formattedCurrentTime = 
+                `${currentHour < 10 ? '0' : ''}${currentHour}:${currentMinute < 10 ? '0' : ''}${currentMinute}`;
+            
+            const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
+            const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
+            const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
+            const displayTimeRange = `${formattedStartTime}:00 - ${formattedEndTime}:00`;
+
+            return (
+                <div className="animate-fade-in flex flex-col items-center">
+                    <p className="mb-4 text-gray-300 text-lg text-center">
+                        Ruang Rahasia ini hanya bisa diakses pada waktu tertentu.
+                    </p>
+                    <p className="text-xl md:text-2xl font-bold text-yellow-300 mb-2">
+                        Saat ini Pukul: {formattedCurrentTime} WIB
+                    </p>
+                    <p className="mb-8 text-gray-400 font-bold text-center">
+                        Waktu Akses: {displayTimeRange} WIB
+                    </p>
+                    
+                    {timeError && <p className="text-red-500 mt-2">{timeError}</p>}
+                    
+                    <button
+                        onClick={() => { handleTimeCheck(); }} 
+                        disabled={isTimeValid} 
+                        className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    >
+                        {isTimeValid ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
+                    </button>
+                    {!isTimeValid && <p className="text-gray-400 mt-4">Mohon tunggu hingga waktu akses yang ditentukan.</p>}
+                </div>
+            );
+        }
+
+        if (currentPhase === 'intro') {
+            return (
+                <div className="animate-fade-in flex flex-col items-center">
+                    <p className="mb-8 text-gray-300 text-lg">
+                        Selamat datang di Ruang Rahasia Menarik Rezeki Malam Hari.
+                        Di sini, kita akan menyelaraskan energi untuk kelimpahan.
+                        Mari mulai dengan menyalakan lilin untuk fokus dan ketenangan.
+                    </p>
+                    <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
+                        <img src="icons/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        {isCandleLit && <div className="flame animate-flicker"></div>}
+                    </div>
+                    <button
+                        onClick={() => { setIsCandleLit(true); setCurrentPhase('idle'); }}
+                        className="bg-yellow-500 text-black font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-yellow-600 transition-all duration-300"
+                    >
+                        Nyalakan Lilin ✨
+                    </button>
+                </div>
+            );
+        }
+
+        if (currentPhase === 'idle') {
+            return (
+                <div className="animate-fade-in flex flex-col items-center">
+                    <div className={`candle-container ${isCandleLit ? 'lit' : ''} mb-8`}>
+                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        {isCandleLit && <div className="flame animate-flicker"></div>}
+                    </div>
+                    <p className="mb-4 text-gray-300">Lilin sudah menyala. Sekarang, pilih suasana sesi Anda:</p>
+                    {/* Menggunakan komponen AmbientSoundAccordion */}
+                    <div className="w-full max-w-sm space-y-3">
+                        {ambientSounds.map(sound => (
+                            <AmbientSoundAccordion
+                                key={sound.name}
+                                sound={sound}
+                                selectedBackgroundSound={selectedBackgroundSound}
+                                setSelectedBackgroundSound={setSelectedBackgroundSound}
+                                isBackgroundPlaying={isBackgroundPlaying}
+                                onStartSession={() => { 
+                                    document.querySelectorAll('audio[id="preview-audio"]').forEach(audio => {
+                                        audio.pause();
+                                        audio.currentTime = 0;
+                                    });
+                                    goToNextPhase('release'); 
+                                }}
+                            />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        if (currentPhase === 'release' || currentPhase === 'manifestation' || currentPhase === 'gratitude') {
+            return (
+                <div className="flex flex-col items-center justify-center h-full w-full">
+                    <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
+                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        {isCandleLit && <div className="flame animate-flicker"></div>}
+                    </div>
+
+                    <p className="text-sm text-gray-400 mt-8 animate-pulse mb-4">
+                        {isCurrentAudioPlaying ? (
+                            <>
+                                {getPhaseTitle().split(': ')[1]} sedang diputar...
+                                <br/>
+                                (Audio akan berhenti otomatis saat selesai.)
+                            </>
+                        ) : (
+                            <>
+                                Audio selesai.
+                            </>
+                        )}
+                    </p>
+
+                    {!isCurrentAudioPlaying && currentPhase !== 'gratitude' && (
+                        <button
+                            onClick={() => startOrRestartPhaseAudio(currentPhase)}
+                            className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300"
+                        >
+                            Ulangi {getPhaseTitle().split(': ')[1]}
+                        </button>
+                    )}
+
+                    {!isCurrentAudioPlaying && (
+                        <>
+                            {currentPhase === 'release' && (
+                                <button
+                                    onClick={() => goToNextPhase('manifestation')}
+                                    className="bg-blue-500 text-white font-bold py-3 px-8 mt-4 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300"
+                                >
+                                    Lanjut ke Manifestasi ✨
+                                </button>
+                            )}
+                            {currentPhase === 'manifestation' && (
+                                <button
+                                    onClick={() => goToNextPhase('gratitude')}
+                                    className="bg-blue-500 text-white font-bold py-3 px-8 mt-4 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300"
+                                >
+                                    Lanjut ke Syukur ❤️
+                                </button>
+                            )}
+                            {currentPhase === 'gratitude' && (
+                                <button
+                                    onClick={() => goToNextPhase('finished')}
+                                    className="bg-green-500 text-white font-bold py-3 px-8 mt-4 rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300"
+                                >
+                                    Selesai Sesi Malam Ini ✅
+                                </button>
+                            )}
+                        </>
+                    )}
+                </div>
+            );
+        }
+
+        if (currentPhase === 'finished') {
+            return (
+                <div className="animate-fade-in flex flex-col items-center">
+                    <p className="text-xl mb-6 text-yellow-300">Sesi Telah Selesai! Anda kini selaras dengan Kelimpahan.</p>
+                    <div className="flex flex-col md:flex-row gap-4 justify-center">
+                        <button
+                            onClick={resetSession}
+                            className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-600 transition-colors"
+                        >
+                            Mulai Sesi Baru
+                        </button>
+                        <button
+                            onClick={() => { resetSession(); setCurrentPageKey('daftar-isi'); }}
+                            className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Kembali ke Daftar Isi
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
+            {/* Latar belakang bintang hanya muncul jika sesi selesai atau saat waktu tidak tepat */}
+            {(currentPhase === 'time_check' || currentPhase === 'finished') && <Starfield />}
+
+            {/* Cahaya lilin sebagai overlay */}
+            {isCandleLit && (currentPhase !== 'finished' && currentPhase !== 'time_check') && <div className="candle-light-overlay"></div>}
+            
+            <audio ref={audioReleaseRef} preload="auto"></audio>
+            <audio ref={audioManifestationRef} preload="auto"></audio>
+            <audio ref={audioGratitudeRef} preload="auto"></audio>
+            <audio ref={backgroundAudioRef} preload="auto"></audio>
+
+            <div className="absolute top-4 right-4 z-20">
+                <button onClick={() => { resetSession(); setCurrentPageKey('daftar-isi'); }} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    Kembali ke Daftar Isi &rarr;
+                </button>
+            </div>
+
+            <div className={`relative z-10 w-full max-w-3xl text-center flex flex-col justify-center items-center p-8 rounded-xl shadow-lg
+                ${(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'finished' || currentPhase === 'time_check') ? 'bg-black/50' : 'bg-black/0'}`}>
+                
+                {(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'finished' || currentPhase === 'time_check') && (
+                    <h1 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300">
+                        {getPhaseTitle()}
+                    </h1>
+                )}
+                
+                {renderPhaseContent()}
+            </div>
+        </div>
+    );
+};
 // --- KOMPONEN BARU UNTUK KILATAN SUBLIMINAL ---
 const AffirmationFlasher = ({ phrase }) => {
     const [positionTop, setPositionTop] = useState('50%');
