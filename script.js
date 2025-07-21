@@ -275,7 +275,7 @@ rounded-lg text-sm transition-colors"
                 <button
                        onClick={() => {
                         onNavigateToRoom('daftar-isi'); // <-- UBAH INI
-                        setIsVisible(false);
+                        onClose();
                     }}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2
 rounded-lg text-sm transition-colors"
@@ -4227,11 +4227,11 @@ const App = () => {
         // Cek apakah reminder sudah pernah ditampilkan di sesi sebelumnya
         // atau jika ini adalah pertama kali aplikasi diaktifkan.
         // Kita bisa menyimpan flag di localStorage untuk ini.
-        return localStorage.getItem('hasShownInitialReminder') === 'true' && localStorage.getItem('ebookActivated') === 'true';
+        return sessionStorage.getItem('hasShownInitialReminder') === 'true' && localStorage.getItem('ebookActivated') === 'true';
     });
     // Update localStorage saat hasShownInitialReminder berubah
     useEffect(() => {
-        localStorage.setItem('hasShownInitialReminder', hasShownInitialReminder);
+        sessionStorage.setItem('hasShownInitialReminder', hasShownInitialReminder);
     }, [hasShownInitialReminder]);
     
     useEffect(() => {
@@ -4371,7 +4371,16 @@ const resetAppState = async () => { // Pastikan ini async
                     // Perubahan ada di sini: SadHourReminder akan muncul setelah aktivasi,
                     // dan sebelum navigasi ke halaman lain.
                     : (currentPageKey === 'kata-pengantar' || currentPageKey === 'home') && !hasShownInitialReminder // <-- Tambahkan state ini
-                        ? <SadHourReminder onClose={() => setHasShownInitialReminder(true)} onNavigateToRoom={setCurrentPageKey} /> // <-- Gunakan state ini
+                        ? <SadHourReminder 
+                                onClose={() => { 
+                                    setHasShownInitialReminder(true); // Tandai sudah ditampilkan
+                                    setCurrentPageKey('daftar-isi'); // Arahkan ke daftar isi setelah tutup
+                                }} 
+                                onNavigateToRoom={(page) => {
+                                    setHasShownInitialReminder(true); // Tandai sudah ditampilkan
+                                    setCurrentPageKey(page); // Navigasi ke halaman yang dipilih dari reminder
+                                }} 
+                              />  // <-- Gunakan state ini
                         : currentPageKey === 'pixel-thoughts' 
                             ? <PixelThoughts />
                             : currentPageKey === 'affirmation-room' 
