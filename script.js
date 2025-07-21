@@ -3755,7 +3755,8 @@ const MainLayout = () => {
         fontSizeIndex, setFontSizeIndex, fontSizes, 
         setIsCoverUnlocked, 
         isSidebarOpen, setIsSidebarOpen,
-        isActivated // <--- PASTIKAN INI ADA DI SINI! (Diambil dari AppContext)
+        isActivated, // <--- PASTIKAN INI ADA DI SINI! (Diambil dari AppContext)
+        resetAppState
     } = useContext(AppContext);
     
     const currentTheme = themes[themeKey];
@@ -3817,6 +3818,7 @@ const MainLayout = () => {
     const handleCloseBook = () => {
         closeFullscreen();
         setIsCoverUnlocked(false);
+        resetAppState();
     };
 
     const renderPage = () => {
@@ -4209,6 +4211,7 @@ const App = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80); 
+    const [userName, setUserName] = useState(() => localStorage.getItem('ebookUserName') || '');
     const [isDoaLooping, setIsDoaLooping] = useState(false); 
 
     // --- State Kunci untuk Fitur Aktivasi ---
@@ -4276,11 +4279,27 @@ const App = () => {
                 console.log("localStorage 'ebookActivated' changed! Updating App state to", newActivationStatus);
                 setIsActivated(newActivationStatus);
             }
+            const newUserName = localStorage.getItem('ebookUserName') || '';
+            if (newUserName !== userName) {
+                setUserName(newUserName);
+            }
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
-
+    
+const resetAppState = () => {
+        console.log("Resetting app state (excluding activation key and bucket list)...");
+        setCurrentPageKey('kata-pengantar'); // Kembali ke kata pengantar (atau halaman awal setelah aktivasi)
+        setIsSidebarOpen(false);
+        setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue'); // Tetap pakai tema tersimpan atau default 'blue'
+        setFontSizeIndex(1); // Reset ukuran font ke default
+        setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80); // Tetap pakai opacity tersimpan atau default 80
+        setIsDoaLooping(false); // Reset looping audio doa
+        // State komponen anak seperti SadHourReminder, SecretRoomRezeki, dll.
+        // akan direset secara otomatis saat komponen tersebut unmount/mount ulang
+        // karena currentPageKey berubah.
+    };
     // Context Value - isActivated dan setIsActivated sekarang disertakan!
     const contextValue = {
         themes, themeKey, setThemeKey,
@@ -4291,7 +4310,9 @@ const App = () => {
         isMenuOpen, setIsMenuOpen,
         bgOpacity, setBgOpacity,
         isDoaLooping, setIsDoaLooping,
-        isActivated, setIsActivated // <-- TAMBAHKAN INI KE CONTEXT!
+        userName, setUserName,
+        isActivated, setIsActivated ,
+        resetAppState
     };
     
     return (
