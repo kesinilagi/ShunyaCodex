@@ -4364,7 +4364,9 @@ const resetAppState = async () => {
         isDoaLooping, setIsDoaLooping,
         userName, setUserName,
         isActivated, setIsActivated ,
-        resetAppState
+        resetAppState,
+        hasShownInitialReminder,
+setHasShownInitialReminder
     };
     
     return (
