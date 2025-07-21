@@ -2,10 +2,6 @@
 // KODE MASTER FINAL v13 - DISempurnakan DENGAN CONTEXT API & PERBAIKAN STRUKTUR
 // ===================================================================
 // --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
-const { useState, useEffect, useRef, createContext, useContext } = React;
-// --- Context untuk State Global ---
-// Ini akan menjadi "pusat data" untuk aplikasi kita.
-const AppContext = createContext();
 const ActivationScreen = () => {
     // Ambil setIsActivated dari context, bukan hanya setCurrentPageKey
     const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
@@ -285,9 +281,11 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
         </div>
     );
 };
+const { useState, useEffect, useRef, createContext, useContext } = React;
 
-
-
+// --- Context untuk State Global ---
+// Ini akan menjadi "pusat data" untuk aplikasi kita.
+const AppContext = createContext();
 
 // --- FUNGSI PEMBANTU UNTUK FULLSCREEN ---
 const openFullscreen = (elem) => {
@@ -423,6 +421,11 @@ const DaftarIsi = () => {
                                               </ul>
                     </li>
               <li><button onClick={() => setCurrentPageKey('bab16')} className={tocSectionClasses}>Bab Tambahan: 369 Tesla × 369 Law of Allah</button></li>
+              <li className="pt-4">
+                    <button onClick={() => setCurrentPageKey('istighfar-app')} className={`${tocFeatureClasses} golden-background text-purple-600`}>
+                        ✨ Aplikasi Istighfar
+                    </button>
+                </li>
                     <li className="pt-4"><button onClick={() => setCurrentPageKey('pixel-thoughts')} className={`${tocFeatureClasses} golden-background text-yellow-600`}>Ruang Pelepasan (Lepaskan Beban)</button></li>
     <li className="pt-2"><button onClick={()=>setCurrentPageKey('affirmation-room')} className={`${tocFeatureClasses} golden-background text-sky-500`}>Ruang Afirmasi / Manifestasi</button></li>
     <li className="pt-2"><button onClick={() => setCurrentPageKey('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}>Ruang Rahasia </button></li>
@@ -435,7 +438,168 @@ const DaftarIsi = () => {
         </div>
     );
 }
+// --- KOMPONEN BARU: Aplikasi Istighfar ---
+const IstighfarApp = () => {
+    const { setCurrentPageKey } = useContext(AppContext);
+    const audioRef = useRef(null); // Untuk audio istighfar
+    const [count, setCount] = useState(0);
+    const [isPraying, setIsPraying] = useState(false);
+    const [message, setMessage] = useState("Tekan tombol untuk memulai Istighfar.");
+    const [animationProgress, setAnimationProgress] = useState(0); // 0-100% untuk animasi visual
 
+    // Path ke audio Istighfar Anda (PASTIKAN FILE INI ADA DI public/musik)
+    const ISTIGHFAR_AUDIO_SRC = "musik/Sholawat nariyah bowl.mp3"; // <--- GANTI NAMA FILE JIKA BERBEDA
+
+    // Efek untuk mengelola pemutaran audio
+    useEffect(() => {
+        if (!audioRef.current) return;
+
+        if (isPraying) {
+            // Hentikan semua audio lain yang mungkin sedang bermain
+            document.querySelectorAll('audio').forEach(otherAudio => {
+                if (otherAudio !== audioRef.current) {
+                    otherAudio.pause();
+                    otherAudio.currentTime = 0;
+                }
+            });
+
+            audioRef.current.currentTime = 0;
+            audioRef.current.play().catch(e => {
+                console.error("Error playing Istighfar audio:", e);
+                setMessage("Gagal memutar audio. Pastikan izinkan autoplay jika diminta.");
+                setIsPraying(false); // Berhenti jika gagal
+            });
+        } else {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
+    }, [isPraying]);
+
+    // Efek untuk menghitung dan mengontrol animasi visual
+    useEffect(() => {
+        if (!isPraying) {
+            // Reset animasi saat tidak berdoa atau berhenti
+            setAnimationProgress(0);
+            return;
+        }
+        if (count >= 100) {
+            setIsPraying(false);
+            setMessage("Istighfar Selesai! Hati telah dibersihkan & saluran terbuka.");
+            setAnimationProgress(100); // Pastikan animasi penuh di akhir
+            return;
+        }
+
+        const timer = setInterval(() => {
+            setCount(prevCount => {
+                const newCount = prevCount + 1;
+                const progress = (newCount / 100) * 100; // Hitung progress 0-100
+                setAnimationProgress(progress);
+
+                if (newCount > 100) {
+                    clearInterval(timer);
+                    setIsPraying(false);
+                    setMessage("Istighfar Selesai! Hati telah dibersihkan & saluran terbuka.");
+                    return 100;
+                } else {
+                    setMessage(`Istighfar ke-${newCount}...`);
+                    return newCount;
+                }
+            });
+        }, 1000); // Setiap 1 detik, hitung 1x istighfar
+
+        return () => clearInterval(timer);
+    }, [isPraying, count]);
+
+    const startIstighfar = () => {
+        setCount(0);
+        setIsPraying(true);
+        setMessage("Memulai Istighfar...");
+    };
+
+    const stopIstighfar = () => {
+        setIsPraying(false);
+        setMessage("Sesi dihentikan.");
+    };
+
+    const resetIstighfar = () => {
+        setIsPraying(false);
+        setCount(0);
+        setMessage("Tekan tombol untuk memulai Istighfar.");
+        setAnimationProgress(0);
+    };
+
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
+            <audio ref={audioRef} src={ISTIGHFAR_AUDIO_SRC} loop preload="auto"></audio>
+
+            {/* Area Visualisasi SVG */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center visual-canvas">
+                <svg viewBox="0 0 200 200" className="istighfar-siluet">
+                    {/* Background siluet, berubah warna */}
+                    <rect x="0" y="0" width="200" height="200"
+                          fill={`hsl(0, 0%, ${10 + (100 - animationProgress) * 0.5}%)`} // Dari gelap ke lebih terang (misal 10% lightness ke 60% lightness)
+                          opacity="0.8" />
+
+                    {/* Ini adalah siluet sederhana orang bersila, Anda bisa menggantinya */}
+                    {/* Ini adalah PATH (d) untuk siluet manusia bersila sederhana. Anda bisa menggantinya dengan SVG yang lebih detail */}
+                    <path
+                        d="M100 20 C 120 20, 120 40, 100 40 S 80 40, 80 20 Z M85 40 Q 80 70, 100 70 T 115 40 Z M100 70 C 130 70, 140 100, 120 120 C 110 130, 90 130, 80 120 C 60 100, 70 70, 100 70 Z M90 120 L 80 160 C 80 180, 120 180, 120 160 L 110 120 Z"
+                        fill="#333"
+                        stroke="#000"
+                        strokeWidth="1"
+                        transform="scale(0.8) translate(20, 20)" // Skala dan posisi agar pas di tengah
+                    />
+
+                    {/* Visualisasi "saluran terbuka" atau pembersihan hati */}
+                    {/* Ini adalah contoh sederhana: lingkaran atau jalur yang "terisi" */}
+                    {/* Anda bisa kustomisasi lebih lanjut di CSS */}
+                    <circle cx="100" cy="100" r="30"
+                            fill="transparent"
+                            stroke="url(#gradient-path)" // Menggunakan gradient untuk efek cahaya
+                            strokeWidth="5"
+                            strokeDasharray="188.5" // Lingkar (2*PI*r)
+                            strokeDashoffset={188.5 * (1 - animationProgress / 100)} // Animasi mengisi lingkaran
+                            className="istighfar-path-animation" />
+
+                    {/* Definisi Gradient untuk efek cahaya */}
+                    <defs>
+                        <linearGradient id="gradient-path" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#8d20e6" /> {/* Ungu tua */}
+                            <stop offset="100%" stopColor="#f7d046" /> {/* Kuning terang */}
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <div className="relative z-10 text-center bg-black/70 p-8 rounded-xl shadow-lg animate-fade-in max-w-sm w-full">
+                <h1 className="text-3xl md:text-5xl font-bold mb-4 text-purple-400">Istighfar</h1>
+                <p className="mb-6 text-gray-300">{message}</p>
+                <p className="text-6xl md:text-8xl font-bold text-yellow-400 mb-8">{count}</p>
+
+                <div className="flex gap-4 justify-center">
+                    {!isPraying && count < 100 && (
+                        <button onClick={startIstighfar} className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-green-700 transition-all duration-300">
+                            Mulai Istighfar
+                        </button>
+                    )}
+                    {isPraying && (
+                        <button onClick={stopIstighfar} className="bg-red-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-red-700 transition-all duration-300">
+                            Hentikan
+                        </button>
+                    )}
+                    {count >= 100 && (
+                        <button onClick={resetIstighfar} className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300">
+                            Ulangi
+                        </button>
+                    )}
+                </div>
+                <button onClick={() => setCurrentPageKey('daftar-isi')} className="mt-8 bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    Kembali ke Daftar Isi
+                </button>
+            </div>
+        </div>
+    );
+};
 // --- KOMPONEN BARU UNTUK GRAFIK JANTUNG INTERAKTIF ---
 const HeartCoherenceChart = () => {
     const canvasRef = useRef(null);
@@ -648,7 +812,7 @@ const AffirmationRoom = () => {
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
-            <audio ref={audioRef} src="musik/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
+            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/suara%20ruang%20afirmasi%208d.mp3" preload="auto"></audio>
             
             {uploadedImage ? (
                 <img 
@@ -756,675 +920,6 @@ const AffirmationRoom = () => {
 };
 
 
-// --- KOMPONEN-KOMPONEN UTILITAS ---
-
-// ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU INI ###
-const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
-    const audioRef = React.useRef(null);
-    const [isPlaying, setIsPlaying] = React.useState(false);
-
-    // Fungsi 'Sapu Bersih' dan pemutaran audio
-    const togglePlay = async () => { // Tambahkan async
-        if (!audioRef.current || !src) { // Pastikan src tidak kosong
-            console.warn("Audio element not ready or src is empty.");
-            return;
-        }
-
-        const thisAudio = audioRef.current;
-
-        // Jika audio ini sedang berputar, hentikan saja.
-        if (isPlaying) {
-            thisAudio.pause();
-            thisAudio.currentTime = 0;
-            return; // Hentikan fungsi di sini
-        }
-
-        // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO ---
-        document.querySelectorAll('audio').forEach(otherAudio => {
-            if (otherAudio !== thisAudio) {
-                otherAudio.pause();
-                otherAudio.currentTime = 0;
-            }
-        });
-
-        // Setel src dan muat audio, lalu coba putar
-        thisAudio.src = src;
-        thisAudio.load(); // Load the audio content
-
-        try {
-            await thisAudio.play();
-            setIsPlaying(true);
-            console.log("Audio played successfully: " + src);
-        } catch (error) {
-            console.error("Audio Playback Error for " + src + ":", error);
-            setIsPlaying(false);
-            // Memberi tahu pengguna jika autoplay diblokir
-            if (error.name === "NotAllowedError" || error.name === "AbortError") {
-                alert("Pemutaran audio diblokir oleh browser. Mohon izinkan autoplay untuk situs ini atau coba interaksi manual.");
-            } else {
-                alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
-            }
-        }
-    };
-
-    // Efek untuk memantau status audio
-    React.useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        
-        audio.loop = isLooping;
-
-        const handlePlay = () => setIsPlaying(true);
-        const handlePause = () => setIsPlaying(false);
-        const handleEnded = () => { if(!isLooping) setIsPlaying(false); };
-        
-        audio.addEventListener('play', handlePlay);
-        audio.addEventListener('pause', handlePause);
-        audio.addEventListener('ended', handleEnded);
-
-        // Cleanup saat komponen unmount
-        return () => {
-            audio.removeEventListener('play', handlePlay);
-            audio.removeEventListener('pause', handlePause);
-            audio.removeEventListener('ended', handleEnded);
-            // Hentikan audio saat komponen di-unmount
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-        };
-    }, [src, isLooping]); // Tambahkan src ke dependencies agar useEffect re-run saat src berubah
-
-    return (
-        <div onClick={togglePlay} className="flex items-center justify-center gap-4 my-4 p-4 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
-            <audio ref={audioRef} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
-            
-            {/* Ikon yang berubah */}
-            <div className="text-white">
-                {isPlaying ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 animate-pulse text-sky-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
-                    </svg>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                    </svg>
-                )}
-            </div>
-
-            {/* Teks dinamis yang berubah */}
-            <p className={`text-center text-xl font-serif text-white`}> {text}
-            </p>
-        </div>
-    );
-};
-
-
-// ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
-// ### VERSI INI MENINGKATKAN KESTABILAN PEMUTARAN UNTUK INLINE AUDIO ICON ###
-// ### DENGAN FOKUS PADA PENGELOLAAN AUTOPLAY POLICY DAN AUDIO CONTEXT ###
-const InlineAudioIcon = ({ src, isLooping = false }) => {
-    const audioRef = React.useRef(null);
-    const [isPlaying, setIsPlaying] = React.useState(false);
-    const [isAudioLoadedAndReady, setIsAudioLoadedAndReady] = React.useState(false); // Melacak kesiapan audio
-    const [showUserInteractionPrompt, setShowUserInteractionPrompt] = React.useState(false); // Untuk tombol "Aktifkan Audio"
-
-    // --- Referensi untuk Web Audio API ---
-    const audioContextRef = React.useRef(null);
-    const pannerNodeRef = React.useRef(null);
-    const sourceNodeRef = React.useRef(null);
-    const gainNodeRef = React.useRef(null);
-    const panIntervalIdRef = React.useRef(null);
-
-    // Inisialisasi AudioContext dan nodes
-    // Kita buat ini jadi `React.useMemo` agar instance-nya tidak berubah antar render
-    // tapi tetap diinisialisasi oleh interaksi pertama kali.
-    const initAudioNodes = React.useCallback(() => {
-        if (audioContextRef.current) return; // Sudah diinisialisasi
-
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) {
-                console.warn("Web Audio API not supported in this browser.");
-                return;
-            }
-            audioContextRef.current = new AudioContext();
-            console.log("[InlineAudioIcon Init] AudioContext created (state:", audioContextRef.current.state + ").");
-
-            pannerNodeRef.current = audioContextRef.current.createPanner();
-            pannerNodeRef.current.panningModel = 'HRTF';
-            pannerNodeRef.current.distanceModel = 'linear';
-            pannerNodeRef.current.refDistance = 1;
-            pannerNodeRef.current.maxDistance = 1000;
-            pannerNodeRef.current.rolloffFactor = 1;
-
-            gainNodeRef.current = audioContextRef.current.createGain();
-            gainNodeRef.current.gain.value = 1;
-
-            pannerNodeRef.current.connect(gainNodeRef.current);
-            gainNodeRef.current.connect(audioContextRef.current.destination);
-
-            console.log("[InlineAudioIcon Init] PannerNode and GainNode initialized.");
-
-        } catch (e) {
-            console.error("[InlineAudioIcon Init] Failed to create AudioContext or Web Audio nodes:", e);
-            audioContextRef.current = null;
-            pannerNodeRef.current = null;
-            gainNodeRef.current = null;
-        }
-    }, []); // Dependencies kosong, jadi memoized
-
-    // Fungsi untuk memulai efek panning 8D
-    const startPanning = React.useCallback(() => {
-        const panner = pannerNodeRef.current;
-        const gainNode = gainNodeRef.current;
-        if (!panner || !gainNode) {
-            console.warn("Panner or GainNode not available for panning. Cannot start 8D effect.");
-            return;
-        }
-
-        let time = 0;
-        const cycleDuration = 10000;
-        const maxDistance = 15;
-
-        if (panIntervalIdRef.current) {
-            clearInterval(panIntervalIdRef.current);
-        }
-
-        panIntervalIdRef.current = setInterval(() => {
-            const normalizedTime = (time % cycleDuration) / cycleDuration;
-            const x = maxDistance * Math.sin(2 * Math.PI * normalizedTime);
-            const z = -maxDistance * Math.cos(2 * Math.PI * normalizedTime);
-
-            panner.positionX.value = x;
-            panner.positionY.value = 0;
-            panner.positionZ.value = z;
-
-            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance));
-            gainNode.gain.value = volume;
-
-            time += 50;
-        }, 50);
-        console.log("8D Panning started.");
-    }, []);
-
-    // Fungsi untuk menghentikan panning
-    const stopPanning = React.useCallback(() => {
-        if (panIntervalIdRef.current) {
-            clearInterval(panIntervalIdRef.current);
-            panIntervalIdRef.current = null;
-            if (pannerNodeRef.current && gainNodeRef.current) {
-                pannerNodeRef.current.positionX.value = 0;
-                pannerNodeRef.current.positionY.value = 0;
-                pannerNodeRef.current.positionZ.value = 0;
-                gainNodeRef.current.gain.value = 1;
-            }
-            console.log("8D Panning stopped and reset.");
-        }
-    }, []);
-
-    // Fungsi utama toggle play/pause
-    const togglePlay = async (e) => {
-        e.stopPropagation(); // Mencegah event klik menyebar ke akordeon
-
-        const thisAudio = audioRef.current;
-        if (!thisAudio || !src) {
-            console.warn("Audio element not ready or src is empty for InlineAudioIcon. Skipping play.");
-            return;
-        }
-
-        // Jika audio ini sedang berputar, hentikan saja
-        if (isPlaying) {
-            thisAudio.pause();
-            thisAudio.currentTime = 0;
-            stopPanning();
-            return;
-        }
-
-        // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO LAIN ---
-        document.querySelectorAll('audio').forEach(otherAudio => {
-            if (otherAudio !== thisAudio) {
-                otherAudio.pause();
-                otherAudio.currentTime = 0;
-            }
-        });
-        
-        // Pastikan AudioContext diinisialisasi
-        initAudioNodes(); // Coba inisialisasi/ambil lagi AudioContext
-        const audioContext = audioContextRef.current;
-        const panner = pannerNodeRef.current;
-        const gainNode = gainNodeRef.current;
-
-        // Penting: Resume AudioContext jika suspended
-        if (audioContext && audioContext.state === 'suspended') {
-            try {
-                await audioContext.resume();
-                console.log("AudioContext resumed by user interaction for InlineAudioIcon.");
-            } catch (e) {
-                console.error("Error resuming AudioContext for InlineAudioIcon:", e);
-                // Tampilkan prompt ke pengguna untuk interaksi lebih lanjut jika diperlukan
-                setShowUserInteractionPrompt(true); // Tampilkan tombol interaksi
-                alert("Browser memblokir pemutaran audio otomatis. Mohon klik OK atau sentuh layar untuk mengaktifkan audio.");
-                return; // Berhenti di sini, menunggu interaksi tambahan
-            }
-        }
-        
-        // Setel SRC dan muat audio, lalu tunggu hingga siap diputar
-        thisAudio.src = src;
-        thisAudio.load(); 
-
-        try {
-            // Tunggu hingga audio bisa diputar sepenuhnya
-            await new Promise((resolve, reject) => {
-                if (thisAudio.readyState >= 3) { // HAVE_FUTURE_DATA atau HAVE_ENOUGH_DATA
-                    resolve();
-                } else {
-                    const handleCanPlayThrough = () => {
-                        thisAudio.removeEventListener('canplaythrough', handleCanPlayThrough);
-                        thisAudio.removeEventListener('error', handleError);
-                        resolve();
-                    };
-                    const handleError = (e) => {
-                        thisAudio.removeEventListener('canplaythrough', handleCanPlayThrough);
-                        thisAudio.removeEventListener('error', handleError);
-                        console.error("Audio loading error event:", e);
-                        reject(new Error("Failed to load audio resource."));
-                    };
-                    thisAudio.addEventListener('canplaythrough', handleCanPlayThrough);
-                    thisAudio.addEventListener('error', handleError);
-                }
-            });
-            setIsAudioLoadedAndReady(true);
-            console.log(`Audio for ${src} is fully loaded and ready.`);
-
-            // Coba putar audio dengan Web Audio API
-            if (audioContext && panner && gainNode) {
-                if (!sourceNodeRef.current || sourceNodeRef.current.mediaElement !== thisAudio) {
-                    if (sourceNodeRef.current) {
-                        sourceNodeRef.current.disconnect();
-                        sourceNodeRef.current = null;
-                    }
-                    sourceNodeRef.current = audioContext.createMediaElementSource(thisAudio);
-                    sourceNodeRef.current.connect(panner);
-                    console.log("[InlineAudioIcon] MediaElementSourceNode created and connected to panner.");
-                }
-                thisAudio.loop = isLooping;
-                await thisAudio.play();
-                setIsPlaying(true);
-                startPanning();
-                console.log("Web Audio API playback started for: " + src);
-            } else { // Fallback jika Web Audio API tidak berfungsi
-                console.warn("Web Audio API not fully initialized or supported, falling back to direct HTML audio.");
-                thisAudio.loop = isLooping;
-                await thisAudio.play();
-                setIsPlaying(true);
-                console.log("Direct HTML audio playback started for: " + src);
-            }
-            setShowUserInteractionPrompt(false); // Sembunyikan prompt jika sukses
-
-        } catch (error) {
-            console.error("Audio Playback/Load Error for InlineAudioIcon " + src + ":", error);
-            setIsPlaying(false);
-            stopPanning();
-            if (error.name === "NotAllowedError" || error.name === "AbortError" || error.message === "Failed to load audio resource.") {
-                // Ini adalah error akibat autoplay policy atau gagal load
-                setShowUserInteractionPrompt(true); // Tampilkan prompt agar user klik
-                alert("Gagal memutar audio. Browser memblokir pemutaran otomatis atau file tidak dapat dimuat. Mohon klik 'Aktifkan Audio' jika muncul.");
-            } else {
-                alert("Terjadi kesalahan tak terduga saat memutar audio. Silakan coba lagi.");
-            }
-        }
-    };
-
-    // Global listener untuk mengaktifkan AudioContext jika suspended
-    // Ini adalah fallback jika `resume()` di `togglePlay` gagal
-    React.useEffect(() => {
-        const handleFirstInteraction = () => {
-            if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-                audioContextRef.current.resume().then(() => {
-                    console.log("Global AudioContext resumed by first document click/touch.");
-                }).catch(e => console.error("Error resuming global AudioContext:", e));
-            }
-            // Hapus listener setelah interaksi pertama
-            document.removeEventListener('click', handleFirstInteraction);
-            document.removeEventListener('touchstart', handleFirstInteraction);
-        };
-
-        document.addEventListener('click', handleFirstInteraction);
-        document.addEventListener('touchstart', handleFirstInteraction);
-
-        return () => {
-            document.removeEventListener('click', handleFirstInteraction);
-            document.removeEventListener('touchstart', handleFirstInteraction);
-        };
-    }, []);
-
-
-    // Efek untuk memantau status audio
-    React.useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        
-        audio.loop = isLooping;
-
-        const handlePlayEvent = () => setIsPlaying(true);
-        const handlePauseEvent = () => { setIsPlaying(false); stopPanning(); };
-        const handleEndedEvent = () => { 
-            if(!isLooping) handlePauseEvent(); 
-        };
-        const handleLoadedDataEvent = () => { setIsAudioLoadedAndReady(true); };
-        const handleErrorEvent = (e) => { 
-            console.error(`Audio event error for ${src}:`, e.target.error);
-            setIsAudioLoadedAndReady(false);
-            setIsPlaying(false);
-            stopPanning();
-        };
-
-        audio.addEventListener('play', handlePlayEvent);
-        audio.addEventListener('pause', handlePauseEvent);
-        audio.addEventListener('ended', handleEndedEvent);
-        audio.addEventListener('loadeddata', handleLoadedDataEvent);
-        audio.addEventListener('error', handleErrorEvent);
-
-        // Cleanup saat komponen di-unmount
-        return () => {
-            audio.removeEventListener('play', handlePlayEvent);
-            audio.removeEventListener('pause', handlePauseEvent);
-            audio.removeEventListener('ended', handleEndedEvent);
-            audio.removeEventListener('loadeddata', handleLoadedDataEvent);
-            audio.removeEventListener('error', handleErrorEvent);
-            
-            if (audio) { audio.pause(); audio.currentTime = 0; }
-            stopPanning();
-            if (sourceNodeRef.current) {
-                sourceNodeRef.current.disconnect();
-                sourceNodeRef.current = null;
-            }
-        };
-    }, [src, isLooping, stopPanning, startPanning]); // Dependencies yang lengkap
-
-    return (
-        <button onClick={togglePlay} className="inline-flex items-center gap-2 ml-3 text-gray-500 hover:text-blue-600 transition-colors" title={isPlaying ? "Hentikan Audio" : "Putar Audio"}>
-            <audio ref={audioRef} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
-            
-            {isPlaying ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
-                </svg>
-            ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                </svg>
-            )}
-
-            <span className="text-xs font-semibold">
-                {isPlaying ? 'Sedang Mendengar...' : (isAudioLoadedAndReady ? 'Dengarkan' : 'Memuat...')}
-            </span>
-
-            {/* Tombol Prompt Interaksi Pengguna (Opsional, jika masalah autoplay parah) */}
-            {/* Ini akan muncul di dalam ikon play/pause jika audio diblokir */}
-            {showUserInteractionPrompt && (
-                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 rounded-full text-xs text-white z-10 p-1"
-                    onClick={(e) => { // Mencegah klik menyebar ke togglePlay lagi
-                        e.stopPropagation();
-                        togglePlay(e); // Coba play lagi setelah klik prompt
-                        setShowUserInteractionPrompt(false);
-                    }}>
-                    Klik!
-                </div>
-            )}
-        </button>
-    );
-};
-
-// --- KOMPONEN BARU UNTUK AKORDEON SHOLAWAT ---
-const SholawatAccordion = ({ title, audioSrc, arabicText, latinText, translationText, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="bg-white/10 backdrop-blur-md rounded-xl mb-4 border border-white/20">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-4 flex justify-between items-center text-left"
-      >
-        <h4 className="text-lg font-bold text-Yellow">{title}</h4>
-        <div className="flex items-center">
-          <InlineAudioIcon src={audioSrc} isLooping={true} />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-6 w-6 text-brown transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </button>
-      <div 
-        className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
-      >
-        <div className="overflow-hidden"> {/* Div ini penting untuk animasi grid */}
-          <div className="p-4 border-t border-white/20">
-            <p className={`${paragraphClasses} text-center text-xl ${arabicTextClass} text-black`}>{arabicText}</p>
-            <p className={`${paragraphClasses} text-center italic text-black-300`}>{latinText}</p>
-            <p className={`${paragraphClasses} text-Yellow-200`}><b>Terjemahan:</b> {translationText}</p>
-            <div className="mt-4 border-t border-dashed border-black/30 pt-4">
-              <h5 className="text-md font-bold text-yellow-300 mb-2">Fadhilah & Anjuran:</h5>
-              <div className="text-black-200 space-y-2 text-sm break-words">
-                  {children}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-// --- KOMPONEN BARU UNTUK AKORDEON DOA ---
-const DoaAccordion = ({ title, audioSrc, arabicText, latinText, translationText, benefitsText ,isLooping}) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className="bg-white/10 backdrop-blur-md rounded-xl mb-4 border border-white/20">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full p-4 flex justify-between items-center text-left"
-            >
-                <h4 className="text-lg font-bold text-black">{title}</h4> {/* Changed text-Yellow to text-black for better contrast */}
-                <div className="flex items-center">
-                    <InlineAudioIcon src={audioSrc} isLooping={isLooping} /> {/* Doa usually isn't looped */}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={`h-6 w-6 text-black transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-            </button>
-            <div
-                className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
-            >
-                <div className="overflow-hidden">
-                    <div className="p-4 border-t border-white/20">
-                        <p className={`${paragraphClasses} text-center text-xl ${arabicTextClass} text-black`}>{arabicText}</p>
-                        <p className={`${paragraphClasses} text-center italic text-black-300`}>{latinText}</p>
-                        <p className={`${paragraphClasses} text-black-800`}><b>Terjemahan:</b> {translationText}</p>
-                        <div className="mt-4 border-t border-dashed border-black/30 pt-4">
-                            <h5 className="text-md font-bold text-black-800 mb-2">Manfaat:</h5>
-                            <p className="text-black-200 space-y-2 text-sm break-words">{benefitsText}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-const Starfield = () => {
-    const canvasRef = useRef(null);
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        let animationFrameId;
-
-        const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < 500; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 1.5 + 0.5,
-                    alpha: Math.random(),
-                    speed: Math.random() * 0.2 + 0.1
-                });
-            }
-        };
-
-        const animate = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            stars.forEach(star => {
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
-                ctx.fill();
-                star.y -= star.speed;
-                if (star.y < 0) {
-                    star.y = canvas.height;
-                    star.x = Math.random() * canvas.width;
-                }
-            });
-            animationFrameId = requestAnimationFrame(animate);
-        };
-        
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        animate();
-
-        return () => {
-            window.removeEventListener('resize', resizeCanvas);
-            cancelAnimationFrame(animationFrameId);
-        };
-    }, []);
-    return <canvas id="starfield" ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}></canvas>;
-};
-// --- KOMPONEN BARU: AmbientSoundAccordion untuk Ruang Rahasia ---
-const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
-    const audioPreviewRef = useRef(null);
-    const [isPlayingPreview, setIsPlayingPreview] = useState(false);
-
-    const togglePreview = (e) => {
-        e.stopPropagation(); // Mencegah akordeon tertutup saat tombol diklik
-        const audio = audioPreviewRef.current;
-        if (!audio) return;
-
-        // Hentikan semua audio preview lainnya
-        document.querySelectorAll('audio[id="preview-audio"]').forEach(otherAudio => {
-            if (otherAudio !== audio && !otherAudio.paused) {
-                otherAudio.pause();
-                otherAudio.currentTime = 0;
-            }
-        });
-
-        // Jika suara ambient ini yang sedang diputar sebagai background utama, hentikan
-        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
-            setSelectedBackgroundSound(''); // Hentikan background utama
-            setIsPlayingPreview(false); // Pastikan status preview juga mati
-            return;
-        }
-
-        // Jika audio ini sedang diputar sebagai preview, pause
-        if (isPlayingPreview) {
-            audio.pause();
-            audio.currentTime = 0;
-        } else {
-            // Jika belum diputar, set src dan play
-            audio.src = sound.src;
-            audio.load(); // Penting untuk memuat ulang jika src berubah
-            audio.play().then(() => {
-                setIsPlayingPreview(true);
-            }).catch(e => {
-                console.error("Error playing ambient preview audio:", e);
-                alert("Gagal memutar preview audio. Mohon izinkan autoplay.");
-            });
-        }
-    };
-
-    useEffect(() => {
-        const audio = audioPreviewRef.current;
-        if (!audio) return;
-
-        const handlePlay = () => setIsPlayingPreview(true);
-        const handlePause = () => setIsPlayingPreview(false);
-        const handleEnded = () => setIsPlayingPreview(false);
-
-        audio.addEventListener('play', handlePlay);
-        audio.addEventListener('pause', handlePause);
-        audio.addEventListener('ended', handleEnded);
-
-        return () => {
-            audio.removeEventListener('play', handlePlay);
-            audio.removeEventListener('pause', handlePause);
-            audio.removeEventListener('ended', handleEnded);
-            if (audio) { audio.pause(); audio.currentTime = 0; } // Bersihkan saat unmount
-        };
-    }, [sound.src]); // Re-run effect if sound.src changes
-
-    // Update isPlayingPreview berdasarkan selectedBackgroundSound
-    useEffect(() => {
-        if (selectedBackgroundSound === sound.src && isBackgroundPlaying) {
-            setIsPlayingPreview(true);
-        } else {
-            setIsPlayingPreview(false);
-        }
-    }, [selectedBackgroundSound, isBackgroundPlaying, sound.src]);
-
-
-    return (
-        <div className="bg-gray-700 rounded-lg shadow-md mb-2">
-            <div className="p-3 flex justify-between items-center text-left">
-                <span className="text-lg font-semibold text-white">{sound.name}</span>
-                <div className="flex items-center gap-2">
-                    {sound.src && ( // Hanya tampilkan tombol preview jika ada src audio
-                        <button
-                            onClick={togglePreview}
-                            className="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded-full transition-colors"
-                            title={isPlayingPreview ? "Hentikan Preview" : "Dengarkan Preview"}
-                        >
-                            {isPlayingPreview ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                            <audio id="preview-audio" ref={audioPreviewRef} preload="auto" loop></audio> {/* Gunakan id agar bisa di-selectAll */}
-                        </button>
-                    )}
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedBackgroundSound(sound.src); // Setel ini sebagai background utama
-                            onStartSession(); // Lanjutkan ke fase berikutnya
-                        }}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-semibold transition-colors"
-                        disabled={sound.src === selectedBackgroundSound && isBackgroundPlaying} // Disable jika sudah aktif
-                    >
-                        {sound.src === selectedBackgroundSound && isBackgroundPlaying ? 'Aktif' : 'Pilih & Mulai'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 // --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
 const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
@@ -1455,18 +950,18 @@ const SecretRoomRezeki = () => {
 
     // Data audio latar
     const ambientSounds = [
-        { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
-    { name: 'Angel Abundance', src: 'musik/AngelAmbient.mp3' },
-    { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
-    { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
+        { name: 'Gamelan Ambient', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Gamelan%20Ambient.mp3' },
+    { name: 'Angel Abundance', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Angel%20Abundance.mp3' },
+    { name: 'Singing Bowl', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Singing%20Bowl.mp3' },
+    { name: 'Rural Ambience', src: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Rural%20Ambient.mp3' },
     { name: 'Hening (Mati)', src: '' }
     ];
 
     // Audio sources untuk setiap fase utama
     const phaseAudios = {
-        release: 'musik/Clearing.mp3',
-    manifestation: 'musik/Afirmasi.mp3',
-    gratitude: 'musik/Gratitude.mp3',
+        release: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Clearing.mp3',
+    manifestation: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi.mp3',
+    gratitude: 'https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Gratitude.mp3',
     };
 
     // --- FUNGSI-FUNGSI PEMBANTU ---
@@ -1672,7 +1167,7 @@ const SecretRoomRezeki = () => {
                         Mari mulai dengan menyalakan lilin untuk fokus dan ketenangan.
                     </p>
                     <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
-                        <img src="icons/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
                         {isCandleLit && <div className="flame animate-flicker"></div>}
                     </div>
                     <button
@@ -1837,6 +1332,673 @@ const SecretRoomRezeki = () => {
         </div>
     );
 };
+
+// --- KOMPONEN-KOMPONEN UTILITAS ---
+
+// ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU INI ###
+const IntegratedAudioPlayer = ({ src, text, isLooping = false }) => {
+    const audioRef = React.useRef(null);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+
+    // Fungsi 'Sapu Bersih' dan pemutaran audio
+    const togglePlay = async () => { // Tambahkan async
+        if (!audioRef.current || !src) { // Pastikan src tidak kosong
+            console.warn("Audio element not ready or src is empty.");
+            return;
+        }
+
+        const thisAudio = audioRef.current;
+
+        // Jika audio ini sedang berputar, hentikan saja.
+        if (isPlaying) {
+            thisAudio.pause();
+            thisAudio.currentTime = 0;
+            return; // Hentikan fungsi di sini
+        }
+
+        // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO ---
+        document.querySelectorAll('audio').forEach(otherAudio => {
+            if (otherAudio !== thisAudio) {
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+            }
+        });
+
+        // Setel src dan muat audio, lalu coba putar
+        thisAudio.src = src;
+        thisAudio.load(); // Load the audio content
+
+        try {
+            await thisAudio.play();
+            setIsPlaying(true);
+            console.log("Audio played successfully: " + src);
+        } catch (error) {
+            console.error("Audio Playback Error for " + src + ":", error);
+            setIsPlaying(false);
+            // Memberi tahu pengguna jika autoplay diblokir
+            if (error.name === "NotAllowedError" || error.name === "AbortError") {
+                alert("Pemutaran audio diblokir oleh browser. Mohon izinkan autoplay untuk situs ini atau coba interaksi manual.");
+            } else {
+                alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+            }
+        }
+    };
+
+    // Efek untuk memantau status audio
+    React.useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        
+        audio.loop = isLooping;
+
+        const handlePlay = () => setIsPlaying(true);
+        const handlePause = () => setIsPlaying(false);
+        const handleEnded = () => { if(!isLooping) setIsPlaying(false); };
+        
+        audio.addEventListener('play', handlePlay);
+        audio.addEventListener('pause', handlePause);
+        audio.addEventListener('ended', handleEnded);
+
+        // Cleanup saat komponen unmount
+        return () => {
+            audio.removeEventListener('play', handlePlay);
+            audio.removeEventListener('pause', handlePause);
+            audio.removeEventListener('ended', handleEnded);
+            // Hentikan audio saat komponen di-unmount
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        };
+    }, [src, isLooping]); // Tambahkan src ke dependencies agar useEffect re-run saat src berubah
+
+    return (
+        <div onClick={togglePlay} className="flex items-center justify-center gap-4 my-4 p-4 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
+            <audio ref={audioRef} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
+            
+            {/* Ikon yang berubah */}
+            <div className="text-white">
+                {isPlaying ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 animate-pulse text-sky-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
+                    </svg>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    </svg>
+                )}
+            </div>
+
+            {/* Teks dinamis yang berubah */}
+            <p className={`text-center text-xl font-serif text-white`}> {text}
+            </p>
+        </div>
+    );
+};
+
+
+// ### GANTI KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
+// ### GANTI SELURUH KOMPONEN INI DENGAN VERSI BARU YANG LEBIH PINTAR ###
+const InlineAudioIcon = ({ src, isLooping = false }) => {
+    const audioRef = React.useRef(null);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+
+    // --- Referensi untuk Web Audio API ---
+    const audioContextRef = React.useRef(null);
+    const pannerNodeRef = React.useRef(null);
+    const sourceNodeRef = React.useRef(null); // MediaElementSourceNode dari audio utama
+    const gainNodeRef = React.useRef(null); // Untuk mengontrol volume Web Audio API
+
+    // Fungsi untuk inisialisasi AudioContext, PannerNode, dan GainNode
+    const initAudioNodes = () => {
+        // Hanya inisialisasi jika belum ada
+        if (!audioContextRef.current) {
+            try {
+                // Pastikan AudioContext diinisialisasi oleh interaksi pengguna pertama
+                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+                
+                pannerNodeRef.current = audioContextRef.current.createPanner();
+                pannerNodeRef.current.panningModel = 'HRTF'; // Human Resources Transfer Function, untuk efek 3D
+                pannerNodeRef.current.distanceModel = 'linear'; // Model jarak, bisa 'inverse', 'linear', 'exponential'
+                pannerNodeRef.current.refDistance = 1; // Referensi jarak
+                pannerNodeRef.current.maxDistance = 1000; // Jarak maksimum suara bisa terdengar
+                pannerNodeRef.current.rolloffFactor = 1; // Seberapa cepat volume menurun seiring jarak
+
+                gainNodeRef.current = audioContextRef.current.createGain(); // Untuk kontrol volume utama Web Audio API
+                gainNodeRef.current.gain.value = 1; // Volume default (max)
+
+                // Hubungkan panner ke gain, lalu gain ke destination
+                pannerNodeRef.current.connect(gainNodeRef.current);
+                gainNodeRef.current.connect(audioContextRef.current.destination);
+
+                console.log("[InlineAudioIcon Init] AudioContext and Web Audio nodes initialized.");
+            } catch (e) {
+                console.error("[InlineAudioIcon Init] Failed to create AudioContext or Web Audio nodes:", e);
+                audioContextRef.current = null; // Set null jika gagal
+                pannerNodeRef.current = null;
+                gainNodeRef.current = null;
+            }
+        }
+    };
+
+    React.useEffect(() => {
+        initAudioNodes(); // Panggil saat komponen mount
+    }, []);
+
+    const panIntervalIdRef = React.useRef(null); // Ref untuk menyimpan ID interval panning
+
+    const togglePlay = async (e) => {
+        e.stopPropagation(); // Mencegah event klik menyebar ke akordeon
+
+        if (!audioRef.current || !src) { // Pastikan elemen audio dan src tersedia
+            console.warn("Audio element not ready or src is empty for InlineAudioIcon.");
+            return;
+        }
+
+        const thisAudio = audioRef.current;
+        const audioContext = audioContextRef.current;
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
+
+        // Jika audio ini sedang berputar, hentikan saja
+        if (isPlaying) {
+            thisAudio.pause();
+            thisAudio.currentTime = 0;
+            return;
+        }
+
+        // --- JURUS SAPU BERSIH GLOBAL UNTUK SEMUA AUDIO LAIN ---
+        // Hentikan semua elemen <audio> HTML di halaman
+        document.querySelectorAll('audio').forEach(otherAudio => {
+            if (otherAudio !== thisAudio) { // Pastikan tidak menghentikan diri sendiri
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+            }
+        });
+        // Pastikan juga semua interval panning dari InlineAudioIcon lain berhenti
+        // Ini tricky tanpa Context API global, jadi kita rely on cleanup effect.
+
+        // Pastikan AudioContext dalam kondisi 'running'
+        if (audioContext && audioContext.state === 'suspended') {
+            try {
+                await audioContext.resume();
+                console.log("AudioContext resumed for InlineAudioIcon.");
+            } catch (e) {
+                console.error("Error resuming AudioContext for InlineAudioIcon:", e);
+                alert("Gagal melanjutkan pemutaran audio. Mohon berikan izin audio.");
+                return;
+            }
+        }
+
+        // Setel src dan muat audio
+        thisAudio.src = src;
+        thisAudio.load();
+
+        if (audioContext && panner && gainNode) {
+            // Buat atau gunakan MediaElementSourceNode yang sesuai
+            if (!sourceNodeRef.current || sourceNodeRef.current.mediaElement !== thisAudio) {
+                if (sourceNodeRef.current) { // Disconnect yang lama jika ada
+                    sourceNodeRef.current.disconnect();
+                    sourceNodeRef.current = null;
+                }
+                sourceNodeRef.current = audioContext.createMediaElementSource(thisAudio);
+                sourceNodeRef.current.connect(panner); // Hubungkan ke PannerNode
+                console.log("[InlineAudioIcon] MediaElementSourceNode created and connected.");
+            }
+            
+            thisAudio.loop = isLooping;
+
+            try {
+                await thisAudio.play();
+                setIsPlaying(true);
+                // Mulai panning hanya jika isPlaying
+                if (isPlaying) { // Check again after play() promise resolves
+                    startPanning();
+                }
+            } catch (error) {
+                console.error("Audio Playback Error for InlineAudioIcon " + src + ":", error);
+                setIsPlaying(false);
+                if (error.name === "NotAllowedError" || error.name === "AbortError") {
+                    alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
+                } else {
+                    alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+                }
+            }
+
+        } else {
+            console.warn("Web Audio API not fully available or failed to initialize, playing directly via HTMLAudioElement.");
+            thisAudio.loop = isLooping;
+            try {
+                await thisAudio.play();
+                setIsPlaying(true);
+            } catch (error) {
+                console.error("Direct HTML Audio Playback Error for " + src + ":", error);
+                setIsPlaying(false);
+                if (error.name === "NotAllowedError" || error.name === "AbortError") {
+                    alert("Pemutaran audio diblokir. Mohon izinkan autoplay untuk situs ini.");
+                } else {
+                    alert("Gagal memutar audio. Pastikan format file cocok atau coba lagi.");
+                }
+            }
+        }
+    };
+
+    // Fungsi untuk memulai efek panning 8D
+    const startPanning = () => {
+        const panner = pannerNodeRef.current;
+        const gainNode = gainNodeRef.current;
+        if (!panner || !gainNode) return;
+
+        let time = 0;
+        const cycleDuration = 10000; // Siklus penuh 10 detik
+        const maxDistance = 15; // Jarak maksimal untuk efek 3D
+
+        if (panIntervalIdRef.current) {
+            clearInterval(panIntervalIdRef.current);
+        }
+
+        panIntervalIdRef.current = setInterval(() => {
+            const normalizedTime = (time % cycleDuration) / cycleDuration;
+            
+            // Gerakan X (kiri-kanan) dan Z (depan-belakang)
+            const x = maxDistance * Math.sin(2 * Math.PI * normalizedTime);
+            const z = -maxDistance * Math.cos(2 * Math.PI * normalizedTime);
+
+            panner.positionX.value = x;
+            panner.positionY.value = 0; // Tetap di tengah vertikal
+            panner.positionZ.value = z;
+
+            // Volume disesuaikan dengan posisi Z (lebih jauh lebih pelan)
+            // Ini akan membuat efek suara terasa "mendekat" dan "menjauh"
+            const volume = 0.5 + 0.5 * ((z + maxDistance) / (2 * maxDistance)); // Dari 0.5 sampai 1.0
+            gainNode.gain.value = volume;
+
+            time += 50; // Update setiap 50ms
+        }, 50);
+    };
+
+    // Efek untuk memantau status audio
+    React.useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        
+        audio.loop = isLooping;
+
+        const handlePlay = () => {
+            setIsPlaying(true);
+            // Mulai panning jika ini adalah audio 8D (Web Audio API aktif)
+            if (audioContextRef.current && pannerNodeRef.current) {
+                startPanning();
+            }
+        };
+
+        const handlePause = () => {
+            setIsPlaying(false);
+            if (panIntervalIdRef.current) {
+                clearInterval(panIntervalIdRef.current);
+                panIntervalIdRef.current = null;
+                // Reset panner position and volume when paused
+                if (pannerNodeRef.current && gainNodeRef.current) {
+                    pannerNodeRef.current.positionX.value = 0;
+                    pannerNodeRef.current.positionY.value = 0;
+                    pannerNodeRef.current.positionZ.value = 0;
+                    gainNodeRef.current.gain.value = 1; // Reset volume ke normal
+                }
+            }
+        };
+
+        const handleEnded = () => { 
+            if(!isLooping) {
+                handlePause(); // Panggil handlePause untuk membersihkan panning
+            }
+        };
+        
+        audio.addEventListener('play', handlePlay);
+        audio.addEventListener('pause', handlePause);
+        audio.addEventListener('ended', handleEnded);
+
+        // Cleanup saat komponen di-unmount
+        return () => {
+            audio.removeEventListener('play', handlePlay);
+            audio.removeEventListener('pause', handlePause);
+            audio.removeEventListener('ended', handleEnded);
+            // Hentikan audio dan bersihkan panning saat komponen unmount
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            if (panIntervalIdRef.current) {
+                clearInterval(panIntervalIdRef.current);
+                panIntervalIdRef.current = null;
+            }
+            // Disconnect source node jika ada
+            if (sourceNodeRef.current) {
+                sourceNodeRef.current.disconnect();
+                sourceNodeRef.current = null;
+            }
+            // Jangan tutup AudioContext di sini, karena mungkin dipakai komponen lain
+        };
+    }, [src, isLooping]); // Tambahkan src ke dependencies agar useEffect re-run saat src berubah
+
+    return (
+        <button onClick={togglePlay} className="inline-flex items-center gap-2 ml-3 text-gray-500 hover:text-blue-600 transition-colors" title={isPlaying ? "Hentikan Audio" : "Putar Audio"}>
+            <audio ref={audioRef} src={src} preload="auto" className="hidden" crossOrigin="anonymous"></audio>
+            
+            {isPlaying ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3.5a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12a.5.5 0 01.5-.5zM5.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5zM14.5 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8a.5.5 0 01.5-.5z" />
+                </svg>
+            ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                </svg>
+            )}
+
+            <span className="text-xs font-semibold">
+                {isPlaying ? 'Sedang Mendengar...' : 'Dengarkan'}
+            </span>
+        </button>
+    );
+};
+
+
+// --- KOMPONEN BARU: AKORDEON SUARA LATAR INDIVIDUAL YANG LEBIH RINGKAS ---
+const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBackgroundSound, isBackgroundPlaying, onStartSession }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const previewAudioRef = useRef(null);
+    const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+
+    // Efek untuk mengelola preview audio saat akordeon dibuka/ditutup
+    useEffect(() => {
+        const audio = previewAudioRef.current;
+        if (!audio) return;
+
+        // Jika akordeon dibuka DAN ada sumber suara DAN suara ini BUKAN suara latar utama
+        // DAN preview belum bermain, kita bisa mulai play
+        if (isOpen && sound.src && sound.src !== selectedBackgroundSound && !isPreviewPlaying) {
+             // Stop any other preview audio first
+            document.querySelectorAll('audio').forEach(otherAudio => {
+                if (otherAudio !== audio && otherAudio.id === "preview-audio") { // Only stop other preview audios
+                    otherAudio.pause();
+                    otherAudio.currentTime = 0;
+                }
+            });
+            audio.volume = 0.5; // Preview agak pelan
+            audio.loop = true; // Preview looping
+            audio.play().then(() => setIsPreviewPlaying(true)).catch(e => console.error(`Error playing preview for ${sound.name}:`, e));
+        } else if (!isOpen || sound.src === selectedBackgroundSound) { // Jika akordeon ditutup atau suara ini sudah jadi background utama
+            audio.pause();
+            audio.currentTime = 0;
+            setIsPreviewPlaying(false);
+        }
+
+        return () => {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+                setIsPreviewPlaying(false);
+            }
+        };
+    }, [isOpen, sound.src, selectedBackgroundSound]);
+
+    // Event listener untuk saat preview audio selesai (jika tidak looping)
+    useEffect(() => {
+        const audio = previewAudioRef.current;
+        if (!audio) return;
+        const handleEnded = () => setIsPreviewPlaying(false);
+        audio.addEventListener('ended', handleEnded);
+        return () => audio.removeEventListener('ended', handleEnded);
+    }, []);
+
+
+    // Fungsi untuk toggle play/pause preview manual
+    const togglePreviewPlay = (e) => {
+        e.stopPropagation(); // Mencegah klik menyebar ke tombol akordeon
+        const audio = previewAudioRef.current;
+        if (!audio) return;
+
+        if (isPreviewPlaying) {
+            audio.pause();
+            audio.currentTime = 0;
+            setIsPreviewPlaying(false);
+        } else {
+             // Stop any other preview audio first
+            document.querySelectorAll('audio').forEach(otherAudio => {
+                if (otherAudio !== audio && otherAudio.id === "preview-audio") { // Only stop other preview audios
+                    otherAudio.pause();
+                    otherAudio.currentTime = 0;
+                }
+            });
+            audio.play().then(() => setIsPreviewPlaying(true)).catch(e => console.error(`Error playing preview for ${sound.name}:`, e));
+        }
+    };
+
+
+    const isCurrentlySelected = selectedBackgroundSound === sound.src;
+
+    return (
+        <div className="bg-gray-800 rounded-lg mb-2 overflow-hidden border border-gray-700"> {/* Ringkas: bg-gray-800 */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`w-full p-3 flex justify-between items-center text-left transition-colors duration-200
+                    ${isCurrentlySelected ? 'bg-blue-700 text-white font-semibold' : 'text-gray-200 hover:bg-gray-700'}`}
+            >
+                <span className="text-base md:text-lg">
+                    {sound.name}
+                    {isCurrentlySelected && <span className="ml-2 text-xs opacity-75">(Terpilih)</span>}
+                    {isBackgroundPlaying && isCurrentlySelected && <span className="ml-2 animate-pulse text-yellow-300">🔊</span>}
+                </span>
+                <div className="flex items-center">
+                    {/* Tombol Play/Pause Preview hanya muncul jika ada src suara */}
+                    {sound.src && (
+                        <button 
+                            onClick={togglePreviewPlay} 
+                            className="p-1 rounded-full hover:bg-gray-600 focus:outline-none"
+                            title={isPreviewPlaying ? "Hentikan Preview" : "Putar Preview"}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isPreviewPlaying ? 'text-red-400' : 'text-gray-400'}`} fill="currentColor" viewBox="0 0 20 20">
+                                {isPreviewPlaying ? (
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                ) : (
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                )}
+                            </svg>
+                            <audio id="preview-audio" ref={previewAudioRef} src={sound.src} preload="auto" loop></audio>
+                        </button>
+                    )}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-5 w-5 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </button>
+            <div 
+                className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+            >
+                <div className="overflow-hidden">
+                    {/* HAPUS BAGIAN INI UNTUK MENGHILANGKAN KETERANGAN */}
+                    {/*
+                    <div className="p-3 pt-0 text-sm text-gray-400"> 
+                        <p className="mb-2 italic">{sound.description}</p>
+                        {isCurrentlySelected ? (
+                            <p className="text-blue-300">Suara ini sedang dipilih sebagai latar utama.</p>
+                        ) : (
+                            <button
+                                onClick={() => { setSelectedBackgroundSound(sound.src); setIsOpen(false); }}
+                                className="bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Pilih Sebagai Latar Utama
+                            </button>
+                        )}
+                        {!sound.src && <p className="text-gray-500">Tidak ada suara untuk pilihan ini.</p>}
+                    </div>
+                    */}
+
+                    {/* GANTI DENGAN BLOK INI (HANYA TOMBOL MULAI SESI JIKA DIPERLUKAN SAAT AKORDEON DIBUKA) */}
+                    {isOpen && ( // Hanya tampilkan tombol ini saat akordeon terbuka
+                         <div className="p-3 pt-0 text-center">
+                            <button
+                                onClick={() => { 
+                                    setSelectedBackgroundSound(sound.src); // Pilih suara latar
+                                    onStartSession(); // Langsung panggil fungsi mulai sesi
+                                    setIsOpen(false); // Tutup akordeon
+                                }}
+                                disabled={!sound.src} 
+                                className="bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed"
+                            >
+                                Mulai Sesi {sound.name === 'Hening (Mati)' ? 'Tanpa Suara' : sound.name}
+                            </button>
+                            {!sound.src && <p className="text-gray-500 mt-2">Tidak ada suara untuk pilihan ini.</p>}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- KOMPONEN BARU UNTUK AKORDEON SHOLAWAT ---
+const SholawatAccordion = ({ title, audioSrc, arabicText, latinText, translationText, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="bg-white/10 backdrop-blur-md rounded-xl mb-4 border border-white/20">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-4 flex justify-between items-center text-left"
+      >
+        <h4 className="text-lg font-bold text-Yellow">{title}</h4>
+        <div className="flex items-center">
+          <InlineAudioIcon src={audioSrc} isLooping={true} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`h-6 w-6 text-brown transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+      <div 
+        className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+      >
+        <div className="overflow-hidden"> {/* Div ini penting untuk animasi grid */}
+          <div className="p-4 border-t border-white/20">
+            <p className={`${paragraphClasses} text-center text-xl ${arabicTextClass} text-black`}>{arabicText}</p>
+            <p className={`${paragraphClasses} text-center italic text-black-300`}>{latinText}</p>
+            <p className={`${paragraphClasses} text-Yellow-200`}><b>Terjemahan:</b> {translationText}</p>
+            <div className="mt-4 border-t border-dashed border-black/30 pt-4">
+              <h5 className="text-md font-bold text-yellow-300 mb-2">Fadhilah & Anjuran:</h5>
+              <div className="text-black-200 space-y-2 text-sm break-words">
+                  {children}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+// --- KOMPONEN BARU UNTUK AKORDEON DOA ---
+const DoaAccordion = ({ title, audioSrc, arabicText, latinText, translationText, benefitsText ,isLooping}) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="bg-white/10 backdrop-blur-md rounded-xl mb-4 border border-white/20">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full p-4 flex justify-between items-center text-left"
+            >
+                <h4 className="text-lg font-bold text-black">{title}</h4> {/* Changed text-Yellow to text-black for better contrast */}
+                <div className="flex items-center">
+                    <InlineAudioIcon src={audioSrc} isLooping={isLooping} /> {/* Doa usually isn't looped */}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-6 w-6 text-black transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </button>
+            <div
+                className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+            >
+                <div className="overflow-hidden">
+                    <div className="p-4 border-t border-white/20">
+                        <p className={`${paragraphClasses} text-center text-xl ${arabicTextClass} text-black`}>{arabicText}</p>
+                        <p className={`${paragraphClasses} text-center italic text-black-300`}>{latinText}</p>
+                        <p className={`${paragraphClasses} text-black-800`}><b>Terjemahan:</b> {translationText}</p>
+                        <div className="mt-4 border-t border-dashed border-black/30 pt-4">
+                            <h5 className="text-md font-bold text-black-800 mb-2">Manfaat:</h5>
+                            <p className="text-black-200 space-y-2 text-sm break-words">{benefitsText}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+const Starfield = () => {
+    const canvasRef = useRef(null);
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        let animationFrameId;
+
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 500; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.2 + 0.1
+                });
+            }
+        };
+
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+                star.y -= star.speed;
+                if (star.y < 0) {
+                    star.y = canvas.height;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+            animationFrameId = requestAnimationFrame(animate);
+        };
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animate();
+
+        return () => {
+            window.removeEventListener('resize', resizeCanvas);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+    return <canvas id="starfield" ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}></canvas>;
+};
+
 // --- KOMPONEN BARU UNTUK KILATAN SUBLIMINAL ---
 const AffirmationFlasher = ({ phrase }) => {
     const [positionTop, setPositionTop] = useState('50%');
@@ -2323,7 +2485,7 @@ const Bab2 = () => (
             Jawabannya… hanya hati nurani Anda yang tahu dan bisa merasakannya.
         </p>
         <IntegratedAudioPlayer
-            src="musik/PendahuluanIA.mp3"
+            src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Pendahuluan IA.mp3"
             text="Dengarkan Pembukaan Bab Ini"
             
         />
@@ -2621,7 +2783,7 @@ const Bab9 = () => (
             Latihan Kawrooh ini bisa dilakukan kapan saja dan dalam kondisi emosi apa pun. Baik saat Anda sedang merasakan kemarahan yang membakar, kekecewaan yang mendalam, atau bahkan kebahagiaan yang begitu intens hingga membuat Anda lekat pada dunia. Sebab, bahkan hal-hal yang paling kita cintai pun kadang perlu dilepaskan dengan ikhlas ke langit agar tidak menjadi 'berhala' yang mengikat hati dan menghalangi kedamaian batin.
         </p>
     <IntegratedAudioPlayer
-            src="musik/PelepasanEmosiIslamic.mp3"
+            src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Pelepasan Emosi Islamic.mp3"
             text="Contoh Audio Pelepasan Emosi"
             
         />
@@ -2667,7 +2829,7 @@ const Bab10 = () => {
       {/* Sholawat Nariyah */}
       <SholawatAccordion
         title="1. Sholawat Nariyah"
-        audioSrc="musik/Sholawatnariyahbowl.mp3"
+        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat nariyah bowl.mp3"
         arabicText="اللَّهُمَّ صَلِّ صَلاَةً كَامِلَةً وَسَلِّمْ سَلاَماً تَامًّا عَلَى سَيِّدِنَا مُحَمَّدٍ الَّذِي تَنْحَلُّ بِهِ الْعُقَدُ، وَتَنْفَرِجُ بِهِ الْكُرَبُ، وَتُقْضَى بِهِ الْحَوَائِجُ، وَتُنَالُ بِهِ الرَّغَائِبُ، وَحُسْنُ الْخَوَاتِيمِ، وَيُسْتَسْقَى الْغَمَامُ بِوَجْهِهِ الْكَرِيمِ، وَعَلَى آلِهِ وَصَحْبِهِ، فِي كُلِّ لَمْحَةٍ وَنَفَسٍ، بِعَدَدِ كُلِّ مَعْلُومٍ لَكَ."
         latinText="Allahumma shalli shalaatan kaamilatan wa sallim salaaman taamman ‘alaa sayyidinaa Muhammadin illadzi tanhallu bihil ‘uqad wa tanfariju bihil kurab wa tuqdhaa bihil hawaaij wa tunaalu bihir raghaaib wa husnul khawaatim wa yustasqal ghamaamu bi wajhihil kariim wa ‘alaa aalihi wa shahbihi fii kulli lamhatin wa nafasin bi ‘adadi kulli ma’luumin laka."
         translationText="Ya Allah, limpahkanlah shalawat yang sempurna dan salam yang sempurna kepada junjungan kami Nabi Muhammad, yang dengan beliau segala simpul kesulitan terurai, segala kesusahan teratasi, segala kebutuhan terpenuhi, segala keinginan tercapai, dan husnul khatimah didapatkan. Dengan wajah mulia beliau, awan pun menurunkan hujan. Dan (limpahkan juga) kepada keluarga dan para sahabat beliau, dalam setiap kilatan pandangan dan hembusan nafas, sebanyak jumlah segala sesuatu yang Engkau ketahui.
@@ -2684,7 +2846,7 @@ const Bab10 = () => {
       {/* Sholawat Munjiyat */}
       <SholawatAccordion
         title="2. Sholawat Munjiyat"
-        audioSrc="musik/Sholawatmunjiyatbowl.mp3"
+        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat munjiyat bowl.mp3"
         arabicText="اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ صَلَاةً تُنَجِّينَا بِهَا مِنْ جَمِيعِ الْأَهْوَالِ وَالآفَاتِ، وَتَقْضِي لَنَا بِهَا جَمِيعَ الْحَاجَاتِ، وَتُطَهِّرُنَا بِهَا مِنْ جَمِيعِ السَّيِّئَاتِ، وَتَرْفَعُنَا بِهَا عِنْدَكَ أَعْلَى الدَّرَجَاتِ..."
         latinText="Allahumma shalli ‘ala sayyidina Muhammadin shalaatan tunajjinaa biha min jamii’il ahwaali wal aafaat, wa taqdhi lanaa biha jamii’al haajaat, wa tutahhirunaa biha min jamii’is sayyi’aat, wa tarfa’unaa biha ‘indaka a’lad darajaat, wa tuballighunaa biha aqshal ghaayaat min jamii’il khayraat fil hayaat wa ba’dal mamaat. Innaka ‘ala kulli syai’in qadiir.*
 "
@@ -2702,7 +2864,7 @@ const Bab10 = () => {
       {/* Sholawat Nuril Anwar */}
        <SholawatAccordion
         title="3. Sholawat Nuril Anwar"
-        audioSrc="musik/SholawatNA8d.mp3"
+        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat Nuril Anwar bowl 8d.mp3"
         arabicText="اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ نُورِ الْأَنْوَارِ، وَسِرِّ الْأَسْرَارِ، وَتِرْيَاقِ الْأَغْيَارِ، وَمِفْتَاحِ بَابِ الْيَسَارِ..."
         latinText="Allahumma shalli ‘ala Sayyidina Muhammad, Nuril Anwar, wa Sirril Asrar, wa Tiryāqil Aghyār, wa Miftāhi Bābil Yasar, Sayyidina wa Maulana Muhammadinil Mukhtar, wa Alihi al-Athar, wa Shahbihi al-Akhyar, 'Adada Ni'amillahi wa Ifdhalihi.*
  "
@@ -2720,7 +2882,7 @@ const Bab10 = () => {
       {/* Sholawat Futuh Rizq */}
        <SholawatAccordion
         title="4. Sholawat Futuh Rizq Wal Afiyah"
-        audioSrc="musik/SholawatFRWA8d.mp3"
+        audioSrc="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Sholawat Futuh Rizq wal Afiyah bowl 8d.mp3"
         arabicText="اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ صَلَاةً تَفْتَحُ لَنَا بِهَا أَبْوَابَ الرِّزْقِ وَالْعَافِيَةِ..."
         latinText="Allahumma shalli ‘alâ Sayyidinâ Muhammadin shalâtan taftahu lanâ bihâ abwâbar rizqi wal ‘âfiyah, wa tuskinu bihâ khawfanâ, wa tuyassiru lanâ bihâ kulla amrin ‘asîr, wa tujliya bihâ kulla hamm wa gham, wa taqdhi bihâ jamî’a hawâ’ijinâ fid-dunyâ wal-âkhirah, wa ‘alâ âlihi wa shahbihi wa sallim.*
 "
@@ -3226,12 +3388,11 @@ const DoaHarianPlaylist = () => {
 // --- KOMPONEN BARU: DOA LOA CODEX (GAMBAR DAN TOMBOL FIXED) ---
 // Data untuk Doa LoA Codex Categories (PASTE INI DI LUAR KOMPONEN JIKA BANYAK KOMPONEN MEMBUTUHKANNYA, ATAU BIARKAN DI DALAM SEPERTI INI)
 const loaCodexDoaCategories = [
-   { id: 'placeholder', name: "Pilih Kategori Doa...", audioUrl: "", imageUrl: "" },
-    { id: 'rezeki', name: "Rezeki", audioUrl: "musik/LoaRejeki.mp3", imageUrl: "icons/Coverijo.png" },
-    { id: 'jodoh', name: "Jodoh", audioUrl: "musik/LoaJodoh.mp3", imageUrl: "icons/Coverijo.png" },
-    { id: 'promil', name: "Promil", audioUrl: "musik/LoaPromil.mp3", imageUrl: "icons/Coverijo.png" },
-    { id: 'hutang', name: "Hutang", audioUrl: "musik/LoaHutang.mp3", imageUrl: "icons/Coverijo.png" },
-    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "musik/LoaSembuh.mp3", imageUrl: "icons/Coverijo.png" }
+    { id: 'rezeki', name: "Rezeki", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Rejeki.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'jodoh', name: "Jodoh", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Jodoh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'promil', name: "Promil", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Promil.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" },
+    { id: 'hutang', name: "Hutang", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Loa%20Hutang.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik@main/Coverijo.png" },
+    { id: 'kesembuhan', name: "Kesembuhan", audioUrl: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/loa%20sembuh.mp3", imageUrl: "https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png" }
 ];
 
 // URL Gambar Latar Belakang Default untuk Doa LoA Codex
@@ -3258,7 +3419,7 @@ const premisNiatText = `
 `;
 
 // URL Musik Latar untuk Doa LoA Codex
-const DOA_LOA_CODEX_AMBIENT_MUSIC = "musik/lyra.mp3"; // Ganti URL musik latar pilihanmu
+const DOA_LOA_CODEX_AMBIENT_MUSIC = "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/lyra.mp3"; // Ganti URL musik latar pilihanmu
 
 const DoaLoaCodex = () => {
     const { setCurrentPageKey } = useContext(AppContext);
@@ -3618,7 +3779,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, sesungguhnya aku berlindung kepada-Mu dari rasa gelisah dan sedih, dari kelemahan dan kemalasan, dari sifat kikir dan penakut, serta dari lilitan hutang dan tekanan orang-orang.\"",
             manfaat: "Memohon perlindungan dari berbagai kesulitan hidup, termasuk beban utang.",
             latin: "Allaahumma innii a’uudzu bika minal-hammi wal-hazan, wal-‘ajzi wal-kasal, wal-bukhli wal-jubn, wa dhala’id-dayni wa ghalabatir-rijaal",
-            audioSrc: "musik/Allahumainneaudzubika.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma inne audzubika.mp3"
         },
         {
             id: 2,
@@ -3627,7 +3788,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, cukupkanlah aku dengan rezeki halal-Mu dari yang haram, dan jadikanlah aku kaya dengan karunia-Mu dari selain-Mu.\"",
             manfaat: "Memohon kecukupan rezeki yang halal dan kemandirian dari selain Allah.",
             latin: "Allaahumma ikfinii bihalaalika ‘an haraamik, wa aghninii bifadhlika ‘amman siwaak.",
-            audioSrc: "musik/Allahumafinne.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma finne.mp3"
         },
         {
             id: 3,
@@ -3636,7 +3797,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Wahai Yang Maha Hidup, Wahai Yang Maha Berdiri Sendiri! Dengan rahmat-Mu aku memohon pertolongan!\"",
             manfaat: "Memohon pertolongan dan kemudahan dalam segala urusan.",
             latin: "Ya Hayyu Ya Qayyum! Bi rahmatika astagheeth",
-            audioSrc: "musik/yahayyyaqayy.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/ya%20hayy%20ya%20qayy.mp3"
         },
         {
             id: 4,
@@ -3645,7 +3806,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Tidak ada Tuhan selain Engkau. Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.\"",
             manfaat: "Doa permohonan ampun dan pertolongan dalam keadaan terdesak (Doa Nabi Yunus).",
             latin: "Laa ilaaha illaa anta subhaanaka inni kuntu minazh-zhaalimiin",
-            audioSrc: "musik/NabiYunus.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Nabi Yunus Perut Ikan Paus.mp3"
         },
         {
             id: 5,
@@ -3654,7 +3815,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Cukuplah Allah bagiku, tiada Tuhan selain Dia. Hanya kepada-Nya aku bertawakal, dan Dia adalah Tuhan pemilik Arsy yang agung.\"",
             manfaat: "Menegaskan tawakal penuh kepada Allah sebagai satu-satunya sandaran.",
             latin: "Hasbiyallaahu laa ilaaha illaa Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arsyil-‘Azhiim.",
-            audioSrc: "musik/Hasbiyallah.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Hasbiyallah.mp3"
         },
         {
             id: 6,
@@ -3663,7 +3824,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah! Wahai penghilang kesedihan... dan bebaskanlah aku dari semua utang.\"",
             manfaat: "Doa spesifik untuk pembebasan dari utang dan memohon rahmat.",
             latin: "Allaahumma yaa faarija al-hamm, wa yaa kaasyifa al-ghamm, farrij hammi wakshif ghummi, warzuqni min haytsu laa ahtasib, yaa arhamar raahimiin.",
-            audioSrc: "musik/Allahumayafarijal.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma ya farijal.mp3"
         },
         {
             id: 7,
@@ -3672,7 +3833,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, kembalikanlah kepada seluruh makhluk-Mu segala kezhaliman mereka yang masih ada padaku — baik yang kecil maupun yang besar — dengan kemudahan dan keselamatan dari-Mu. Dan apa pun yang kekuatanku tak sanggup menyampaikannya, yang tanganku tak sanggup menjangkaunya, yang tubuhku, keyakinanku, dan diriku tak mampu memikulnya — maka tunaikanlah itu dariku dengan limpahan karunia-Mu. Lalu janganlah Engkau kurangi sedikit pun darinya dari (imbalan) kebaikanku, wahai Zat Yang Maha Pengasih di antara para pengasih.\"",
             manfaat: "Permohonan agar Allah melunasi utang yang tak mampu dibayar dari karunia-Nya.",
             latin: "Allaahumma urdud ilaa jamii‘i khalqika mazaalimahum allati qibalii shaghiiruhaa wa kabiiruhaa fii yusrin minka wa ‘aafiyah. Wa maa lam tuballigh-hu quwwatii wa lam tasa‘hu dhaatu yadî wa lam yaqwa ‘alayhi badanii wa yaqînii wa nafsii, fa-addihi ‘annii min jaziili maa ‘indaka min fadhlika, tsumma laa tukhlif ‘alayya minhu syay’an taqdhiihi min hasanaatii, yaa arhamar raahimiin.",
-            audioSrc: "musik/Allahumaurdud.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma urdud.mp3"
         },
         {
             id: 8,
@@ -3681,7 +3842,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, tidak ada kemudahan kecuali apa yang Engkau jadikan mudah, dan Engkaulah yang menjadikan kesedihan (kesulitan) itu mudah jika Engkau kehendaki.\"",
             manfaat: "Memohon kemudahan dari Allah dalam menghadapi segala kesulitan.",
             latin: "Allahumma la sahla illa maa ja‘altahu sahlan, wa anta taj‘alu al-hazna idza syi’ta sahlan.",
-            audioSrc: "musik/Allahumasahla.mp3" 
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma sahla.mp3" // This audio seems duplicated, might want a different one.
         },
         {
             id: 9,
@@ -3690,7 +3851,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Ya Allah, cukupkanlah aku dengan apa yang Engkau rezekikan kepadaku, berkahilah ia untukku, dan gantilah setiap yang hilang dariku dengan yang lebih baik.\"",
             manfaat: "Memohon rasa cukup (qana'ah), keberkahan, dan penggantian yang lebih baik.",
             latin: "Allahumma qanni’ni bima razaqtani, wa baarik li fihi, wakhluf ‘alayya kulla gha’ibatin li bikhayr.",
-            audioSrc: "musik/Allahumaqanni.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Allahuma%20qanni.mp3"
         },
       {
             id: 10,
@@ -3699,7 +3860,7 @@ const DoaPilihan = () => {
             terjemahan: "\"Katakanlah (Muhammad), ‘Wahai Allah, Pemilik kerajaan, Engkau berikan kerajaan kepada siapa yang Engkau kehendaki, dan Engkau cabut kerajaan dari siapa yang Engkau kehendaki. Engkau muliakan siapa yang Engkau kehendaki, dan Engkau hinakan siapa yang Engkau kehendaki. Di tangan-Mu segala kebajikan. Sungguh, Engkau Mahakuasa atas segala sesuatu. Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau berikan rezeki kepada siapa yang Engkau kehendaki tanpa perhitungan\"",
             manfaat: "memohon dibalikkan keadaan, diangkat derajat, dicukupkan rezeki, dan diberi kemuliaan di dunia & akhirat.",
             latin: "Qulillaahumma maalikal-mulki tu’til-mulka man tasyā’u wa tanzi‘ul-mulka mimman tasyā’, wa tu‘izzu man tasyā’u wa tudzillu man tasyā’, biyadikal-khayr, innaka ‘alā kulli syay’in qadiir. Tuulijul-layla fin-nahāri wa tuulijun-nahāra fil-layl, wa tukhrijul-hayya minal-mayyit, wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyā’u bighayri hisāb.",
-            audioSrc: "musik/Surah2627.mp3"
+            audioSrc: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Surah Ali Imran ayat 26-27 8D(1).mp3"
         },
     ];
 
@@ -3755,8 +3916,7 @@ const MainLayout = () => {
         fontSizeIndex, setFontSizeIndex, fontSizes, 
         setIsCoverUnlocked, 
         isSidebarOpen, setIsSidebarOpen,
-        isActivated, // <--- PASTIKAN INI ADA DI SINI! (Diambil dari AppContext)
-        resetAppState
+        isActivated // <--- PASTIKAN INI ADA DI SINI! (Diambil dari AppContext)
     } = useContext(AppContext);
     
     const currentTheme = themes[themeKey];
@@ -3818,7 +3978,6 @@ const MainLayout = () => {
     const handleCloseBook = () => {
         closeFullscreen();
         setIsCoverUnlocked(false);
-        resetAppState();
     };
 
     const renderPage = () => {
@@ -3842,6 +4001,7 @@ const MainLayout = () => {
             case 'bab14b': return <Bab14b />;
             case 'bab15': return <Bab15 />;
             case 'bab16': return <Bab16 />;
+            case 'istighfar-app': return <IstighfarApp />;
             case 'doa-loa-codex': return <DoaLoaCodex />;
             case 'doapilihan': return <DoaPilihan />;
             case 'pengaturan': return <ThemeSettings />;
@@ -4115,6 +4275,11 @@ const SidebarMenu = () => {
                         </ul>
                     </li>
               <li><button onClick={() => handleNavigate('bab16')} className={tocSectionClasses}>Bab Tambahan: 369 Tesla × 369 Law of Allah</button></li>
+              <li className="pt-4">
+                    <button onClick={() => handleNavigate('istighfar-app')} className={`${tocFeatureClasses} golden-background text-purple-600`}>
+                        ✨ Aplikasi Istighfar
+                    </button>
+                </li>
                 <li className="pt-4"><button onClick={() => handleNavigate('pixel-thoughts')} className={`${tocFeatureClasses} golden-background text-yellow-600`}>Ruang Pelepasan</button></li>
     <li className="pt-2"><button onClick={()=> handleNavigate('affirmation-room')} className={`${tocFeatureClasses} golden-background text-sky-500`}> Ruang Afirmasi</button></li>
     <li className="pt-2"><button onClick={() => handleNavigate('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}> Ruang Rahasia Menarik Rezeki</button></li>
@@ -4185,7 +4350,7 @@ const [isExiting, setIsExiting] = useState(false);
 };
 
 // Daftar halaman untuk navigasi
-  const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15','bab16','affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan','doa-harian','secret-room-rezeki','activation-screen','reminder-settings','doa-loa-codex' ];
+  const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15','bab16','istighfar-app','affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan','doa-harian','secret-room-rezeki','activation-screen','reminder-settings','doa-loa-codex' ];
 
 
 // ### KOMPONEN UTAMA APLIKASI (OTAK DARI SEMUANYA) ###
@@ -4211,7 +4376,6 @@ const App = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80); 
-    const [userName, setUserName] = useState(() => localStorage.getItem('ebookUserName') || '');
     const [isDoaLooping, setIsDoaLooping] = useState(false); 
 
     // --- State Kunci untuk Fitur Aktivasi ---
@@ -4279,27 +4443,11 @@ const App = () => {
                 console.log("localStorage 'ebookActivated' changed! Updating App state to", newActivationStatus);
                 setIsActivated(newActivationStatus);
             }
-            const newUserName = localStorage.getItem('ebookUserName') || '';
-            if (newUserName !== userName) {
-                setUserName(newUserName);
-            }
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
-    
-const resetAppState = () => {
-        console.log("Resetting app state (excluding activation key and bucket list)...");
-        setCurrentPageKey('kata-pengantar'); // Kembali ke kata pengantar (atau halaman awal setelah aktivasi)
-        setIsSidebarOpen(false);
-        setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue'); // Tetap pakai tema tersimpan atau default 'blue'
-        setFontSizeIndex(1); // Reset ukuran font ke default
-        setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80); // Tetap pakai opacity tersimpan atau default 80
-        setIsDoaLooping(false); // Reset looping audio doa
-        // State komponen anak seperti SadHourReminder, SecretRoomRezeki, dll.
-        // akan direset secara otomatis saat komponen tersebut unmount/mount ulang
-        // karena currentPageKey berubah.
-    };
+
     // Context Value - isActivated dan setIsActivated sekarang disertakan!
     const contextValue = {
         themes, themeKey, setThemeKey,
@@ -4310,9 +4458,7 @@ const resetAppState = () => {
         isMenuOpen, setIsMenuOpen,
         bgOpacity, setBgOpacity,
         isDoaLooping, setIsDoaLooping,
-        userName, setUserName,
-        isActivated, setIsActivated ,
-        resetAppState
+        isActivated, setIsActivated // <-- TAMBAHKAN INI KE CONTEXT!
     };
     
     return (
@@ -4559,7 +4705,7 @@ style.innerHTML = `
     aspect-ratio: 2 / 3; /* Menjaga rasio buku */
     max-height: 85vh
     background-color: #382e28; /* Warna dasar kulit coklat tua */
-    background-image: url('icons/Coverijo.png');
+    background-image: url('https://raw.githubusercontent.com/kesinilagi/asetmusik/main/Coverijo.png');
     background-size: cover;      /* Membuat gambar menutupi seluruh area tanpa merusak rasio */
     background-position: center; /* Memposisikan gambar pas di tengah */
     background-repeat: no-repeat;  /* Mencegah gambar diulang-ulang */
@@ -4864,6 +5010,27 @@ style.innerHTML = `
         transform: translate(-50%, -50%) scale(1);
     }
 }
+/* --- CSS untuk Aplikasi Istighfar --- */
+.istighfar-siluet {
+    width: 80%; /* Sesuaikan ukuran siluet */
+    max-width: 400px;
+    height: auto;
+    background-color: transparent; /* Pastikan background SVG transparan */
+}
 
+/* Animasi sederhana untuk mengisi stroke atau fill */
+.istighfar-path-animation {
+    transition: stroke-dashoffset 1s linear, stroke 1s linear, fill 1s linear;
+}
+
+/* Anda bisa menambahkan kelas-kelas CSS lain untuk perubahan visual yang lebih kompleks
+   misalnya, untuk mengubah warna fill siluet berdasarkan progress:
+.istighfar-siluet path {
+    transition: fill 1s ease-in-out;
+}
+.istighfar-siluet.progress-low path { fill: #333; }
+.istighfar-siluet.progress-mid path { fill: #666; }
+.istighfar-siluet.progress-high path { fill: #999; }
+*/
 `;
 document.head.appendChild(style);
