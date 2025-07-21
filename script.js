@@ -163,11 +163,10 @@ const defaultSadHoursData = [
 
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
 const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
-    // defaultSadHoursData sekarang bisa diakses dari luar scope komponen
-    // Anda bisa mengganti nama sadHoursData di sini jika mau
-    const [currentReminderMessage, setCurrentReminderMessage] = useState(null); 
+    const [currentReminderMessage, setCurrentReminderMessage] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
-    const [displayedUserName, setDisplayedUserName] = useState(''); 
+    const [displayedUserName, setDisplayedUserName] = useState('');
+    const [savedGoals, setSavedGoals] = useState([]); // State untuk daftar Goal
 
     useEffect(() => {
         const storedUserName = localStorage.getItem('ebookUserName');
@@ -175,109 +174,88 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             setDisplayedUserName(storedUserName);
         }
 
-        const checkSadHour = () => {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const todayDateString = now.toDateString(); 
-            
-            console.log(`[SadHourReminder] Checking time: ${currentHour}:xx, Date: ${todayDateString}`);
+        // MODIFIKASI INI: Langsung tampilkan pop-up saat komponen dimuat
+        setIsVisible(true);
+        
+        // Pilih pesan pengingat acak dari defaultSadHoursData untuk ditampilkan
+        const randomDefaultMessage = defaultSadHoursData[Math.floor(Math.random() * defaultSadHoursData.length)].message;
+        setCurrentReminderMessage(randomDefaultMessage);
 
-            let selectedHourData = null; 
-            
-            // Sekarang sadHoursData sudah di luar komponen
-            for (const hourData of defaultSadHoursData) { 
-                if (currentHour >= hourData.start && currentHour < hourData.end) {
-                    selectedHourData = hourData;
-                    break;
-                }
-            }
-
-            const lastRemindedInfo = JSON.parse(localStorage.getItem('lastSadHourReminder')) || {};
-            const lastRemindedDate = lastRemindedInfo.date;
-            const lastRemindedId = lastRemindedInfo.id; 
-
-            // Jika ada rentang jam galau yang cocok
-            if (selectedHourData) {
-                console.log(`[SadHourReminder] Found matching hour data: ${selectedHourData.id}`);
-                
-                const customReminders = JSON.parse(localStorage.getItem('customReminders')) || [];
-                let messageToDisplay = '';
-
-                if (customReminders.length > 0) {
-                    messageToDisplay = customReminders[Math.floor(Math.random() * customReminders.length)];
-                    console.log(`[SadHourReminder] Using custom message.`);
-                } else {
-                    messageToDisplay = selectedHourData.message;
-                    console.log(`[SadHourReminder] Using default message.`);
-                }
-
-                // Kondisi untuk menampilkan reminder:
-                // BELUM PERNAH TAMPIL untuk ID ini di HARI INI
-                if (lastRemindedDate !== todayDateString || lastRemindedId !== selectedHourData.id) {
-                    setCurrentReminderMessage(messageToDisplay); 
-                    setIsVisible(true);
-                    localStorage.setItem('lastSadHourReminder', JSON.stringify({ date: todayDateString, id: selectedHourData.id })); 
-                    console.log(`[SadHourReminder] Displaying reminder for ID: ${selectedHourData.id}`);
-                } else {
-                    setIsVisible(false); 
-                    setCurrentReminderMessage(null);
-                    console.log(`[SadHourReminder] Reminder for ID ${selectedHourData.id} already shown today.`);
-                }
-            } else {
-                setIsVisible(false); 
-                setCurrentReminderMessage(null);
-                console.log(`[SadHourReminder] No matching hour data for current time.`);
-                if (lastRemindedDate === todayDateString && lastRemindedId) {
-                    localStorage.removeItem('lastSadHourReminder'); 
-                    console.log("[SadHourReminder] Resetting lastSadHourReminder because outside sad hours.");
-                }
-            }
-        };
-
-        checkSadHour();
-        const intervalId = setInterval(checkSadHour, 60 * 1000); // Cek setiap 1 menit
-
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, []); 
+        // Ambil daftar goal dari localStorage
+        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
+        setSavedGoals(storedGoals);
+        
+        // Hapus logika interval checkSadHour dan removeItem('lastSadHourReminder')
+        // karena sekarang pop-up ini selalu muncul di awal dan tidak berdasarkan jam.
+        // Tidak perlu ada clearInterval karena tidak ada setInterval.
+    }, []); // Dependencies kosong agar hanya jalan sekali saat mount
 
     if (!isVisible || !currentReminderMessage) {
         return null;
     }
 
-    const finalMessage = displayedUserName 
-        ? `Hai ${displayedUserName}, ${currentReminderMessage}` 
-        : `Hai Sahabat, ${currentReminderMessage}`; 
+    const finalMessage = displayedUserName
+        ? `Hai ${displayedUserName}, ${currentReminderMessage}`
+        : `Hai Sahabat, ${currentReminderMessage}`;
 
     return (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg shadow-xl z-50 animate-slide-up max-w-sm text-center">
-            <p className="mb-3 text-lg font-semibold text-yellow-300">💡 Pengingat Hati</p>
+        <div
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white
+            p-4 rounded-lg shadow-xl z-50 animate-slide-up max-w-sm text-center"
+        >
+            <p className="mb-3 text-lg font-semibold text-yellow-300">💡 Pengingat & Akses Cepat</p>
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
-            </p> 
-            <div className="flex justify-center gap-3">
+            </p>
+
+            {/* Bagian baru untuk menampilkan daftar Bucket Goal */}
+            {savedGoals.length > 0 && (
+                <div className="mt-4 p-3 bg-gray-700 rounded-md">
+                    <p className="font-semibold text-yellow-200 mb-2">Daftar Goal Anda:</p>
+                    <ul className="list-disc list-inside text-sm text-gray-200 text-left max-h-24 overflow-y-auto">
+                        {savedGoals.map((goal, index) => (
+                            <li key={index}>{goal}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            {/* Tombol-tombol akses cepat */}
+            <div className="flex flex-col gap-3 mt-4"> {/* Menggunakan flex-col untuk tombol */}
                 <button
                     onClick={() => {
-                        onNavigateToRoom('pixel-thoughts'); 
-                        setIsVisible(false); 
+                        onNavigateToRoom('secret-room-rezeki');
+                        setIsVisible(false);
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs transition-colors"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2
+rounded-lg text-sm transition-colors"
                 >
-                    Ruang Pelepasan ✨
+                    Ruang Rahasia ✨
                 </button>
                 <button
                     onClick={() => {
-                        onNavigateToRoom('affirmation-room'); 
-                        setIsVisible(false); 
+                        onNavigateToRoom('doapilihan'); // Ini adalah "Doa Pilihan (Kelapangan Rezeki dan Pelunasan Utang)"
+                        setIsVisible(false);
                     }}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-xs transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2
+rounded-lg text-sm transition-colors"
                 >
-                    Ruang Afirmasi 🌟
+                    Doa Lunas Utang & Rezeki 💰
+                </button>
+                <button
+                    onClick={() => {
+                        onNavigateToRoom('doa-loa-codex');
+                        setIsVisible(false);
+                    }}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2
+rounded-lg text-sm transition-colors"
+                >
+                    Doa LoA Codex 🌟
                 </button>
                 <button
                     onClick={() => setIsVisible(false)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2
+rounded-lg text-sm transition-colors"
                 >
                     Tutup
                 </button>
@@ -4221,7 +4199,18 @@ const App = () => {
         console.log("App startup: isActivated from localStorage =", storedActivation);
         return storedActivation;
     });
-
+// --- NEW STATE UNTUK MENGONTROL POP-UP AWAL ---
+    const [hasShownInitialReminder, setHasShownInitialReminder] = useState(() => {
+        // Cek apakah reminder sudah pernah ditampilkan di sesi sebelumnya
+        // atau jika ini adalah pertama kali aplikasi diaktifkan.
+        // Kita bisa menyimpan flag di localStorage untuk ini.
+        return localStorage.getItem('hasShownInitialReminder') === 'true' && localStorage.getItem('ebookActivated') === 'true';
+    });
+    // Update localStorage saat hasShownInitialReminder berubah
+    useEffect(() => {
+        localStorage.setItem('hasShownInitialReminder', hasShownInitialReminder);
+    }, [hasShownInitialReminder]);
+    
     useEffect(() => {
         // Ambil nilai transparansi yang tersimpan
         const savedOpacity = localStorage.getItem('ebookBgOpacity');
@@ -4296,6 +4285,7 @@ const resetAppState = () => {
         setFontSizeIndex(1); // Reset ukuran font ke default
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80); // Tetap pakai opacity tersimpan atau default 80
         setIsDoaLooping(false); // Reset looping audio doa
+        setHasShownInitialReminder(false);
         // State komponen anak seperti SadHourReminder, SecretRoomRezeki, dll.
         // akan direset secara otomatis saat komponen tersebut unmount/mount ulang
         // karena currentPageKey berubah.
@@ -4323,14 +4313,20 @@ const resetAppState = () => {
                 // Logika routing berdasarkan isActivated dan currentPageKey
                 // Jika belum aktif, selalu tampilkan ActivationScreen
                 : !isActivated ? <ActivationScreen /> 
-                // Jika sudah aktif, baru routing normal berdasarkan currentPageKey
-                : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
-                : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
-                : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                : <MainLayout /> // MainLayout adalah default jika tidak ada halaman spesifik
-            }
-        </AppContext.Provider>
-    );
+                    // Perubahan ada di sini: SadHourReminder akan muncul setelah aktivasi,
+                    // dan sebelum navigasi ke halaman lain.
+                    : (currentPageKey === 'kata-pengantar' || currentPageKey === 'home') && !hasShownInitialReminder // <-- Tambahkan state ini
+                        ? <SadHourReminder onClose={() => setHasShownInitialReminder(true)} onNavigateToRoom={setCurrentPageKey} /> // <-- Gunakan state ini
+                        : currentPageKey === 'pixel-thoughts' 
+                            ? <PixelThoughts />
+                            : currentPageKey === 'affirmation-room' 
+                                ? <AffirmationRoom />
+                                : currentPageKey === 'secret-room-rezeki' 
+                                    ? <SecretRoomRezeki />
+                                    : <MainLayout /> // MainLayout adalah default jika tidak ada halaman spesifik
+        }
+    </AppContext.Provider>
+);
 };
 
 // Perintah Final untuk merender Aplikasi
