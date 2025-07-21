@@ -4220,6 +4220,10 @@ const App = () => {
     const [userName, setUserName] = useState(() => localStorage.getItem('ebookUserName') || '');
     const [isDoaLooping, setIsDoaLooping] = useState(false); 
 
+    // --- NEW: Deklarasi isMenuOpen di useState ---
+    // Saya lalai di sini sebelumnya. Ini harus dideklarasikan.
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     // --- State Kunci untuk Fitur Aktivasi ---
     // Baca status aktivasi dari localStorage saat inisialisasi App
     const [isActivated, setIsActivated] = useState(() => {
@@ -4388,8 +4392,7 @@ const App = () => {
         currentPageKey, setCurrentPageKey,
         isCoverUnlocked, setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
-        isMenuOpen, // Anda bisa menghapus ini jika isMenuOpen tidak digunakan di tempat lain
-        // setIsMenuOpen, // Anda bisa menghapus ini jika setIsMenuOpen tidak digunakan di tempat lain
+        isMenuOpen, setIsMenuOpen, // KINI isMenuOpen DAN setIsMenuOpen sudah dideklarasikan
         bgOpacity, setBgOpacity,
         isDoaLooping, setIsDoaLooping,
         userName, setUserName,
