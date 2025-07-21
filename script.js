@@ -275,7 +275,7 @@ rounded-lg text-sm transition-colors"
                 <button
                        onClick={() => {
                         onNavigateToRoom('daftar-isi'); // <-- UBAH INI
-                        onClose();
+                        setIsVisible(false);
                     }}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2
 rounded-lg text-sm transition-colors"
