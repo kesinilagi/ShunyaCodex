@@ -4224,11 +4224,20 @@ const App = () => {
     });
 // --- NEW STATE UNTUK MENGONTROL POP-UP AWAL ---
     const [hasShownInitialReminder, setHasShownInitialReminder] = useState(() => {
-        // Cek apakah reminder sudah pernah ditampilkan di sesi sebelumnya
-        // atau jika ini adalah pertama kali aplikasi diaktifkan.
-        // Kita bisa menyimpan flag di localStorage untuk ini.
-        return sessionStorage.getItem('hasShownInitialReminder') === 'true' && localStorage.getItem('ebookActivated') === 'true';
+        // Cek apakah flag sudah ada di sessionStorage untuk sesi ini
+        const sessionFlag = sessionStorage.getItem('hasShownInitialReminder') === 'true';
+        console.log("App startup: hasShownInitialReminder from sessionStorage =", sessionFlag);
+        return sessionFlag;
     });
+    useEffect(() => {
+        // Jika aplikasi sudah aktif, dan belum pernah menampilkan pengingat di sesi ini (sessionStorage),
+        // dan currentPageKey adalah 'kata-pengantar' (setelah cover/aktivasi)
+        // Maka tampilkan pengingat, dan langsung tandai sebagai sudah ditampilkan di sesi ini.
+        if (isActivated && !hasShownInitialReminder && (currentPageKey === 'kata-pengantar' || currentPageKey === 'daftar-isi')) {
+             console.log("Marking hasShownInitialReminder as true due to initial load into kata-pengantar/daftar-isi after activation.");
+             setHasShownInitialReminder(true); // Ini akan memicu penyimpanan ke sessionStorage
+        }
+    }, [isActivated, currentPageKey, hasShownInitialReminder]);
     // Update localStorage saat hasShownInitialReminder berubah
     useEffect(() => {
         sessionStorage.setItem('hasShownInitialReminder', hasShownInitialReminder);
@@ -4300,15 +4309,11 @@ const App = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
     
-const resetAppState = async () => { // Pastikan ini async
+const resetAppState = async () => { 
         console.log("Resetting app state (excluding activation key and bucket list)...");
         
-        // --- REVISI DI SINI: Tambahkan 'customReminders' ke itemsToKeep ---
-        const itemsToKeep = ['ebookActivated', 'ebookActivationKey', 'customReminders', 'ebookUserName', 'ebookBgOpacity', 'ebookThemeKey', 'hasShownInitialReminder']; 
-        // Anda juga bisa menambahkan 'ebookUserName', 'ebookBgOpacity', 'ebookThemeKey', 'hasShownInitialReminder'
-        // jika ingin setting personalisasi ini tetap ada setelah reset.
-        // Saya menyarankan untuk tetap menyimpan ini, kecuali hasShownInitialReminder jika ingin popup awal muncul lagi.
-
+        const itemsToKeep = ['ebookActivated', 'ebookActivationKey', 'customReminders', 'ebookUserName', 'ebookBgOpacity', 'ebookThemeKey']; 
+        
         const allLocalStorageKeys = Object.keys(localStorage);
         for (const key of allLocalStorageKeys) {
             if (!itemsToKeep.includes(key)) {
@@ -4333,16 +4338,19 @@ const resetAppState = async () => { // Pastikan ini async
         }
 
         // Reset state aplikasi ke nilai default
-        setCurrentPageKey('kata-pengantar'); // Kembali ke kata pengantar
+        setCurrentPageKey('kata-pengantar'); 
         setIsSidebarOpen(false);
-        // Nilai di bawah ini akan diambil dari localStorage yang sudah kita tentukan untuk disimpan
         setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue'); 
-        setFontSizeIndex(1); // Reset ukuran font ke default
+        setFontSizeIndex(1); 
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80); 
         setIsDoaLooping(false); 
-        // hasShownInitialReminder akan diambil dari localStorage (dipertahankan)
-        // jika tidak, maka tambahkan setHasShownInitialReminder(false) jika ingin selalu muncul.
-        setHasShownInitialReminder(localStorage.getItem('hasShownInitialReminder') === 'true'); // Mempertahankan status tampil/tidak tampilnya pengingat awal
+        
+        // --- OPSIONAL: Jika ingin pop-up pengingat awal muncul lagi setelah resetAppState ---
+        // Jika fungsi resetAppState dipanggil, kita biasanya ingin pengalaman "fresh start".
+        // Maka, set hasShownInitialReminder ke false agar pop-up muncul lagi saat sesi baru.
+        sessionStorage.setItem('hasShownInitialReminder', 'false'); // Reset flag di sessionStorage
+        setHasShownInitialReminder(false); 
+
         setUserName(localStorage.getItem('ebookUserName') || ''); 
     };
     // Context Value - isActivated dan setIsActivated sekarang disertakan!
