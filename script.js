@@ -162,11 +162,17 @@ const defaultSadHoursData = [
 ];
 
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
+// --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
 const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
+    // defaultSadHoursData sekarang bisa diakses dari luar scope komponen
+    // Anda bisa mengganti nama sadHoursData di sini jika mau
     const [currentReminderMessage, setCurrentReminderMessage] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
     const [displayedUserName, setDisplayedUserName] = useState('');
     const [customGoals, setCustomGoals] = useState([]);
+
+    // === PERBAIKAN: Pastikan setHasReminderShownForSession diambil dari AppContext ===
+    const { setHasReminderShownForSession } = useContext(AppContext); // Pastikan baris ini ada dan benar
 
     useEffect(() => {
         const storedUserName = localStorage.getItem('ebookUserName');
@@ -174,6 +180,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             setDisplayedUserName(storedUserName);
         }
 
+        // === BARU: Muat customGoals dari localStorage di sini ===
         const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
         setCustomGoals(storedGoals);
 
@@ -206,10 +213,17 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                 // Simpan tanggal hari ini agar tidak muncul lagi sampai besok
                 localStorage.setItem('lastSadHourReminder', JSON.stringify({ date: todayDateString }));
                 console.log(`[SadHourReminder] Displaying reminder.`);
+                // === PENTING: Beri tahu App bahwa reminder sudah tampil di sesi ini ===
+                setHasReminderShownForSession(true); // Memanggil fungsi dari context
             } else {
                 setIsVisible(false);
                 setCurrentReminderMessage(null);
                 console.log(`[SadHourReminder] Reminder already shown today.`);
+                // === PENTING: Beri tahu App bahwa reminder TIDAK perlu tampil di sesi ini,
+                // sehingga App bisa melanjutkan ke 'kata-pengantar'.
+                // Ini penting jika SadHourReminder tidak muncul karena sudah tampil hari itu.
+                setHasReminderShownForSession(true); // Tetap set true agar App tidak terus mencoba menampilkannya.
+                onNavigateToRoom('kata-pengantar'); // Langsung alihkan ke kata pengantar jika sudah tampil hari ini
             }
         };
 
@@ -222,7 +236,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
         return () => {
             clearInterval(intervalId);
         };
-    }, [customGoals,onNavigateToRoom, setHasReminderShownForSession]); // Menambahkan customGoals ke dependency array
+    }, [customGoals, onNavigateToRoom, setHasReminderShownForSession]); // Tambahkan dependencies baru
 
     if (!isVisible || !currentReminderMessage) {
         return null;
