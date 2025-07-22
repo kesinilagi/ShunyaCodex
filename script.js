@@ -168,8 +168,8 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
     const finalMessage = `Hai ${displayedUserName}, ${messageToDisplay}`;
 
     return (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg shadow-xl z-50 animate-slide-up max-w-sm text-center">
-            <p className="mb-3 text-lg font-semibold text-yellow-300">💡 SHORTCUT</p>
+        <div className="sad-hour-reminder-popup animate-slide-up"> 
+            <p className="mb-3 text-lg font-semibold text-yellow-300">SHORTCUT</p>
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
             </p>
@@ -4462,7 +4462,7 @@ style.innerHTML = `
     .affirmation-flasher {
         position: absolute;
         z-index: 10;
-        font-size: clamp(10rem, 20vw, 10rem);
+        font-size: clamp(5rem, 10vw, 5rem);
         font-weight: extrabold;
         color: white;
         text-shadow: 0 0 25px white, 0 0 40px #0ea5e9;
@@ -4843,29 +4843,38 @@ style.innerHTML = `
         color: #F8FAFC !important; /* Warna putih bersinar, karena ini fitur khusus */
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
     }
-    /* === Gaya untuk Pop-up SadHourReminder di tengah layar === */
     .sad-hour-reminder-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%); /* Menempatkan elemen tepat di tengah */
-        width: 60vw; /* Lebar 60% dari viewport width */
-        max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
-        background-color: #3f3f46; /* Warna latar belakang pop-up (seperti popup-animate-in) */
-        color: #ffffff; /* Warna teks utama */
-        padding: 1.5rem;
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Bayangan yang lebih menonjol */
-        z-index: 1000; /* Pastikan di atas elemen lain */
-        animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
-    }
-    /* Menggunakan kembali keyframes fadeInScaleUp dari popup-animate-in */
-    /* @keyframes fadeInScaleUp { ... } sudah didefinisikan di atas */
+    position: fixed;
+    top: 50%; /* Pindah ke tengah vertikal */
+    left: 50%; /* Pindah ke tengah horizontal */
+    transform: translate(-50%, -50%); /* Geser kembali sebesar setengah lebar dan tinggi elemen */
+    
+    width: 60vw; /* Lebar 60% dari viewport width */
+    max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
+    
+    background-color: #3f3f46;
+    color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1000; /* Pastikan di atas elemen lain */
+    animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
+}
 
-    /* Gaya untuk tombol di dalam pop-up (jika perlu penyesuaian khusus) */
-    .sad-hour-reminder-popup button {
-        /* Contoh: jarak antar tombol sedikit lebih besar jika perlu */
-        margin: 0.25rem;
+/* Menggunakan kembali keyframes fadeInScaleUp dari popup-animate-in jika sudah didefinisikan */
+/* Kalau belum, kamu bisa copy definisi @keyframes fadeInScaleUp dari blok popup-animate-in yang lama */
+
+/* Contoh: */
+/*
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9); 
     }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
 `;
 document.head.appendChild(style);
