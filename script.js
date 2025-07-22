@@ -53,9 +53,9 @@ const ActivationScreen = () => {
             setIsActivated(true); 
             setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
 
-            setTimeout(() => {
-                setCurrentPageKey('kata-pengantar'); // Mengarahkan ke kata pengantar setelah aktivasi
-            }, 1500); 
+            //setTimeout(() => {
+                //setCurrentPageKey('kata-pengantar'); // Mengarahkan ke kata pengantar setelah aktivasi
+           // }, 1500); 
 
         } else {
             setMessage(`Aktivasi Gagal: ${result.message}`);
@@ -70,9 +70,9 @@ const ActivationScreen = () => {
 
         if (storedActivated) {
             setMessage(`E-book sudah aktif di perangkat ini, ${storedName || 'Sahabat'}.`); 
-            setTimeout(() => {
-                setCurrentPageKey('kata-pengantar'); // Mengarahkan ke kata pengantar jika sudah aktif
-            }, 500);
+            //setTimeout(() => {
+               // setCurrentPageKey('kata-pengantar'); // Mengarahkan ke kata pengantar jika sudah aktif
+           // }, 500);
         }
     }, []);
 
@@ -222,7 +222,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
         return () => {
             clearInterval(intervalId);
         };
-    }, [customGoals]); // Menambahkan customGoals ke dependency array
+    }, [customGoals,onNavigateToRoom, setHasReminderShownForSession]); // Menambahkan customGoals ke dependency array
 
     if (!isVisible || !currentReminderMessage) {
         return null;
@@ -4230,7 +4230,7 @@ const App = () => {
         console.log("App startup: isActivated from localStorage =", storedActivation);
         return storedActivation;
     });
-
+const [hasReminderShownForSession, setHasReminderShownForSession] = useState(false);
     useEffect(() => {
         // Ambil nilai transparansi yang tersimpan
         const savedOpacity = localStorage.getItem('ebookBgOpacity');
@@ -4301,6 +4301,18 @@ const App = () => {
     console.log("App mounted. Clearing lastSadHourReminder from localStorage to ensure popup appears.");
     localStorage.removeItem('lastSadHourReminder');
 }, []);
+    useEffect(() => {
+        // Jika sudah aktif DAN belum pernah menunjukkan reminder di sesi ini
+        if (isActivated && !hasReminderShownForSession) {
+            // Coba periksa apakah reminder seharusnya muncul hari ini (logika di SadHourReminder)
+            // Kita tidak langsung set hasReminderShownForSession di sini,
+            // tapi kita biarkan SadHourReminder yang menentukannya.
+            // Setelah SadHourReminder muncul, dia akan set isVisible-nya sendiri,
+            // dan kita bisa menanggapi itu jika perlu.
+            console.log("[App Effect] User is activated, checking if SadHourReminder needs to be shown.");
+        }
+    }, [isActivated, hasReminderShownForSession]);
+
 const resetAppState = () => {
         console.log("Resetting app state (excluding activation key and bucket list)...");
         setCurrentPageKey('kata-pengantar'); // Kembali ke kata pengantar (atau halaman awal setelah aktivasi)
@@ -4308,7 +4320,8 @@ const resetAppState = () => {
         setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue'); // Tetap pakai tema tersimpan atau default 'blue'
         setFontSizeIndex(1); // Reset ukuran font ke default
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80); // Tetap pakai opacity tersimpan atau default 80
-        setIsDoaLooping(false); // Reset looping audio doa
+        setIsDoaLooping(false);
+        setHasReminderShownForSession(false);
         // State komponen anak seperti SadHourReminder, SecretRoomRezeki, dll.
         // akan direset secara otomatis saat komponen tersebut unmount/mount ulang
         // karena currentPageKey berubah.
@@ -4325,22 +4338,39 @@ const resetAppState = () => {
         isDoaLooping, setIsDoaLooping,
         userName, setUserName,
         isActivated, setIsActivated ,
-        resetAppState
+        resetAppState,
+        installPromptEvent,
+        hasReminderShownForSession, setHasReminderShownForSession,
     };
     
     return (
         <AppContext.Provider value={contextValue}>
-            <Starfield /> 
+            <Starfield />
             {
-                !isCoverUnlocked ? <CoverScreen /> 
-                // Logika routing berdasarkan isActivated dan currentPageKey
-                // Jika belum aktif, selalu tampilkan ActivationScreen
-                : !isActivated ? <ActivationScreen /> 
-                // Jika sudah aktif, baru routing normal berdasarkan currentPageKey
-                : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
-                : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
-                : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                : <MainLayout /> // MainLayout adalah default jika tidak ada halaman spesifik
+                !isCoverUnlocked ? <CoverScreen />
+                    // Jika belum aktif, tampilkan ActivationScreen
+                    : !isActivated ? <ActivationScreen />
+                        // Jika sudah aktif, tapi reminder belum muncul di sesi ini DAN BUKAN DI RUANG KHUSUS
+                        : isActivated && !hasReminderShownForSession &&
+                            currentPageKey !== 'pixel-thoughts' &&
+                            currentPageKey !== 'affirmation-room' &&
+                            currentPageKey !== 'secret-room-rezeki' ?
+                            <SadHourReminder
+                                onClose={() => {
+                                    setHasReminderShownForSession(true); // Tandai sudah tampil untuk sesi ini
+                                    // Pindahkan pengguna ke kata-pengantar setelah menutup reminder
+                                    setCurrentPageKey('kata-pengantar');
+                                }}
+                                onNavigateToRoom={(room) => {
+                                    setHasReminderShownForSession(true); // Tandai sudah tampil
+                                    setCurrentPageKey(room);
+                                }}
+                            />
+                            // Jika reminder sudah tampil atau di ruang khusus, render MainLayout atau halaman khusus
+                            : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
+                                : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
+                                    : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
+                                        : <MainLayout /> // MainLayout adalah default jika tidak ada halaman spesifik
             }
         </AppContext.Provider>
     );
