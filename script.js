@@ -164,10 +164,8 @@ const defaultSadHoursData = [
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
 const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
-    // defaultSadHoursData sekarang bisa diakses dari luar scope komponen
-    // Anda bisa mengganti nama sadHoursData di sini jika mau
     const [currentReminderMessage, setCurrentReminderMessage] = useState(null);
-    const [isVisible, setIsVisible] = useState(false); // <--- KITA AKAN KONTROL INI DARI LUAR SEPENUHNYA
+    const [isVisible, setIsVisible] = useState(false); // Ini akan dikontrol dari luar
     const [displayedUserName, setDisplayedUserName] = useState('');
     const [customGoals, setCustomGoals] = useState([]);
 
@@ -177,43 +175,25 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             setDisplayedUserName(storedUserName);
         }
 
-        // === BARU: Muat customGoals dari localStorage di sini ===
         const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
         setCustomGoals(storedGoals);
 
-        // === LOGIKA BARU UNTUK MENENTUKAN PESAN (BUKAN KAPAN MUNCUL) ===
         let messageToDisplay = '';
         if (storedGoals.length > 0) {
             messageToDisplay = storedGoals[Math.floor(Math.random() * storedGoals.length)];
             console.log(`[SadHourReminder] Using custom message.`);
         } else {
-            // Ini pesan default umum jika tidak ada custom goals
             messageToDisplay = "Saatnya menenangkan hati dan merenung. Mari lepaskan beban dan isi energi positif.";
             console.log(`[SadHourReminder] Using general default message.`);
         }
         setCurrentReminderMessage(messageToDisplay);
-        setIsVisible(true); // <--- SADHOURREMINDER AKAN SELALU MENGATAKAN IA VISIBLE JIKA DIRENDER
+        setIsVisible(true); // SadHourReminder ini akan selalu mengatakan ia visible jika dirender oleh App.js
 
-        // Hapus semua logika checkSadHour dan interval waktu di sini.
-        // Komponen ini tidak lagi peduli dengan jam atau tanggal untuk visibilitasnya.
-        // Visibilitasnya akan diatur oleh parent (App.js).
+    }, [customGoals]);
 
-        // Hapus baris ini dan seluruh fungsi checkSadHour jika sudah yakin tidak ada lagi:
-        // const checkSadHour = () => { /* ... */ };
-        // checkSadHour();
-        // const intervalId = setInterval(checkSadHour, 60 * 1000);
-        // return () => { clearInterval(intervalId); };
-
-    }, [customGoals]); // customGoals adalah satu-satunya dependency untuk message
-
-    // isVisible sekarang diatur oleh komponen App.js yang merendernya.
-    // Jadi, kita bisa hapus `if (!isVisible)` di sini, atau biarkan jika `isVisible` dikirim dari parent.
-    // Untuk tujuan ini, kita akan mengirim `isVisible` sebagai prop dari App.js.
-    // Jadi, `if (!isVisible || !currentReminderMessage)` perlu tetap ada.
     if (!isVisible || !currentReminderMessage) {
         return null;
     }
-
 
     const finalMessage = displayedUserName
         ? `Hai ${displayedUserName}, ${currentReminderMessage}`
@@ -225,7 +205,6 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
             </p>
-            {/* === KEMBALIKAN BAGIAN INI jika sebelumnya hilang (bucket list goals) === */}
             {customGoals.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-gray-600">
                     <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
@@ -236,15 +215,15 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                     </ul>
                 </div>
             )}
-            {/* === AKHIR BAGIAN BUCKET LIST GOALS === */}
-
-            <div className="flex justify-center gap-3 mt-4"> {/* Tambahkan mt-4 untuk spacing */}
+            
+            {/* === BARU: Penambahan Tombol-Tombol Navigasi === */}
+            <div className="flex flex-wrap justify-center gap-3 mt-4"> {/* Menggunakan flex-wrap untuk responsif di layar kecil */}
                 <button
                     onClick={() => {
                         onNavigateToRoom('pixel-thoughts');
                         onClose(); // Memberi tahu parent untuk menutup pop-up
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
                 >
                     Ruang Pelepasan ✨
                 </button>
@@ -253,17 +232,55 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                         onNavigateToRoom('affirmation-room');
                         onClose(); // Memberi tahu parent untuk menutup pop-up
                     }}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-xs transition-colors"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
                 >
                     Ruang Afirmasi 🌟
                 </button>
                 <button
-                    onClick={onClose} // Cukup panggil onClose
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                    onClick={() => {
+                        onNavigateToRoom('doa-loa-codex'); // Navigasi ke Doa LoA Codex
+                        onClose();
+                    }}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-black px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
                 >
-                    Tutup
+                    Doa LoA Codex 📜
+                </button>
+                <button
+                    onClick={() => {
+                        onNavigateToRoom('secret-room-rezeki'); // Navigasi ke Ruang Rahasia
+                        onClose();
+                    }}
+                    className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
+                >
+                    Ruang Rahasia 🗝️
+                </button>
+                <button
+                    onClick={() => {
+                        onNavigateToRoom('doapilihan'); // Navigasi ke Doa Pilihan
+                        onClose();
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
+                >
+                    Doa Pilihan 🙏
+                </button>
+                <button
+                    onClick={() => {
+                        onNavigateToRoom('reminder-settings'); // Navigasi ke Bucket List Goal
+                        onClose();
+                    }}
+                    className="bg-red-400 hover:bg-red-500 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
+                >
+                    Daftar List Goal 🔔
+                </button>
+                <button
+                    onNavigateToRoom('daftar-isi');
+                    onClick={onClose} // Cukup panggil onClose untuk menutup pop-up
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
+                >
+                    Tutup Pop-up
                 </button>
             </div>
+            {/* === AKHIR Penambahan Tombol-Tombol Navigasi === */}
         </div>
     );
 };
