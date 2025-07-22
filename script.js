@@ -163,43 +163,24 @@ const defaultSadHoursData = [
 
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
-const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
-    // Tidak ada state isVisible di sini, karena visibilitasnya sepenuhnya dikontrol dari App.js
-    const [currentReminderMessage, setCurrentReminderMessage] = useState(null);
-    const [displayedUserName, setDisplayedUserName] = useState('');
-    const [customGoals, setCustomGoals] = useState([]);
+// --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
+const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) => {
+    // Tidak ada state internal isVisible, atau currentReminderMessage
+    // Semua data dan kontrol visibilitas datang dari App.js
 
-    useEffect(() => {
-        const storedUserName = localStorage.getItem('ebookUserName');
-        if (storedUserName) {
-            setDisplayedUserName(storedUserName);
-        }
-
-        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
-        setCustomGoals(storedGoals);
-
-        let messageToDisplay = '';
-        if (storedGoals.length > 0) {
-            messageToDisplay = storedGoals[Math.floor(Math.random() * storedGoals.length)];
-            console.log(`[SadHourReminder] Using custom message.`);
-        } else {
-            messageToDisplay = "Saatnya menenangkan hati dan merenung. Mari lepaskan beban dan isi energi positif.";
-            console.log(`[SadHourReminder] Using general default message.`);
-        }
-        setCurrentReminderMessage(messageToDisplay);
-
-        // Tidak ada logika visibilitas atau interval di sini.
-        // Komponen ini hanya menyiapkan pesan dan dianggap visible jika dirender.
-    }, [customGoals]);
-
-    // Jika pesan belum disiapkan, jangan tampilkan apa-apa (initial render sebelum useEffect jalan)
-    if (!currentReminderMessage) {
-        return null;
+    const displayedUserName = userName || 'Sahabat'; // Menggunakan prop userName
+    
+    // Logika untuk menentukan pesan langsung, tanpa useEffect internal
+    let messageToDisplay = '';
+    if (customGoals && customGoals.length > 0) {
+        messageToDisplay = customGoals[Math.floor(Math.random() * customGoals.length)];
+        console.log(`[SadHourReminder] Using custom message: ${messageToDisplay}`);
+    } else {
+        messageToDisplay = "Saatnya menenangkan hati dan merenung. Mari lepaskan beban dan isi energi positif.";
+        console.log(`[SadHourReminder] Using general default message: ${messageToDisplay}`);
     }
 
-    const finalMessage = displayedUserName
-        ? `Hai ${displayedUserName}, ${currentReminderMessage}`
-        : `Hai Sahabat, ${currentReminderMessage}`;
+    const finalMessage = `Hai ${displayedUserName}, ${messageToDisplay}`;
 
     return (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg shadow-xl z-50 animate-slide-up max-w-sm text-center">
@@ -207,7 +188,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
             </p>
-            {customGoals.length > 0 && (
+            {customGoals && customGoals.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-gray-600">
                     <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
                     <ul className="text-xs text-gray-300 list-disc list-inside max-h-20 overflow-y-auto">
@@ -220,7 +201,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             
             <div className="flex flex-wrap justify-center gap-3 mt-4">
                 <button
-                    onClick={() => onNavigateToRoom('pixel-thoughts')} // onNavigateToRoom sudah mengurus penutupan
+                    onClick={() => onNavigateToRoom('pixel-thoughts')}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
                 >
                     Ruang Pelepasan ✨
@@ -256,7 +237,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                     Daftar List Goal 🔔
                 </button>
                 <button
-                    onClick={onClose} // Hanya panggil onClose, tidak ada navigasi
+                    onClick={onClose} // Hanya panggil onClose
                     className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
                 >
                     Tutup Pop-up
@@ -4210,6 +4191,9 @@ const App = () => {
     // States untuk kontrol SadHourReminder
     const [isSadHourReminderVisible, setIsSadHourReminderVisible] = useState(false);
     const [hasSadHourReminderBeenShownThisSession, setHasSadHourReminderBeenShownThisSession] = useState(false);
+    // State untuk menyimpan custom goals agar bisa diteruskan ke SadHourReminder
+    const [customGoalsForReminder, setCustomGoalsForReminder] = useState([]);
+
 
     // --- Efek untuk memuat opacity tersimpan ---
     useEffect(() => {
@@ -4252,6 +4236,54 @@ const App = () => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
 
+    // Ini adalah useEffect paling kritis untuk logika SadHourReminder
+    useEffect(() => {
+        // Load custom goals untuk reminder
+        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
+        setCustomGoalsForReminder(storedGoals);
+
+        // --- Logika untuk menampilkan SadHourReminder HANYA JIKA: ---
+        // 1. Cover baru dibuka (isCoverUnlocked menjadi true).
+        // 2. Aplikasi sudah diaktivasi.
+        // 3. SadHourReminder belum pernah ditampilkan di sesi ini.
+        // 4. Aplikasi belum berada di halaman khusus (yang tidak boleh diinterupsi pop-up).
+        // 5. Sidebar tidak terbuka (agar tidak tumpang tindih).
+        // 6. currentPageKey BUKAN 'home' (karena 'home' adalah default saat App dirender pertama kali setelah reset/refresh)
+        //    Ini mencegah SadHourReminder muncul terlalu dini sebelum navigasi awal ke kata-pengantar/aktivasi
+        //    atau saat aplikasi dalam keadaan "menunggu" setelah reset.
+
+        // Mencegah loop: Hanya aktifkan SadHourReminder jika isSadHourReminderVisible saat ini FALSE
+        if (isCoverUnlocked && isActivated && !hasSadHourReminderBeenShownThisSession && 
+            !isSadHourReminderVisible && // PENTING: Hanya trigger jika belum visible
+            currentPageKey !== 'pixel-thoughts' && 
+            currentPageKey !== 'affirmation-room' && 
+            currentPageKey !== 'secret-room-rezeki' && 
+            currentPageKey !== 'activation-screen' &&
+            currentPageKey !== 'home' && 
+            isSidebarOpen === false) {
+            
+            console.log("[App Effect] Conditions met to show SadHourReminder. Setting visible.");
+            setIsSadHourReminderVisible(true);
+            // hasSadHourReminderBeenShownThisSession akan diset TRUE saat pop-up ditutup
+        } 
+        // Logika navigasi awal setelah cover dibuka, jika SadHourReminder tidak perlu/bisa tampil
+        else if (isCoverUnlocked && !isSadHourReminderVisible) { // Hanya navigasi jika reminder tidak visible
+            if (!isActivated) {
+                setCurrentPageKey('activation-screen');
+            } else if (!hasSadHourReminderBeenShownThisSession) {
+                // Jika sudah aktif tapi reminder belum tampil dan tidak memenuhi kondisi di atas
+                // (misalnya karena currentPageKey masih 'home' atau sedang loading awal)
+                // Maka, set halaman awal ke kata pengantar.
+                // Ini akan mencegah loop jika `currentPageKey === 'home'` memicu `useEffect` lagi.
+                setCurrentPageKey('kata-pengantar');
+            } else {
+                // Jika sudah aktif dan reminder sudah tampil di sesi ini, langsung ke kata pengantar
+                setCurrentPageKey('kata-pengantar');
+            }
+        }
+    }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, currentPageKey, isSidebarOpen, isSadHourReminderVisible, setCurrentPageKey]); // Tambahkan isSadHourReminderVisible sebagai dependensi
+
+    // Efek untuk memantau perubahan localStorage untuk isActivated dan userName
     useEffect(() => {
         const handleStorageChange = () => {
             const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
@@ -4271,59 +4303,19 @@ const App = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated, userName]);
 
-    // === PERBAIKAN AKAR MASALAH LOOP: Memisahkan trigger SadHourReminder dari navigasi utama ===
-    useEffect(() => {
-        // Logika untuk menampilkan SadHourReminder HANYA JIKA:
-        // 1. Cover baru dibuka (isCoverUnlocked menjadi true).
-        // 2. Aplikasi sudah diaktivasi.
-        // 3. SadHourReminder belum pernah ditampilkan di sesi saat ini.
-        // 4. Aplikasi belum berada di halaman khusus (yang tidak boleh diinterupsi pop-up).
-        // 5. Sidebar tidak terbuka (agar tidak tumpang tindih).
-        // 6. CurrentPageKey BUKAN 'home' (karena 'home' adalah default saat App dirender pertama kali setelah reset/refresh)
-        //    Ini mencegah SadHourReminder muncul terlalu dini sebelum navigasi awal ke kata-pengantar/aktivasi
-        //    atau saat aplikasi dalam keadaan "menunggu" setelah reset.
-
-        if (isCoverUnlocked && isActivated && !hasSadHourReminderBeenShownThisSession && 
-            currentPageKey !== 'pixel-thoughts' && 
-            currentPageKey !== 'affirmation-room' && 
-            currentPageKey !== 'secret-room-rezeki' && 
-            currentPageKey !== 'activation-screen' &&
-            currentPageKey !== 'home' && // Penting: SadHourReminder jangan muncul saat currentPageKey masih 'home'
-            isSidebarOpen === false) {
-            
-            console.log("[App Effect] Triggering SadHourReminder because conditions met.");
-            setIsSadHourReminderVisible(true);
-        }
-        // Logika navigasi setelah cover dibuka
-        else if (isCoverUnlocked) {
-            if (!isActivated) {
-                setCurrentPageKey('activation-screen');
-            } else if (!hasSadHourReminderBeenShownThisSession) {
-                // Jika sudah aktif tapi reminder belum tampil (dan kondisi di atas tidak terpenuhi
-                // karena misalnya currentPageKey masih 'home'), maka kita harus mengarahkan ke kata-pengantar.
-                // Ini untuk kasus reload setelah aktivasi atau navigasi ke home tanpa trigger reminder.
-                setCurrentPageKey('kata-pengantar');
-            } else {
-                // Jika sudah aktif dan reminder sudah tampil di sesi ini, langsung ke kata pengantar
-                setCurrentPageKey('kata-pengantar');
-            }
-        }
-    }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, currentPageKey, isSidebarOpen, setCurrentPageKey]);
-
 
     // Fungsi reset state aplikasi (dipanggil dari handleCloseBook di MainLayout)
     const resetAppState = () => {
         console.log("Resetting app state for new session...");
         setIsCoverUnlocked(false);
-        setCurrentPageKey('home'); // Reset halaman ke 'home' untuk memicu ulang logika App
+        setCurrentPageKey('home'); 
         setIsSidebarOpen(false);
         setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue');
         setFontSizeIndex(1);
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80);
         setIsDoaLooping(false);
-        // === PENTING: Reset flag ini agar SadHourReminder muncul lagi di sesi baru ===
-        setHasSadHourReminderBeenShownThisSession(false);
-        localStorage.removeItem('lastSadHourReminder'); // Hapus ini agar pop-up SadHourReminder bisa muncul lagi (opsional, tergantung kamu mau pop-up harian atau per sesi)
+        setHasSadHourReminderBeenShownThisSession(false); // Reset flag ini agar SadHourReminder muncul lagi di sesi baru
+        localStorage.removeItem('lastSadHourReminder'); 
     };
 
     // Context Value
@@ -4345,6 +4337,7 @@ const App = () => {
     // Fungsi ini dipanggil dari dalam SadHourReminder.
     // Parameter `destinationPageKey` akan menentukan ke mana navigasi selanjutnya.
     const handleSadHourReminderInteraction = (destinationPageKey) => {
+        console.log(`[App] SadHourReminder interaction: Navigating to ${destinationPageKey}`);
         setIsSadHourReminderVisible(false); // Sembunyikan pop-up
         setHasSadHourReminderBeenShownThisSession(true); // Tandai sudah tampil di sesi ini
         setCurrentPageKey(destinationPageKey); // Navigasi ke halaman yang dipilih/default
@@ -4358,20 +4351,25 @@ const App = () => {
                     <CoverScreen />
                 ) : (
                     // Render SadHourReminder HANYA JIKA isSadHourReminderVisible true
-                    // DAN BUKAN di halaman khusus DAN sidebar tidak terbuka
+                    // DAN BUKAN di halaman khusus (agar tidak menimpa pengalaman utama)
+                    // DAN sidebar tidak terbuka
                     isSadHourReminderVisible && !isSidebarOpen && 
                     currentPageKey !== 'pixel-thoughts' && 
                     currentPageKey !== 'affirmation-room' && 
                     currentPageKey !== 'secret-room-rezeki' && 
-                    currentPageKey !== 'activation-screen' ? (
+                    currentPageKey !== 'activation-screen' // Pastikan tidak muncul di layar aktivasi
+                    ? (
                         <SadHourReminder
-                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tombol 'Tutup' mengarahkan ke kata-pengantar
-                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tombol navigasi mengarah ke ruangan spesifik
+                            // Props diteruskan ke SadHourReminder
+                            userName={userName} // Teruskan userName dari App state
+                            customGoals={customGoalsForReminder} // Teruskan customGoals dari App state
+                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tombol 'Tutup' default ke kata-pengantar
+                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tombol navigasi ke ruangan spesifik
                         />
                     ) : null // Jika tidak visible, jangan render komponennya
                 )
             }
-            {/* Konten utama App (di bawah SadHourReminder jika aktif) */}
+            {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
             {isCoverUnlocked && (
                 !isActivated ? <ActivationScreen />
                     : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
