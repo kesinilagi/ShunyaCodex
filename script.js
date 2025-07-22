@@ -163,12 +163,9 @@ const defaultSadHoursData = [
 
 // --- KOMPONEN BARU: SAD HOUR REMINDER / NOTIFIKASI JAM GALAU (FIXED) ---
 const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
-    // defaultSadHoursData sekarang bisa diakses dari luar scope komponen
-    // Anda bisa mengganti nama sadHoursData di sini jika mau
-    const [currentReminderMessage, setCurrentReminderMessage] = useState(null); 
+    const [currentReminderMessage, setCurrentReminderMessage] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
-    const [displayedUserName, setDisplayedUserName] = useState(''); 
-    // === BARU: State untuk menyimpan pesan kustom (Bucket List Goal) ===
+    const [displayedUserName, setDisplayedUserName] = useState('');
     const [customGoals, setCustomGoals] = useState([]);
 
     useEffect(() => {
@@ -177,94 +174,70 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             setDisplayedUserName(storedUserName);
         }
 
-        // === BARU: Muat customGoals dari localStorage di sini ===
         const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
         setCustomGoals(storedGoals);
 
-        const checkSadHour = () => {
+        const checkReminder = () => { // Nama fungsi diganti agar lebih umum
             const now = new Date();
-            const currentHour = now.getHours();
-            const todayDateString = now.toDateString(); 
-            
-            console.log(`[SadHourReminder] Checking time: ${currentHour}:xx, Date: ${todayDateString}`);
+            const todayDateString = now.toDateString();
 
-            let selectedHourData = null; 
-            
-            // Sekarang sadHoursData sudah di luar komponen
-            for (const hourData of defaultSadHoursData) { 
-                if (currentHour >= hourData.start && currentHour < hourData.end) {
-                    selectedHourData = hourData;
-                    break;
-                }
-            }
+            console.log(`[SadHourReminder] Checking for reminder, Date: ${todayDateString}`);
 
             const lastRemindedInfo = JSON.parse(localStorage.getItem('lastSadHourReminder')) || {};
             const lastRemindedDate = lastRemindedInfo.date;
-            const lastRemindedId = lastRemindedInfo.id; 
 
-            // Jika ada rentang jam galau yang cocok
-            if (selectedHourData) {
-                console.log(`[SadHourReminder] Found matching hour data: ${selectedHourData.id}`);
-                
-                const customReminders = JSON.parse(localStorage.getItem('customReminders')) || [];
-                let messageToDisplay = '';
+            let messageToDisplay = '';
 
-                if (customReminders.length > 0) {
-                    messageToDisplay = customReminders[Math.floor(Math.random() * customReminders.length)];
-                    console.log(`[SadHourReminder] Using custom message.`);
-                } else {
-                    messageToDisplay = selectedHourData.message;
-                    console.log(`[SadHourReminder] Using default message.`);
-                }
-
-                // Kondisi untuk menampilkan reminder:
-                // BELUM PERNAH TAMPIL untuk ID ini di HARI INI
-                if (lastRemindedDate !== todayDateString || lastRemindedId !== selectedHourData.id) {
-                    setCurrentReminderMessage(messageToDisplay); 
-                    setIsVisible(true);
-                    localStorage.setItem('lastSadHourReminder', JSON.stringify({ date: todayDateString, id: selectedHourData.id })); 
-                    console.log(`[SadHourReminder] Displaying reminder for ID: ${selectedHourData.id}`);
-                } else {
-                    setIsVisible(false); 
-                    setCurrentReminderMessage(null);
-                    console.log(`[SadHourReminder] Reminder for ID ${selectedHourData.id} already shown today.`);
-                }
+            // Jika ada custom goals, pilih salah satu secara acak
+            if (customGoals.length > 0) {
+                messageToDisplay = customGoals[Math.floor(Math.random() * customGoals.length)];
+                console.log(`[SadHourReminder] Using custom message.`);
             } else {
-                setIsVisible(false); 
+                // Jika tidak ada custom goals, gunakan pesan default umum
+                messageToDisplay = "Saatnya menenangkan hati dan merenung. Mari lepaskan beban dan isi energi positif.";
+                console.log(`[SadHourReminder] Using general default message.`);
+            }
+
+            // Kondisi untuk menampilkan reminder:
+            // Jika BELUM PERNAH TAMPIL untuk HARI INI
+            if (lastRemindedDate !== todayDateString) {
+                setCurrentReminderMessage(messageToDisplay);
+                setIsVisible(true);
+                // Simpan tanggal hari ini agar tidak muncul lagi sampai besok
+                localStorage.setItem('lastSadHourReminder', JSON.stringify({ date: todayDateString }));
+                console.log(`[SadHourReminder] Displaying reminder.`);
+            } else {
+                setIsVisible(false);
                 setCurrentReminderMessage(null);
-                console.log(`[SadHourReminder] No matching hour data for current time.`);
-                if (lastRemindedDate === todayDateString && lastRemindedId) {
-                    localStorage.removeItem('lastSadHourReminder'); 
-                    console.log("[SadHourReminder] Resetting lastSadHourReminder because outside sad hours.");
-                }
+                console.log(`[SadHourReminder] Reminder already shown today.`);
             }
         };
 
-        // Panggil checkSadHour segera saat komponen dimuat
-        checkSadHour();
-        // Set interval untuk pemeriksaan berkala
-        const intervalId = setInterval(checkSadHour, 60 * 1000); // Cek setiap 1 menit
+        // Panggil checkReminder segera saat komponen dimuat
+        checkReminder();
+        // Set interval untuk pemeriksaan berkala (misal setiap 1 jam atau 5 menit, disesuaikan kebutuhan)
+        // Interval ini sekarang hanya untuk refresh pengecekan tanggal saja, bukan jam spesifik.
+        const intervalId = setInterval(checkReminder, 60 * 60 * 1000); // Cek setiap 1 jam
 
         return () => {
             clearInterval(intervalId);
         };
-    }, []); 
+    }, [customGoals]); // Menambahkan customGoals ke dependency array
 
     if (!isVisible || !currentReminderMessage) {
         return null;
     }
 
-    const finalMessage = displayedUserName 
-        ? `Hai ${displayedUserName}, ${currentReminderMessage}` 
-        : `Hai Sahabat, ${currentReminderMessage}`; 
+    const finalMessage = displayedUserName
+        ? `Hai ${displayedUserName}, ${currentReminderMessage}`
+        : `Hai Sahabat, ${currentReminderMessage}`;
 
     return (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg shadow-xl z-50 animate-slide-up max-w-sm text-center">
             <p className="mb-3 text-lg font-semibold text-yellow-300">💡 Pengingat Hati</p>
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
-            </p> 
-            {/* === BARU: Tampilkan daftar Bucket List Goal di sini === */}
+            </p>
             {customGoals.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-gray-600">
                     <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
@@ -275,12 +248,11 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                     </ul>
                 </div>
             )}
-            {/* === AKHIR BAGIAN BARU === */}
             <div className="flex justify-center gap-3 mt-4">
                 <button
                     onClick={() => {
-                        onNavigateToRoom('pixel-thoughts'); 
-                        setIsVisible(false); 
+                        onNavigateToRoom('pixel-thoughts');
+                        setIsVisible(false);
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs transition-colors"
                 >
@@ -288,8 +260,8 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                 </button>
                 <button
                     onClick={() => {
-                        onNavigateToRoom('affirmation-room'); 
-                        setIsVisible(false); 
+                        onNavigateToRoom('affirmation-room');
+                        setIsVisible(false);
                     }}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-xs transition-colors"
                 >
