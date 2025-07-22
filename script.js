@@ -3735,13 +3735,48 @@ const MainLayout = () => {
         setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
         isActivated,
-        resetAppState // Pastikan ini diambil dari context
+        resetAppState
     } = useContext(AppContext);
 
     const currentTheme = themes[themeKey];
     const pageIndex = pages.findIndex(p => p === currentPageKey);
 
-    // ... (groundedMessages dan logika rotasi tetap sama)
+    // --- PESAN GROUNDED DAN LOGIKA ROTASI ---
+    const groundedMessages = [
+        "Ketenangan di hati adalah pangkal rezeki.",
+        "Setiap tarikan napas adalah karunia. Bersyukurlah.",
+        "Fokus pada sekarang. Hadirkan hati, semesta berpihak padamu.",
+        "Ridho dan syukur melapangkan jalanmu.",
+        "Yakinlah, Allah sebaik-baiknya perencana.",
+        "Dunia boleh heboh, hatimu tetap tenang.",
+        "Jalanmu lapang, rezekimu berlimpah. Percayalah."
+    ];
+    const [currentGroundedMessage, setCurrentGroundedMessage] = useState(groundedMessages[0]);
+    const [displayedUserName, setDisplayedUserName] = useState('');
+
+    useEffect(() => {
+        const storedUserName = localStorage.getItem('ebookUserName');
+        if (storedUserName) {
+            setDisplayedUserName(storedUserName);
+        }
+
+        let messageIndex = 0;
+        const interval = setInterval(() => {
+            messageIndex = (messageIndex + 1) % groundedMessages.length;
+            setCurrentGroundedMessage(groundedMessages[messageIndex]);
+        }, 10000); // Ganti pesan setiap 10 detik
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // === PERBAIKAN PENTING: Fungsi getGroundedHeaderText dideklarasikan di sini ===
+    const getGroundedHeaderText = () => {
+        if (displayedUserName) {
+            return `Hai ${displayedUserName}, ${currentGroundedMessage}`;
+        }
+        return currentGroundedMessage; // Jika nama belum ada, tampilkan pesan saja
+    };
+    // --- AKHIR PESAN GROUNDED ---
 
     const goToPage = (direction) => {
         const nextIndex = pages.findIndex(p => p === currentPageKey) + direction;
@@ -3781,10 +3816,7 @@ const MainLayout = () => {
 
     const handleCloseBook = () => {
         closeFullscreen();
-        // Langsung panggil resetAppState dari context.
-        // resetAppState akan mengurus setIsCoverUnlocked(false) dan reset flag SadHourReminder.
         resetAppState();
-        // Hapus semua cache storage
         clearCacheStorage();
     };
 
