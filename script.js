@@ -7,14 +7,12 @@ const { useState, useEffect, useRef, createContext, useContext } = React;
 // Ini akan menjadi "pusat data" untuk aplikasi kita.
 const AppContext = createContext();
 const ActivationScreen = () => {
-    // Ambil setIsActivated dari context, bukan hanya setCurrentPageKey
     const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
     const [activationKey, setActivationKey] = useState('');
-    const [userName, setUserName] = useState(''); // Tambahkan kembali state userName
+    const [userName, setUserName] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT KAMU DI SINI!
     const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyvtJwSHb0rJLX4p1PYHAS9RSdU2H2fBPdyJoYIZygCUz3NSvEuAhB9NefBjpHIbp5u/exec'; 
 
     const verifyKeyWithBackend = async (keyToVerify) => { 
@@ -29,8 +27,7 @@ const ActivationScreen = () => {
     };
 
     const handleActivate = async () => {
-        // --- VALIDASI AWAL ---
-        if (!userName.trim()) { // Validasi nama
+        if (!userName.trim()) {
             setMessage('Mohon masukkan nama Anda.');
             return;
         }
@@ -45,17 +42,17 @@ const ActivationScreen = () => {
         const result = await verifyKeyWithBackend(activationKey); 
 
         if (result.success) {
-            // Simpan di localStorage agar persisten antar sesi
             localStorage.setItem('ebookActivated', 'true'); 
             localStorage.setItem('ebookActivationKey', activationKey.trim()); 
-            localStorage.setItem('ebookUserName', userName.trim()); // Simpan nama di localStorage
+            localStorage.setItem('ebookUserName', userName.trim()); 
             
-            setIsActivated(true); 
+            setIsActivated(true); // Ini akan memicu useEffect di App.js untuk navigasi
             setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
 
-            setTimeout(() => {
-                setCurrentPageKey('kata-pengantar'); // Mengarahkan ke kata pengantar setelah aktivasi
-            }, 1500); 
+            // === PENTING: Hapus setTimeout ini! Navigasi awal diatur sepenuhnya oleh App.js ===
+            // setTimeout(() => {
+            //     setCurrentPageKey('kata-pengantar');
+            // }, 1500); 
 
         } else {
             setMessage(`Aktivasi Gagal: ${result.message}`);
@@ -70,9 +67,11 @@ const ActivationScreen = () => {
 
         if (storedActivated) {
             setMessage(`E-book sudah aktif di perangkat ini, ${storedName || 'Sahabat'}.`); 
-            setTimeout(() => {
-                setCurrentPageKey('kata-pengantar'); // Mengarahkan ke kata pengantar jika sudah aktif
-            }, 500);
+            setIsActivated(true); // Ini memicu App.js untuk menangani navigasi awal
+            // === PENTING: Hapus setTimeout ini! Navigasi awal diatur sepenuhnya oleh App.js ===
+            // setTimeout(() => {
+            //     setCurrentPageKey('kata-pengantar');
+            // }, 500);
         }
     }, []);
 
@@ -81,10 +80,10 @@ const ActivationScreen = () => {
             <Starfield />
             
             <div className="z-10 text-center animate-fade-in bg-black/60 p-8 rounded-xl shadow-lg">
-                {/* --- HEADER AKTIVASI --- */}
-                {/* --- FORM AKTIVASI --- */}
+                <p className="text-lg md:text-xl mb-4 text-gray-300">
+                    Masukkan nama dan kunci aktivasi Anda untuk mengakses fitur penuh.
+                </p>
                 <div className="flex flex-col items-center">
-                    {/* Input Nama Pengguna */}
                     <input
                         type="text"
                         value={userName}
@@ -93,9 +92,8 @@ const ActivationScreen = () => {
                         placeholder="Nama Anda"
                         disabled={isLoading}
                     />
-                    {/* Input Kunci Aktivasi */}
                     <input
-                        type="text" // Menggunakan type="text" agar lebih mudah debug (bisa diganti password nanti)
+                        type="text"
                         value={activationKey}
                         onChange={(e) => setActivationKey(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleActivate()}
@@ -104,30 +102,20 @@ const ActivationScreen = () => {
                         disabled={isLoading}
                     />
                     
-                    {/* Pesan Sukses/Error */}
                     {message && <p className={`mt-4 text-center ${message.includes('Berhasil') ? 'text-green-400' : 'text-red-400'}`}>{message}</p>}
                     
-                    {/* Tombol Aktivasi */}
                     <button
                         onClick={handleActivate}
-                        // Disable tombol jika sedang loading, atau nama/kunci kosong
                         disabled={isLoading || !userName.trim() || !activationKey.trim()} 
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     > 
                         {isLoading ? 'Memverifikasi...' : 'Aktivasi'}
                     </button>
                 </div>
-                <p className="text-lg md:text-xl mb-4 text-gray-300">
-                    Masukkan nama dan kunci aktivasi Anda untuk mengakses fitur penuh.
-                </p>
                 <p className="text-sm italic text-gray-400 mb-8">
                     Setiap kunci aktivasi berlaku untuk jumlah perangkat tertentu yang Anda beli. Jika Anda membutuhkan akses di lebih banyak perangkat, mohon hubungi kami untuk informasi penawaran khusus.
                 </p>
-
-                
             </div>
-           
-            
         </div>
     );
 };
@@ -4095,55 +4083,37 @@ const SidebarMenu = () => {
   
 
 // --- GANTI COVER SCREEN ANDA DENGAN VERSI AMAN INI ---
-// --- GANTI COVER SCREEN ANDA DENGAN VERSI KITAB KUNO INI ---
 const CoverScreen = () => {
-    const { setIsCoverUnlocked, setCurrentPageKey, isActivated } = useContext(AppContext);
+    const { setIsCoverUnlocked, isActivated } = useContext(AppContext); // Hapus setCurrentPageKey karena App.js yang mengurusnya
     const [isExiting, setIsExiting] = useState(false);
 
     const handleUnlock = () => {
         openFullscreen(document.documentElement);
         setIsExiting(true); // Aktifkan animasi keluar
-        // Beri sedikit delay agar animasi balik bukunya terlihat
         setTimeout(() => {
-            setIsCoverUnlocked(true); // Buka cover. Ini akan memicu useEffect di App.js
-            // Tidak perlu setCurrentPageKey di sini secara langsung ke kata-pengantar/aktivasi.
-            // Biarkan App.js yang menentukan halaman awal setelah cover terbuka berdasarkan kondisi aktivasi dan reminder.
+            setIsCoverUnlocked(true); // Cukup ini saja. App.js akan bereaksi terhadap perubahan ini.
         }, 500); // Durasi animasi penutupan buku
     };
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col items-center justify-center p-4 overflow-hidden">
-            {/* Starfield sebagai latar belakang kosmik */}
             <WordRainBackground rainColor="#f0e68c" />
-
-            {/* Container Buku */}
             <div className="book-container animate-fade-in">
-
-
-                {/* Konten di dalam cover */}
                 <div className="relative z-10 text-center flex flex-col items-center justify-center h-full p-5">
-
-
                     <p className="mb-11 text-gray-300/80 text-sm"></p>
-
-
                     <button
                         onClick={handleUnlock}
                         className={`relative p-4 group ${isExiting ? 'star-shine-effect' : ''}`}
                         aria-label="Buka E-book"
                     >
                         <div className="w-7 h-20 text-yellow-100 transition-transform duration-500 group-hover:scale-150">
-                            {/* === SVG BINTANG DIGANTI DENGAN SVG STARLIGHT / PERCIKAN CAHAYA === */}
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-full w-full" viewBox="-1 13 20 20" fill="currentColor">
                                 <path d="M10 3L12 8L17 10L12 12L10 17L8 12L3 10L8 8L10 3z" />
                             </svg>
-
                         </div>
                     </button>
                 </div>
             </div>
-
-            {/* Nama Pengarang diletakkan di luar 'buku' */}
             <div className="mt-7">
                 <p className="text-sm text-gray-400/60">
                     Karya: Akasha Bayu Sasmita
@@ -4175,7 +4145,7 @@ const App = () => {
     const [fontSizes, setFontSizes] = useState(initialFontSizes);
     const [fontSizeIndex, setFontSizeIndex] = useState(1);
 
-    const [currentPageKey, setCurrentPageKey] = useState('home');
+    const [currentPageKey, setCurrentPageKey] = useState('home'); // Default ke 'home'
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80);
@@ -4191,8 +4161,9 @@ const App = () => {
     // States untuk kontrol SadHourReminder
     const [isSadHourReminderVisible, setIsSadHourReminderVisible] = useState(false);
     const [hasSadHourReminderBeenShownThisSession, setHasSadHourReminderBeenShownThisSession] = useState(false);
-    // State untuk menyimpan custom goals agar bisa diteruskan ke SadHourReminder
     const [customGoalsForReminder, setCustomGoalsForReminder] = useState([]);
+    // === BARU: Flag untuk melacak apakah navigasi awal sudah terjadi ===
+    const [initialNavigationDone, setInitialNavigationDone] = useState(false);
 
 
     // --- Efek untuk memuat opacity tersimpan ---
@@ -4232,56 +4203,8 @@ const App = () => {
         document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
     }, [fontSizeIndex, fontSizes]);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [currentPageKey]);
-
-    // Ini adalah useEffect paling kritis untuk logika SadHourReminder
-    useEffect(() => {
-        // Load custom goals untuk reminder
-        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
-        setCustomGoalsForReminder(storedGoals);
-
-        // --- Logika untuk menampilkan SadHourReminder HANYA JIKA: ---
-        // 1. Cover baru dibuka (isCoverUnlocked menjadi true).
-        // 2. Aplikasi sudah diaktivasi.
-        // 3. SadHourReminder belum pernah ditampilkan di sesi ini.
-        // 4. Aplikasi belum berada di halaman khusus (yang tidak boleh diinterupsi pop-up).
-        // 5. Sidebar tidak terbuka (agar tidak tumpang tindih).
-        // 6. currentPageKey BUKAN 'home' (karena 'home' adalah default saat App dirender pertama kali setelah reset/refresh)
-        //    Ini mencegah SadHourReminder muncul terlalu dini sebelum navigasi awal ke kata-pengantar/aktivasi
-        //    atau saat aplikasi dalam keadaan "menunggu" setelah reset.
-
-        // Mencegah loop: Hanya aktifkan SadHourReminder jika isSadHourReminderVisible saat ini FALSE
-        if (isCoverUnlocked && isActivated && !hasSadHourReminderBeenShownThisSession && 
-            !isSadHourReminderVisible && // PENTING: Hanya trigger jika belum visible
-            currentPageKey !== 'pixel-thoughts' && 
-            currentPageKey !== 'affirmation-room' && 
-            currentPageKey !== 'secret-room-rezeki' && 
-            currentPageKey !== 'activation-screen' &&
-            currentPageKey !== 'home' && 
-            isSidebarOpen === false) {
-            
-            console.log("[App Effect] Conditions met to show SadHourReminder. Setting visible.");
-            setIsSadHourReminderVisible(true);
-            // hasSadHourReminderBeenShownThisSession akan diset TRUE saat pop-up ditutup
-        } 
-        // Logika navigasi awal setelah cover dibuka, jika SadHourReminder tidak perlu/bisa tampil
-        else if (isCoverUnlocked && !isSadHourReminderVisible) { // Hanya navigasi jika reminder tidak visible
-            if (!isActivated) {
-                setCurrentPageKey('activation-screen');
-            } else if (!hasSadHourReminderBeenShownThisSession) {
-                // Jika sudah aktif tapi reminder belum tampil dan tidak memenuhi kondisi di atas
-                // (misalnya karena currentPageKey masih 'home' atau sedang loading awal)
-                // Maka, set halaman awal ke kata pengantar.
-                // Ini akan mencegah loop jika `currentPageKey === 'home'` memicu `useEffect` lagi.
-                setCurrentPageKey('kata-pengantar');
-            } else {
-                // Jika sudah aktif dan reminder sudah tampil di sesi ini, langsung ke kata pengantar
-                setCurrentPageKey('kata-pengantar');
-            }
-        }
-    }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, currentPageKey, isSidebarOpen, isSadHourReminderVisible, setCurrentPageKey]); // Tambahkan isSadHourReminderVisible sebagai dependensi
+    // Hapus useEffect untuk window.scrollTo(0,0) di sini.
+    // Jika masih dibutuhkan, sebaiknya letakkan di dalam komponen halaman individual.
 
     // Efek untuk memantau perubahan localStorage untuk isActivated dan userName
     useEffect(() => {
@@ -4292,6 +4215,7 @@ const App = () => {
                 setIsActivated(newActivationStatus);
                 if (newActivationStatus) {
                     setHasSadHourReminderBeenShownThisSession(false); // Reset flag reminder jika baru diaktivasi
+                    setInitialNavigationDone(false); // Penting: reset ini agar alur awal berjalan lagi
                 }
             }
             const newUserName = localStorage.getItem('ebookUserName') || '';
@@ -4303,18 +4227,52 @@ const App = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated, userName]);
 
+    // === PERBAIKAN AKAR MASALAH LOOP & NAVIGASI AWAL ===
+    useEffect(() => {
+        // Logika ini akan berjalan HANYA SEKALI setelah cover dibuka dan semua state utama siap.
+        // Ini adalah controller utama untuk navigasi awal dan SadHourReminder.
+        if (isCoverUnlocked && !initialNavigationDone) {
+            console.log("[App Effect] Starting initial navigation/reminder logic.");
+            setInitialNavigationDone(true); // Tandai bahwa navigasi awal sudah dicoba
+
+            // 1. Jika belum diaktivasi, pergi ke ActivationScreen
+            if (!isActivated) {
+                setCurrentPageKey('activation-screen');
+                console.log("[App Effect] Navigating to ActivationScreen.");
+            }
+            // 2. Jika sudah diaktivasi TAPI SadHourReminder belum tampil di sesi ini
+            else if (!hasSadHourReminderBeenShownThisSession) {
+                // Load custom goals untuk reminder
+                const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
+                setCustomGoalsForReminder(storedGoals);
+
+                // Tampilkan SadHourReminder
+                setIsSadHourReminderVisible(true);
+                console.log("[App Effect] Showing SadHourReminder.");
+                // Jangan set currentPageKey di sini agar SadHourReminder muncul di atas layar kosong/latar belakang.
+                // Navigasi akan terjadi setelah SadHourReminder ditutup.
+            }
+            // 3. Jika sudah diaktivasi DAN SadHourReminder sudah tampil di sesi ini
+            else {
+                setCurrentPageKey('kata-pengantar');
+                console.log("[App Effect] Navigating directly to Kata Pengantar.");
+            }
+        }
+    }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, initialNavigationDone, setCurrentPageKey]); // Tambahkan semua dependensi
+
 
     // Fungsi reset state aplikasi (dipanggil dari handleCloseBook di MainLayout)
     const resetAppState = () => {
         console.log("Resetting app state for new session...");
         setIsCoverUnlocked(false);
-        setCurrentPageKey('home'); 
+        setCurrentPageKey('home'); // Kembali ke halaman 'home' untuk memicu ulang logika App
         setIsSidebarOpen(false);
         setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue');
         setFontSizeIndex(1);
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80);
         setIsDoaLooping(false);
         setHasSadHourReminderBeenShownThisSession(false); // Reset flag ini agar SadHourReminder muncul lagi di sesi baru
+        setInitialNavigationDone(false); // PENTING: Reset ini agar efek navigasi awal di atas terpicu lagi
         localStorage.removeItem('lastSadHourReminder'); 
     };
 
@@ -4334,8 +4292,7 @@ const App = () => {
         installPromptEvent,
     };
 
-    // Fungsi ini dipanggil dari dalam SadHourReminder.
-    // Parameter `destinationPageKey` akan menentukan ke mana navigasi selanjutnya.
+    // Fungsi ini dipanggil dari dalam SadHourReminder saat interaksi
     const handleSadHourReminderInteraction = (destinationPageKey) => {
         console.log(`[App] SadHourReminder interaction: Navigating to ${destinationPageKey}`);
         setIsSadHourReminderVisible(false); // Sembunyikan pop-up
@@ -4351,26 +4308,19 @@ const App = () => {
                     <CoverScreen />
                 ) : (
                     // Render SadHourReminder HANYA JIKA isSadHourReminderVisible true
-                    // DAN BUKAN di halaman khusus (agar tidak menimpa pengalaman utama)
-                    // DAN sidebar tidak terbuka
-                    isSadHourReminderVisible && !isSidebarOpen && 
-                    currentPageKey !== 'pixel-thoughts' && 
-                    currentPageKey !== 'affirmation-room' && 
-                    currentPageKey !== 'secret-room-rezeki' && 
-                    currentPageKey !== 'activation-screen' // Pastikan tidak muncul di layar aktivasi
-                    ? (
+                    // Ini akan dirender sebagai overlay di atas konten utama yang sudah dimuat.
+                    isSadHourReminderVisible && (
                         <SadHourReminder
-                            // Props diteruskan ke SadHourReminder
-                            userName={userName} // Teruskan userName dari App state
-                            customGoals={customGoalsForReminder} // Teruskan customGoals dari App state
-                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tombol 'Tutup' default ke kata-pengantar
-                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tombol navigasi ke ruangan spesifik
+                            userName={userName}
+                            customGoals={customGoalsForReminder}
+                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tutup pop-up, lalu ke kata pengantar
+                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tutup pop-up, lalu ke ruangan spesifik
                         />
-                    ) : null // Jika tidak visible, jangan render komponennya
+                    )
                 )
             }
             {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
-            {isCoverUnlocked && (
+            {isCoverUnlocked && ( // Render konten ini HANYA JIKA cover sudah terbuka
                 !isActivated ? <ActivationScreen />
                     : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
                         : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
@@ -4476,8 +4426,6 @@ style.innerHTML = `
     }
 
     .custom-affirmation-image.image-zoom-fade {
-        transform: translate(-50%, -50%) scale(0.95);
-        opacity: 0.1;
         animation: imageFlash 7s infinite linear; 
         transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
     }
@@ -4568,7 +4516,7 @@ style.innerHTML = `
         width: 90vw;
         max-width: 450px;
         aspect-ratio: 2 / 3;
-        max-height: 85vh; /* Perbaiki typo, tambahkan semicolon */
+        max-height: 85vh;
         background-color: #382e28;
         background-image: url('icons/Coverijo.png');
         background-size: cover;
@@ -4599,13 +4547,6 @@ style.innerHTML = `
         font-family: 'Georgia', 'Times New Roman', serif;
         color: #f0e68c;
         text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
-    }
-
-    .unlock-button-gold {
-        background: radial-gradient(ellipse at center, #7a5f2c 0%,#c19a48 45%,#d4af37 62%,#c19a48 100%);
-        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
-        border: 2px solid #f0e68c;
-        transition: all 0.3s ease;
     }
 
     .unlock-button-gold:hover {
@@ -4841,8 +4782,16 @@ style.innerHTML = `
         }
     }
     /* PERBAIKAN WARNA TEKS DENGAN !important */
-    .dynamic-paragraph {
+    /* Menambahkan selektor yang lebih spesifik untuk menimpa Tailwind */
+    .contentContainerClasses .dynamic-paragraph { /* Menggunakan kelas induk */
         color: #F8FAFC !important; /* Warna teks putih keabu-abuan */
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 
+                     0 0 10px rgba(255, 255, 255, 0.2); 
+    }
+
+    /* Juga terapkan pada paragraphClasses yang dipakai langsung tanpa contentContainerClasses */
+    p.dynamic-paragraph {
+        color: #F8FAFC !important;
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 
                      0 0 10px rgba(255, 255, 255, 0.2); 
     }
@@ -4865,6 +4814,36 @@ style.innerHTML = `
         text-align: justify;
         text-shadow: 0 0 3px rgba(255, 255, 255, 0.1);
     }
-
+    /* Tambahan untuk teks di dalam SholawatAccordion dan DoaAccordion agar warnanya sesuai */
+    /* Menggunakan selektor yang lebih spesifik */
+    .bg-white\\/10 .text-black, .bg-white\\/10 .text-black-800 { /* Untuk judul utama di akordeon */
+        color: #F8FAFC !important; /* Menggunakan warna teks paragraf bersinar */
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+    }
+    .bg-white\\/10 .text-black-300 { /* Untuk Latin/Italic di akordeon */
+        color: #D1D5DB !important; /* Warna abu-abu terang */
+        text-shadow: 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+    .bg-white\\/10 .text-yellow-300 { /* Untuk judul/sub-judul kuning di akordeon */
+        color: #FCD34D !important; /* Kuning terang */
+        text-shadow: 0 0 5px rgba(252, 211, 77, 0.6);
+    }
+    /* Tambahan untuk teks di dalam SidebarMenu */
+    .sidebar .text-black {
+        color: #333 !important; /* Mengembalikan warna hitam di sidebar */
+        text-shadow: none !important; /* Hapus shadow di sidebar */
+    }
+    .sidebar .text-black-700 {
+        color: #333 !important; /* Mengembalikan warna hitam di sidebar */
+        text-shadow: none !important;
+    }
+    .sidebar .text-gray-700 {
+        color: #555 !important; /* Mengembalikan warna abu-abu di sidebar */
+        text-shadow: none !important;
+    }
+    .sidebar .text-white-200 { /* Khusus untuk Bucket List Goal di sidebar */
+        color: #F8FAFC !important; /* Warna putih bersinar, karena ini fitur khusus */
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+    }
 `;
 document.head.appendChild(style);
