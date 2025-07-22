@@ -291,7 +291,7 @@ const closeFullscreen = () => {
 // --- Styling Constants ---
 const contentContainerClasses = "p-6 md:p-10 [background-color:rgba(254,243,199,var(--content-bg-opacity))] backdrop-blur-sm rounded-3xl shadow-lg animate-fade-in mb-8";  // <-- DARI bg-white MENJADI bg-stone-100
 const sectionTitleClasses = "text-2xl md:text-3xl font-bold text-center text-black-800 mb-6 border-b-2 pb-2 border-black-200";
-const paragraphClasses = "dynamic-paragraph text-black-1000 leading-loose mb-4 text-justify[text-shadow:1px_1px_3px_rgba(0,0,0,0.7)]";
+const paragraphClasses = "dynamic-paragraph text-white-1000 leading-loose mb-4 text-justify[text-shadow:1px_1px_3px_rgba(0,0,0,0.7)]";
 const highlightTextClasses = "text-blue-600 font-semibold";
 const quoteClasses = "italic text-gray-600 border-l-4 border-blue-400 pl-4 py-2 my-4 text-justify";
 const subHeadingClasses = "text-xl font-bold text-gray-800 mb-3 mt-6";
@@ -4887,6 +4887,36 @@ style.innerHTML = `
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
     }
+}
+.paragraphClasses {
+    /* PERUBAHAN DI SINI: */
+    color: #F8FAFC; /* Warna teks putih keabu-abuan (mirip text-gray-100/200 di Tailwind) */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), /* Sedikit glow putih */
+                 0 0 10px rgba(255, 255, 255, 0.2); /* Glow yang lebih lembut */
+    line-height: loose; /* Menjaga spasi baris */
+    margin-bottom: 4; /* Menjaga margin bawah */
+    text-align: justify; /* Menjaga rata kanan-kiri */
+}
+
+.highlightTextClasses {
+    /* Menyesuaikan highlight agar tetap terlihat dengan latar belakang putih */
+    color: #60A5FA; /* Warna biru cerah yang kontras dengan latar belakang gelap */
+    font-weight: 600; /* Semi-bold */
+    text-shadow: 0 0 8px rgba(96, 165, 250, 0.8); /* Efek glow biru yang lebih kuat */
+}
+
+.quoteClasses {
+    /* Menyesuaikan quote agar tetap terlihat dengan latar belakang putih */
+    color: #D1D5DB; /* Warna abu-abu terang untuk quote */
+    font-style: italic;
+    border-left: 4px solid #60A5FA; /* Border biru cerah */
+    padding-left: 1rem; /* Padding kiri */
+    padding-top: 0.5rem; /* Padding atas */
+    padding-bottom: 0.5rem; /* Padding bawah */
+    margin-top: 1rem; /* Margin atas */
+    margin-bottom: 1rem; /* Margin bawah */
+    text-align: justify; /* Rata kanan-kiri */
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.1); /* Sedikit efek glow putih */
 }
 
 `;
