@@ -4470,7 +4470,7 @@ style.innerHTML = `
         left: 50%;
         transform: translate(-50%, -50%);
         width: 90%;
-        max-width: 800px;
+        max-width: 679px;
         text-align: center;
         text-transform: uppercase;
         transition: opacity 0.2s ease-in-out; 
@@ -4514,7 +4514,7 @@ style.innerHTML = `
         width: 90vw;
         max-width: 450px;
         aspect-ratio: 2 / 3;
-        max-height: 85vh;
+        max-height: 85vh; /* Perbaiki typo, tambahkan semicolon */
         background-color: #382e28;
         background-image: url('icons/Coverijo.png');
         background-size: cover;
@@ -4829,7 +4829,7 @@ style.innerHTML = `
     /* Tambahan untuk teks di dalam SidebarMenu */
     .sidebar .text-black {
         color: #333 !important; /* Mengembalikan warna hitam di sidebar */
-        text-shadow: none !important; /* Hapus shadow di sidebar */
+        text-shadow: none !important;
     }
     .sidebar .text-black-700 {
         color: #333 !important; /* Mengembalikan warna hitam di sidebar */
@@ -4842,6 +4842,30 @@ style.innerHTML = `
     .sidebar .text-white-200 { /* Khusus untuk Bucket List Goal di sidebar */
         color: #F8FAFC !important; /* Warna putih bersinar, karena ini fitur khusus */
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+    }
+    /* === Gaya untuk Pop-up SadHourReminder di tengah layar === */
+    .sad-hour-reminder-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Menempatkan elemen tepat di tengah */
+        width: 60vw; /* Lebar 60% dari viewport width */
+        max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
+        background-color: #3f3f46; /* Warna latar belakang pop-up (seperti popup-animate-in) */
+        color: #ffffff; /* Warna teks utama */
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Bayangan yang lebih menonjol */
+        z-index: 1000; /* Pastikan di atas elemen lain */
+        animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
+    }
+    /* Menggunakan kembali keyframes fadeInScaleUp dari popup-animate-in */
+    /* @keyframes fadeInScaleUp { ... } sudah didefinisikan di atas */
+
+    /* Gaya untuk tombol di dalam pop-up (jika perlu penyesuaian khusus) */
+    .sad-hour-reminder-popup button {
+        /* Contoh: jarak antar tombol sedikit lebih besar jika perlu */
+        margin: 0.25rem;
     }
 `;
 document.head.appendChild(style);
