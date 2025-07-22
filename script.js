@@ -4424,7 +4424,7 @@ style.innerHTML = `
     }
 
     .custom-affirmation-image.image-zoom-fade {
-        animation: imageFlash 7s infinite linear; 
+        animation: imageFlash 3s infinite linear; 
         transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
     }
 
