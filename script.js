@@ -273,8 +273,9 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
                     Daftar List Goal 🔔
                 </button>
                 <button
-                    onNavigateToRoom('daftar-isi');
-                    onClick={onClose} // Cukup panggil onClose untuk menutup pop-up
+                    onClick={() => {
+                        onNavigateToRoom('daftar-isi'); // Navigasi ke Bucket List Goal
+                        onClose(); // Cukup panggil onClose untuk menutup pop-up
                     className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
                 >
                     Tutup Pop-up
