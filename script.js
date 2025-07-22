@@ -169,16 +169,17 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
 
     return (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg shadow-xl z-50 animate-slide-up max-w-sm text-center">
-            <p className="mb-3 text-lg font-semibold text-yellow-300">💡 Pengingat Hati</p>
+            <p className="mb-3 text-lg font-semibold text-yellow-300">💡 SHORTCUT</p>
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
             </p>
             {customGoals && customGoals.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-gray-600">
+                // === PERBAIKAN STYLING: Tambahkan border dan padding untuk memisahkan List Goal ===
+                <div className="mt-4 pt-3 pb-3 px-3 border border-gray-600 rounded-lg bg-gray-700/50"> 
                     <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
-                    <ul className="text-xs text-gray-300 list-disc list-inside max-h-20 overflow-y-auto">
+                    <ul className="text-xs text-gray-300 list-disc list-inside max-h-20 overflow-y-auto text-left"> {/* Tambahkan text-left */}
                         {customGoals.map((goal, index) => (
-                            <li key={index} className="text-left py-0.5">{goal}</li>
+                            <li key={index} className="py-0.5">{goal}</li>
                         ))}
                     </ul>
                 </div>
