@@ -1799,7 +1799,7 @@ const AffirmationFlasher = ({ phrase }) => {
             }, 200);
 
             return () => clearTimeout(flashTimer);
-        }, 2900);
+        }, 2990);
 
         return () => clearInterval(mainTimer);
     }, [phrase]);
