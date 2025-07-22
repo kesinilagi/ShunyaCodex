@@ -4362,6 +4362,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 // CSS untuk variabel font size
 // GANTI SELURUH BLOK CSS LAMA ANDA DENGAN YANG INI
+/* GANTI SELURUH BLOK CSS LAMA ANDA DENGAN YANG INI */
 const style = document.createElement('style');
 style.innerHTML = `
     /* === Global & Reset === */
@@ -4371,6 +4372,7 @@ style.innerHTML = `
     }
     :root {
         --dynamic-font-size: 18px;
+        --content-bg-opacity: 0.8; /* Default fallback, akan ditimpa oleh JS */
     }
     .dynamic-paragraph {
         font-size: var(--dynamic-font-size);
@@ -4387,121 +4389,93 @@ style.innerHTML = `
     /* === CSS untuk Hujan Kata-Kata (CoverScreen) === */
     .falling-word {
         position: absolute; top: -50px; color: var(--rain-color, #E6C700);
-    text-shadow: 0 0 10px var(--rain-color, #FFD700);
-
-    font-family: 'Times New Roman', serif;
-    white-space: nowrap;
-    animation-name: fall;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    user-select: none;
-    text-transform: uppercase;
-}
+        text-shadow: 0 0 10px var(--rain-color, #FFD700);
+        font-family: 'Times New Roman', serif;
+        white-space: nowrap;
+        animation-name: fall;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        user-select: none;
+        text-transform: uppercase;
+    }
     @keyframes fall {
         from { transform: translateY(0vh) rotate(-10deg); }
         to { transform: translateY(110vh) rotate(10deg); }
     }
     
-    /* Kelas baru untuk setiap KATA yang muncul */
-/* Kelas baru untuk setiap KATA yang muncul dengan efek zoom */
-.zooming-word {
-    position: absolute;
-    /* WARNA SEKARANG DIAMBIL DARI VARIABLE, JADI BISA BERUBAH-UBAH */
-    color: var(--rain-color, #38bdf8); 
-    text-shadow: 0 0 10px var(--rain-color, #38bdf8);
-    font-family: 'Times New Roman', serif;
-    white-space: nowrap;
-    animation-name: zoomInOut; /* Menggunakan resep animasi baru */
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-    user-select: none;
-    text-transform: uppercase;
-}
+    /* Kelas baru untuk setiap KATA yang muncul dengan efek zoom */
+    .zooming-word {
+        position: absolute;
+        color: var(--rain-color, #38bdf8); 
+        text-shadow: 0 0 10px var(--rain-color, #38bdf8);
+        font-family: 'Times New Roman', serif;
+        white-space: nowrap;
+        animation-name: zoomInOut;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        user-select: none;
+        text-transform: uppercase;
+    }
 
-/* Resep animasi "zoom mendekat dan menghilang" yang baru */
-@keyframes zoomInOut {
-    0% {
-        transform: scale(0.2);
-        opacity: 0;
+    @keyframes zoomInOut {
+        0% {
+            transform: scale(0.2);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(2.5);
+            opacity: 0;
+        }
     }
-    50% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-    100% {
-        /* Tujuan akhir: jadi 2x lebih besar (mendekat) dan menghilang */
-        transform: scale(2.5);
-        opacity: 0;
-    }
-}
-/* --- CSS UNTUK GAMBAR KUSTOM AFIRMASI (Tidak Full Screen, Dengan Flasher yang Jelas) --- */
+    /* --- CSS UNTUK GAMBAR KUSTOM AFIRMASI (Tidak Full Screen, Dengan Flasher yang Jelas) --- */
 
-.custom-affirmation-image {
-    position: fixed; 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); 
-    
-    width: auto; 
-    height: auto; 
-    max-width: 90vw; 
-    max-height: 90vh; 
-    object-fit: contain; 
-    
-    z-index: 0; 
-    opacity: 0.4; /* Opasitas default di fase input (sesuaikan jika ingin lebih/kurang terlihat) */
-    
-    /* Pastikan transisi ini halus saat beralih dari fase input ke raining */
-    transition: all 1s ease-in-out; 
-}
+    .custom-affirmation-image {
+        position: fixed; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        
+        width: auto; 
+        height: auto; 
+        max-width: 90vw; 
+        max-height: 90vh; 
+        object-fit: contain; 
+        
+        z-index: 0; 
+        opacity: 0.4;
+        
+        transition: all 1s ease-in-out; 
+    }
 
-/* Gaya untuk gambar saat di fase 'raining' (dengan zoom, fade, dan flasher) */
-.custom-affirmation-image.image-zoom-fade {
-    /* Properti dasar untuk fase raining */
-    transform: translate(-50%, -50%) scale(0.95); /* Sedikit zoom out */
-    opacity: 0.1; /* Opasitas dasar saat raining, akan di-override oleh animasi */
-    
-    /* Animasi kilatan (flasher) */
-    /* Pastikan ini adalah animasi flasher yang kamu inginkan */
-    animation: imageFlash 7s infinite linear; /* Nama animasi, durasi 7 detik, looping tak terbatas, linear */
+    .custom-affirmation-image.image-zoom-fade {
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0.1;
+        animation: imageFlash 7s infinite linear; 
+        transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
+    }
 
-    /* Transisi untuk perubahan awal saat masuk ke fase raining. Opacity akan segera dikontrol oleh animasi. */
-    transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
-}
-
-/* --- DEFINISI KEYFRAMES UNTUK EFEK KILATAN GAMBAR --- */
-@keyframes imageFlash {
-    0% {
-        opacity: 0.1; /* Mulai dari opasitas dasar yang rendah (sesuai base di image-zoom-fade) */
+    @keyframes imageFlash {
+        0% { opacity: 0.1; }
+        0.1% { opacity: 0.9; }
+        1% { opacity: 0.1; }
+        100% { opacity: 0.1; }
     }
-    /* Flash ke 0.9 selama 1 detik (1/7 dari 7 detik = ~14%) */
-    /* Kita bisa buat lebih cepat flashnya */
-    0.1% { /* Sangat cepat ke opacity tinggi */
-        opacity: 0.9; /* Kilat penuh yang kamu inginkan (tidak 100% agar tidak terlalu silau) */
-    }
-    1% { /* Kembali ke opasitas dasar dengan cepat */
-        opacity: 0.1; /* Kembali ke opasitas dasar */
-    }
-    100% {
-        opacity: 0.1; /* Tetap di opasitas dasar selama sisa siklus (sampai 7 detik) */
-    }
-}
     /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
     .thought-bubble {
-        /* Transisi untuk menyusut */
         transition: transform 20s ease-in-out, opacity 1s ease-out;
         transform: scale(1);
         opacity: 1;
     }
     .thought-bubble.recede {
-        /* Saat menyusut, ukuran jadi 2% */
         transform: scale(0.02);
     }
     .thought-bubble.vanish {
-        /* Saat terbang, ukurannya mengecil lagi dan terbang ke atas sambil menghilang */
         transform: scale(0.015) translateY(-3500vh);
         opacity: 0.5;
-        /* Transisi untuk terbang dibuat lebih cepat dan dramatis */
         transition: transform 9s cubic-bezier(0.5, 0, 1, 1), opacity 1.5s ease-out;
     }
     .glowing-border {
@@ -4515,409 +4489,358 @@ style.innerHTML = `
         from { opacity: 0; }
         to { opacity: 1; }
     }
-    // TAMBAHKAN KELAS INI KE DALAM BLOK <STYLE> ANDA
-
-.affirmation-flasher {
-    position: absolute;
-    z-index: 10;
-    /* Ukuran font dibuat responsif dan tidak terlalu besar agar muat */
-    font-size: clamp(10rem, 20vw, 10rem);
-    font-weight: extrabold;
-    color: white;
-    text-shadow: 0 0 25px white, 0 0 40px #0ea5e9;
-    pointer-events: none;
-        
-    /* Pengaturan agar selalu di tengah dan tidak terpotong */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%; /* Lebar maksimal 90% dari layar */
-    max-width: 800px; /* Lebar absolut maksimal */
-    text-align: center;
-    text-transform: uppercase;
-    
-    /* Transisi untuk flash yang lebih halus */
-    transition: opacity 0.2s ease-in-out; 
-    
-}
-/* TAMBAHKAN KELAS INI KE BLOK CSS ANDA */
-
-.force-uppercase {
-    text-transform: uppercase;
-}
-/* Untuk placeholder agar tidak ikut kapital */
-.force-uppercase::placeholder {
-    text-transform: uppercase;
-}
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 300px; /* Lebar sidebar */
-    max-width: 80%;
-    height: 100%;
-    background-color: white;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
-    transform: translateX(-100%); /* Sembunyi di kiri */
-    transition: transform 0.3s ease-in-out;
-    z-index: 100;
-    overflow-y: auto; /* Bisa di-scroll jika isinya panjang */
-    color: #333; /* Warna teks di dalam sidebar */
-}
-
-.sidebar.is-open {
-    transform: translateX(0); /* Muncul ke layar */
-}
-
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5); /* Warna gelap transparan */
-    z-index: 99;
-}
-.book-container {
-    width: 90vw;
-    max-width: 450px;
-    aspect-ratio: 2 / 3; /* Menjaga rasio buku */
-    max-height: 85vh
-    background-color: #382e28; /* Warna dasar kulit coklat tua */
-    background-image: url('icons/Coverijo.png');
-    background-size: cover;      /* Membuat gambar menutupi seluruh area tanpa merusak rasio */
-    background-position: center; /* Memposisikan gambar pas di tengah */
-    background-repeat: no-repeat;  /* Mencegah gambar diulang-ulang */
-    border-radius: 8px;
-    box-shadow: 10px 10px 40px rgba(0,0,0,0.6), inset 0 0 25px rgba(0,0,0,0.5);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    border: 3px solid #1c1511;
-}
-
-.book-ornament-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill; /* Membuat gambar bingkai meregang pas */
-    pointer-events: none; /* Agar gambar tidak bisa diklik */
-    opacity: 0.8;
-}
-
-.book-title-gold {
-    font-family: 'Georgia', 'Times New Roman', serif; /* Font serif yang klasik */
-    color: #f0e68c; /* Warna emas pucat */
-    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
-}
-
-.unlock-button-gold {
-    background: radial-gradient(ellipse at center, #7a5f2c 0%,#c19a48 45%,#d4af37 62%,#c19a48 100%);
-    box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
-    border: 2px solid #f0e68c;
-    transition: all 0.3s ease;
-}
-
-.unlock-button-gold:hover {
-    box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.7);
-    transform: scale(1.05);
-}
-/* TAMBAHKAN RESEP ANIMASI INI KE CSS ANDA */
-
-/* Kelas ini akan kita panggil saat tombol diklik */
-.star-shine-effect {
-    animation: star-shine 0.5s ease-in-out;
-}
-
-/* Resep/langkah-langkah animasinya */
-@keyframes star-shine {
-    0% {
-        box-shadow: 0 60 60px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
+    .affirmation-flasher {
+        position: absolute;
+        z-index: 10;
+        font-size: clamp(10rem, 20vw, 10rem);
+        font-weight: extrabold;
+        color: white;
+        text-shadow: 0 0 25px white, 0 0 40px #0ea5e9;
+        pointer-events: none;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 800px;
+        text-align: center;
+        text-transform: uppercase;
+        transition: opacity 0.2s ease-in-out; 
     }
-    50% {
-        /* Di tengah animasi, cahayanya membesar dan sangat terang */
-        box-shadow: 0 60 60px 20px rgba(255, 215, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.8);
+    .force-uppercase {
+        text-transform: uppercase;
     }
-    100% {
-        box-shadow: 0 60 60px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
+    .force-uppercase::placeholder {
+        text-transform: uppercase;
     }
-}
-/* --- CSS untuk Lilin dan Efek Cahaya (Diperbaiki) --- */
-.candle-container {
-    position: relative;
-    width: 150px; /* Lebar container, sesuaikan */
-    height: 300px; /* Tinggi container, sesuaikan */
-    margin: 0 auto;
-    /* background-color: transparent; */ /* Pastikan transparent, atau hapus jika tidak perlu */
-    box-shadow: none; /* HAPUS SEMUA SHADOW DARI CONTAINER INI */
-    transition: all 0.5s ease-in-out;
-    display: flex;
-    flex-direction: column; /* Mengatur elemen di dalamnya secara kolom */
-    align-items: center; /* Pusatkan secara horizontal */
-    justify-content: flex-end; /* Posisikan elemen ke bawah */
-    overflow: hidden;
-}
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        max-width: 80%;
+        height: 100%;
+        background-color: white;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 100;
+        overflow-y: auto;
+        color: #333;
+    }
 
-.candle-container.lit {
-    /* box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.5), 0 0 30px 10px rgba(255, 200, 0, 0.3); */
-    /* Hapus dari sini, kita akan coba letakkan di candle-light-overlay atau di flame */
-}
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
 
-.candle-image {
-    position: absolute;
-    bottom: 0; /* Pastikan gambar lilin ada di dasar container */
-    width: 100%; /* Gambar mengisi lebar container lilin */
-    height: auto; /* Jaga aspek rasio */
-    max-height: 200px; /* Batasi tinggi gambar lilin agar ada ruang untuk api di atas */
-    object-fit: contain; /* Memastikan gambar pas di dalam tanpa terpotong */
-    display: block;
-    z-index: 1; /* Di bawah nyala api */
-}
-   
- 
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 99;
+    }
+    .book-container {
+        width: 90vw;
+        max-width: 450px;
+        aspect-ratio: 2 / 3;
+        max-height: 85vh; /* Perbaiki typo, tambahkan semicolon */
+        background-color: #382e28;
+        background-image: url('icons/Coverijo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        box-shadow: 10px 10px 40px rgba(0,0,0,0.6), inset 0 0 25px rgba(0,0,0,0.5);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        border: 3px solid #1c1511;
+    }
 
-.flame {
-    position: absolute;
-    /* Posisi 'top' ini yang paling krusial untuk menempelkan api ke sumbu */
-    /* Sesuaikan nilai 'px' ini berdasarkan hasil ujimu */
-    top: 90px; /* Contoh nilai, kamu mungkin perlu MENYESUAIKAN ini! */ 
-    /* Misal: coba 40px, 20px, 50px, sampai pas */
+    .book-ornament-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        pointer-events: none;
+        opacity: 0.8;
+    }
 
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px; /* Sesuaikan lebar api agar proporsional dengan gambar lilin */
-    height: 80px; /* Sesuaikan tinggi api */
-    background: radial-gradient(circle at center, #ffeb3b 0%, #ffc107 50%, transparent 80%);
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    filter: blur(8px); /* Blur lebih banyak agar lebih menyatu dan efek glow */
-    box-shadow: 
-        0 0 10px 5px rgba(255, 235, 59, 0.7), /* Kuning terang, blur kecil */
-        0 0 20px 10px rgba(255, 193, 7, 0.5), /* Kuning lebih gelap, blur sedang */
-        0 0 40px 15px rgba(255, 159, 0, 0.3); /* Oranye, blur besar */
-    opacity: 0; /* Awalnya tidak terlihat */
-    animation: fadeInFlame 1s forwards; /* Animasi muncul */
-    z-index: 2; /* Pastikan api di atas gambar lilin */
-}
+    .book-title-gold {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        color: #f0e68c;
+        text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
+    }
 
-.candle-container.lit .flame {
-    opacity: 1; /* Terlihat saat lilin menyala */
-}
+    .unlock-button-gold {
+        background: radial-gradient(ellipse at center, #7a5f2c 0%,#c19a48 45%,#d4af37 62%,#c19a48 100%);
+        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
+        border: 2px solid #f0e68c;
+        transition: all 0.3s ease;
+    }
 
-@keyframes fadeInFlame {
-    from { opacity: 0; transform: translateX(-50%) scale(0.5); }
-    to { opacity: 1; transform: translateX(-50%) scale(1); }
-}
+    .unlock-button-gold:hover {
+        box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.7);
+        transform: scale(1.05);
+    }
+    .star-shine-effect {
+        animation: star-shine 0.5s ease-in-out;
+    }
 
-.animate-flicker {
-    animation: flicker 1.5s ease-in-out infinite alternate;
-}
+    @keyframes star-shine {
+        0% { box-shadow: 0 60px 60px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5); }
+        50% { box-shadow: 0 60px 60px 20px rgba(255, 215, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.8); }
+        100% { box-shadow: 0 60px 60px 5px rgba(255, 215, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5); }
+    }
+    .candle-container {
+        position: relative;
+        width: 150px;
+        height: 300px;
+        margin: 0 auto;
+        box-shadow: none;
+        transition: all 0.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        overflow: hidden;
+    }
 
-@keyframes flicker {
-    0% { transform: translateX(-50%) scale(1) rotate(-1deg); opacity: 1; filter: blur(2px); }
-    25% { transform: translateX(-50%) scale(0.98) rotate(1deg); opacity: 0.95; filter: blur(1.8px); }
-    50% { transform: translateX(-50%) scale(1.02) rotate(-0.5deg); opacity: 1; filter: blur(2.2px); }
-    75% { transform: translateX(-50%) scale(0.99) rotate(0.5deg); opacity: 0.97; filter: blur(1.9px); }
-    100% { transform: translateX(-50%) scale(1) rotate(-1deg); opacity: 1; filter: blur(2px); }
-}
+    .candle-container.lit {
+        /* Hapus dari sini */
+    }
 
-.candle-light-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% 70%, rgba(255, 200, 0, 0.1) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 5; /* Di atas starfield tapi di bawah konten */
-    animation: pulseLight 3s infinite alternate;
-}
-
-@keyframes pulseLight {
-    0% { opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { opacity: 0.8; }
-}
-/* --- New Golden Background Class --- */
-.golden-background {
-    background: linear-gradient(to right, #DAA520, #FFD700, #DAA520); /* Gold gradient */
-    color: #4B3B00 !important; /* Dark brown text for contrast */
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* Light shadow for readability */
-    border: 2px solid #DAA520;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-}
-
-.golden-background:hover {
-    background: linear-gradient(to right, #FFD700, #DAA520, #FFD700);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
-    transform: scale(1.02);
-}
-/* --- CSS untuk Kotak Rangkuman Hijau di Bab 16 --- */
-.summary-green-box {
-    background-color: #34d399; /* Hijau Zamrud */
-    color: #ffffff; /* Teks putih */
-    padding: 1.5rem; /* Padding di dalam kotak */
-    border-radius: 1.5rem; /* Sudut membulat (rounded-3xl) */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bayangan */
-    margin-top: 2.5rem; /* Margin atas agar terpisah dari teks sebelumnya */
-    margin-bottom: 2.5rem; /* Margin bawah */
-    font-weight: bold; /* Teks tebal */
-    text-align: center; /* Teks di tengah */
-    line-height: 1.75; /* Spasi baris agar mudah dibaca */
-}
-.triangle-container {
-    position: relative;
-    width: 100%; /* Wadah agar segitiga bisa responsif */
-    height: 200px; /* Tinggi wadah untuk segitiga, sesuaikan jika perlu */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-}
-.triangle-shape {
-    width: 0;
-    height: 0;
-    border-left: 300px solid transparent; /* Setengah lebar segitiga */
-    border-right: 300px solid transparent; /* Setengah lebar segitiga */
-    border-bottom: 200px solid #FFD700; /* Warna dan tinggi segitiga */
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%); /* Pusatkan segitiga */
-    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); /* Sedikit bayangan */
-}
-
-.triangle-text {
-    position: absolute;
-    /* Sesuaikan posisi teks agar pas di tengah-tengah bentuk segitiga */
-    top: calc(50% + 20px); /* Geser sedikit ke bawah dari tengah wadah */
-    left: 50%;
-    transform: translate(-50%, -50%); /* Memusatkan teks di dalam wadah */
+    .candle-image {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        object-fit: contain;
+        display: block;
+        z-index: 1;
+    }
     
-    width: 80%; /* Batasi lebar teks agar tidak keluar dari segitiga */
-    color: #4B3B00; /* Warna teks gelap agar kontras dengan emas */
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.4; /* Spasi baris */
-    font-size: 0.9rem; /* Ukuran font, sesuaikan agar pas */
-    z-index: 1; /* Pastikan teks di atas segitiga */
-}
-
-.triangle-text p {
-    margin-bottom: 0.2rem; /* Spasi antar baris paragraf dalam segitiga */
-}
-
-
-/* --- CSS untuk Doa LoA Codex (Gambar Latar Belakang & Teks Scrollable) --- */
-.doa-background-image {
-    position: fixed; 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); 
-    
-    min-width: 100vw; 
-    min-height: 100vh; 
-    width: auto;
-    height: auto;
-    object-fit: cover; 
-    
-    z-index: 0; 
-    opacity: 0.2; 
-    transition: opacity 0.5s ease-in-out; 
-}
-
-/* --- CSS untuk Gambar Dinamis Per Doa di Fase 'playing' --- */
-.playing-phase-dynamic-image {
-    position: fixed; /* Gambar ini akan mengisi seluruh viewport */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Pusatkan */
-    
-    width: 100vw; 
-    height: 100vh; 
-    object-fit: contain; /* Gambar akan utuh di dalam, dengan bar hitam jika rasio tidak pas */
-    background-color: black; /* Latar belakang hitam untuk bar yang tidak terisi gambar */
-    
-    z-index: 0; /* KOREKSI: Ini sekarang di lapisan PALING BELAKANG (di bawah semuanya) */
-    opacity: 1; /* Gambar terlihat penuh, tidak transparan */
-    transition: opacity 0.5s ease-in-out; 
-}
-
-/* --- CSS untuk Kotak Konten (Judul, Icon, Pesan) di Fase Playing --- */
-/* KOREKSI: KELAS INI SEKARANG DIHAPUS DARI JSX, TIDAK ADA LAGI KOTAK DI TENGAH */
-/* Karena kamu ingin LATAR BELAKANG GAMBAR CLEAN dan tidak ada overlay */
-/* Jika kamu ingin KONTEN (teks/icon) tampil di tengah, tapi tanpa kotak background,
-   maka kita perlu mengatur positioning mereka secara terpisah di atas gambar */
-/* Untuk saat ini, saya akan SEMBUNYIKAN KELAS INI (display: none)
-   karena JSX untuk renderPlayingPhase sudah saya modifikasi untuk tidak merendernya. */
-.playing-phase-content-overlay {
-    display: none; /* KOREKSI: Sembunyikan sepenuhnya */
-}
-
-
-/* --- CSS untuk Pop-up Premis (Sederhana & Elegan Seperti Reminder) --- */
-.popup-animate-in {
-    position: fixed; 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1); 
-    z-index: 60; 
-    
-    width: 90%; 
-    max-width: 400px; 
-    
-    background-color: #3f3f46; 
-    color: #ffffff;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-    text-align: center; 
-
-    animation: fadeInScaleUp 0.5s ease-out forwards; 
-}
-@keyframes fadeInScaleUp {
-    from {
+    .flame {
+        position: absolute;
+        top: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 80px;
+        background: radial-gradient(circle at center, #ffeb3b 0%, #ffc107 50%, transparent 80%);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        filter: blur(8px);
+        box-shadow: 
+            0 0 10px 5px rgba(255, 235, 59, 0.7),
+            0 0 20px 10px rgba(255, 193, 7, 0.5),
+            0 0 40px 15px rgba(255, 159, 0, 0.3);
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9); 
+        animation: fadeInFlame 1s forwards;
+        z-index: 2;
     }
-    to {
+
+    .candle-container.lit .flame {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
     }
-}
-.paragraphClasses {
-    /* PERUBAHAN DI SINI: */
-    color: #F8FAFC; /* Warna teks putih keabu-abuan (mirip text-gray-100/200 di Tailwind) */
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), /* Sedikit glow putih */
-                 0 0 10px rgba(255, 255, 255, 0.2); /* Glow yang lebih lembut */
-    line-height: loose; /* Menjaga spasi baris */
-    margin-bottom: 4; /* Menjaga margin bawah */
-    text-align: justify; /* Menjaga rata kanan-kiri */
-}
 
-.highlightTextClasses {
-    /* Menyesuaikan highlight agar tetap terlihat dengan latar belakang putih */
-    color: #60A5FA; /* Warna biru cerah yang kontras dengan latar belakang gelap */
-    font-weight: 600; /* Semi-bold */
-    text-shadow: 0 0 8px rgba(96, 165, 250, 0.8); /* Efek glow biru yang lebih kuat */
-}
+    @keyframes fadeInFlame {
+        from { opacity: 0; transform: translateX(-50%) scale(0.5); }
+        to { opacity: 1; transform: translateX(-50%) scale(1); }
+    }
 
-.quoteClasses {
-    /* Menyesuaikan quote agar tetap terlihat dengan latar belakang putih */
-    color: #D1D5DB; /* Warna abu-abu terang untuk quote */
-    font-style: italic;
-    border-left: 4px solid #60A5FA; /* Border biru cerah */
-    padding-left: 1rem; /* Padding kiri */
-    padding-top: 0.5rem; /* Padding atas */
-    padding-bottom: 0.5rem; /* Padding bawah */
-    margin-top: 1rem; /* Margin atas */
-    margin-bottom: 1rem; /* Margin bawah */
-    text-align: justify; /* Rata kanan-kiri */
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.1); /* Sedikit efek glow putih */
-}
+    .animate-flicker {
+        animation: flicker 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+        0% { transform: translateX(-50%) scale(1) rotate(-1deg); opacity: 1; filter: blur(2px); }
+        25% { transform: translateX(-50%) scale(0.98) rotate(1deg); opacity: 0.95; filter: blur(1.8px); }
+        50% { transform: translateX(-50%) scale(1.02) rotate(-0.5deg); opacity: 1; filter: blur(2.2px); }
+        75% { transform: translateX(-50%) scale(0.99) rotate(0.5deg); opacity: 0.97; filter: blur(1.9px); }
+        100% { transform: translateX(-50%) scale(1) rotate(-1deg); opacity: 1; filter: blur(2px); }
+    }
+
+    .candle-light-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 70%, rgba(255, 200, 0, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 5;
+        animation: pulseLight 3s infinite alternate;
+    }
+
+    @keyframes pulseLight {
+        0% { opacity: 0.8; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+    }
+    .golden-background {
+        background: linear-gradient(to right, #DAA520, #FFD700, #DAA520);
+        color: #4B3B00 !important;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        border: 2px solid #DAA520;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .golden-background:hover {
+        background: linear-gradient(to right, #FFD700, #DAA520, #FFD700);
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+        transform: scale(1.02);
+    }
+    .summary-green-box {
+        background-color: #34d399;
+        color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        margin-top: 2.5rem;
+        margin-bottom: 2.5rem;
+        font-weight: bold;
+        text-align: center;
+        line-height: 1.75;
+    }
+    .triangle-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    .triangle-shape {
+        width: 0;
+        height: 0;
+        border-left: 300px solid transparent;
+        border-right: 300px solid transparent;
+        border-bottom: 200px solid #FFD700;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+    }
+
+    .triangle-text {
+        position: absolute;
+        top: calc(50% + 20px);
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 80%;
+        color: #4B3B00;
+        font-weight: bold;
+        text-align: center;
+        line-height: 1.4;
+        font-size: 0.9rem;
+        z-index: 1;
+    }
+
+    .triangle-text p {
+        margin-bottom: 0.2rem;
+    }
+
+    .doa-background-image {
+        position: fixed; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        
+        min-width: 100vw; 
+        min-height: 100vh; 
+        width: auto;
+        height: auto;
+        object-fit: cover; 
+        
+        z-index: 0; 
+        opacity: 0.2; 
+        transition: opacity 0.5s ease-in-out; 
+    }
+
+    .playing-phase-dynamic-image {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        
+        width: 100vw; 
+        height: 100vh; 
+        object-fit: contain; 
+        background-color: black; 
+        
+        z-index: 0; 
+        opacity: 1; 
+        transition: opacity 0.5s ease-in-out; 
+    }
+
+    .playing-phase-content-overlay {
+        display: none;
+    }
+
+    .popup-animate-in {
+        position: fixed; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1); 
+        z-index: 60; 
+        
+        width: 90%; 
+        max-width: 400px; 
+        
+        background-color: #3f3f46; 
+        color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        text-align: center; 
+
+        animation: fadeInScaleUp 0.5s ease-out forwards; 
+    }
+    @keyframes fadeInScaleUp {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9); 
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+    /* PERBAIKAN WARNA TEKS DENGAN !important */
+    .dynamic-paragraph {
+        color: #F8FAFC !important; /* Warna teks putih keabu-abuan */
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 
+                     0 0 10px rgba(255, 255, 255, 0.2); 
+    }
+
+    .highlightTextClasses {
+        color: #60A5FA !important; /* Warna biru cerah */
+        font-weight: 600;
+        text-shadow: 0 0 8px rgba(96, 165, 250, 0.8);
+    }
+
+    .quoteClasses {
+        color: #D1D5DB !important; /* Warna abu-abu terang untuk quote */
+        font-style: italic;
+        border-left: 4px solid #60A5FA;
+        padding-left: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        text-align: justify;
+        text-shadow: 0 0 3px rgba(255, 255, 255, 0.1);
+    }
 
 `;
 document.head.appendChild(style);
