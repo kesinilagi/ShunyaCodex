@@ -160,11 +160,8 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
     
     // Logika untuk menentukan pesan langsung, tanpa useEffect internal
     let messageToDisplay = '';
-    if (customGoals && customGoals.length > 0) {
-        messageToDisplay = customGoals[Math.floor(Math.random() * customGoals.length)];
-        console.log(`[SadHourReminder] Using custom message: ${messageToDisplay}`);
-    } else {
-        messageToDisplay = "Saatnya menenangkan hati dan merenung. Mari lepaskan beban dan isi energi positif.";
+    {
+        messageToDisplay = "Saatnya menjadi Pribadi yang Luar biasa. Mari lepaskan beban dan isi energi positif.";
         console.log(`[SadHourReminder] Using general default message: ${messageToDisplay}`);
     }
 
@@ -225,7 +222,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
                     Daftar List Goal 🔔
                 </button>
                 <button
-                    onClick={onClose} // Hanya panggil onClose
+                    onClick={() => onNavigateToRoom('daftar-isi')}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
                 >
                     Tutup Pop-up
