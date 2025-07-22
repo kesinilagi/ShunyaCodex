@@ -168,12 +168,18 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
     const [currentReminderMessage, setCurrentReminderMessage] = useState(null); 
     const [isVisible, setIsVisible] = useState(false);
     const [displayedUserName, setDisplayedUserName] = useState(''); 
+    // === BARU: State untuk menyimpan pesan kustom (Bucket List Goal) ===
+    const [customGoals, setCustomGoals] = useState([]);
 
     useEffect(() => {
         const storedUserName = localStorage.getItem('ebookUserName');
         if (storedUserName) {
             setDisplayedUserName(storedUserName);
         }
+
+        // === BARU: Muat customGoals dari localStorage di sini ===
+        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
+        setCustomGoals(storedGoals);
 
         const checkSadHour = () => {
             const now = new Date();
@@ -234,7 +240,9 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             }
         };
 
+        // Panggil checkSadHour segera saat komponen dimuat
         checkSadHour();
+        // Set interval untuk pemeriksaan berkala
         const intervalId = setInterval(checkSadHour, 60 * 1000); // Cek setiap 1 menit
 
         return () => {
@@ -256,7 +264,19 @@ const SadHourReminder = ({ onClose, onNavigateToRoom }) => {
             <p className="mb-4 text-gray-200 leading-snug text-sm">
                 {finalMessage}
             </p> 
-            <div className="flex justify-center gap-3">
+            {/* === BARU: Tampilkan daftar Bucket List Goal di sini === */}
+            {customGoals.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-gray-600">
+                    <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
+                    <ul className="text-xs text-gray-300 list-disc list-inside max-h-20 overflow-y-auto">
+                        {customGoals.map((goal, index) => (
+                            <li key={index} className="text-left py-0.5">{goal}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {/* === AKHIR BAGIAN BARU === */}
+            <div className="flex justify-center gap-3 mt-4">
                 <button
                     onClick={() => {
                         onNavigateToRoom('pixel-thoughts'); 
@@ -3814,11 +3834,28 @@ const MainLayout = () => {
             setFontSizeIndex(nextIndex);
         }
     };
-
+    // Fungsi baru untuk membersihkan Cache Storage
+    const clearCacheStorage = async () => {
+        if ('caches' in window) {
+            try {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => {
+                    console.log(`Clearing cache: ${name}`);
+                    return caches.delete(name);
+                }));
+                console.log('All Cache Storage cleared successfully.');
+            } catch (error) {
+                console.error('Failed to clear Cache Storage:', error);
+            }
+        } else {
+            console.warn('Cache Storage API not supported in this browser.');
+        }
+    };
     const handleCloseBook = () => {
         closeFullscreen();
         setIsCoverUnlocked(false);
-        resetAppState();
+        resetAppState(); // Ini akan mereset state aplikasi React
+        clearCacheStorage(); // Panggil fungsi untuk membersihkan Cache Storage
     };
 
     const renderPage = () => {
@@ -4288,6 +4325,10 @@ const App = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated]); // Dependensi isActivated agar listener aktif jika isActivated berubah sendiri
     
+    useEffect(() => {
+    console.log("App mounted. Clearing lastSadHourReminder from localStorage to ensure popup appears.");
+    localStorage.removeItem('lastSadHourReminder');
+}, []);
 const resetAppState = () => {
         console.log("Resetting app state (excluding activation key and bucket list)...");
         setCurrentPageKey('kata-pengantar'); // Kembali ke kata pengantar (atau halaman awal setelah aktivasi)
