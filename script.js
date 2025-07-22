@@ -4243,12 +4243,9 @@ const App = () => {
 
     // --- EFEK UNTUK MENGUBAH CSS VARIABEL ---
     useEffect(() => {
-        // Ini adalah tempat `fontSizes[fontSizeIndex]` digunakan untuk DOM CSS
-        // Pastikan `fontSizes` dan `fontSizeIndex` sudah terdefinisi saat ini.
-        document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
-    }, [fontSizeIndex, fontSizes]); // Tambahkan `fontSizes` ke dependency array
+        document.documentElement.style.setProperty('--content-bg-opacity', bgOpacity / 100);
+    }, [bgOpacity]);
 
-    // --- Efek untuk PWA Install Prompt ---
     useEffect(() => {
         const handleBeforeInstallPrompt = (event) => {
             event.preventDefault();
@@ -4262,7 +4259,6 @@ const App = () => {
         };
     }, []);
 
-    // --- Efek untuk Memuat Tema Tersimpan ---
     useEffect(() => {
         const savedTheme = localStorage.getItem('ebookThemeKey');
         if (savedTheme && themes[savedTheme]) {
@@ -4270,12 +4266,14 @@ const App = () => {
         }
     }, []);
 
-    // --- Efek untuk Scroll ke Atas Saat Halaman Berubah ---
+    useEffect(() => {
+        document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
+    }, [fontSizeIndex, fontSizes]);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [currentPageKey]);
 
-    // --- Efek untuk memantau perubahan localStorage untuk isActivated dan userName ---
     useEffect(() => {
         const handleStorageChange = () => {
             const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
@@ -4316,7 +4314,7 @@ const App = () => {
         setCurrentPageKey('home');
         setIsSidebarOpen(false);
         setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue');
-        setFontSizeIndex(1); // Reset font size index
+        setFontSizeIndex(1);
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80);
         setIsDoaLooping(false);
         setHasSadHourReminderBeenShownThisSession(false);
@@ -4326,7 +4324,7 @@ const App = () => {
     // Context Value
     const contextValue = {
         themes, setThemeKey, themeKey,
-        fontSizes, fontSizeIndex, setFontSizeIndex, // Pastikan variabel ini dari state di atas
+        fontSizes, fontSizeIndex, setFontSizeIndex,
         currentPageKey, setCurrentPageKey,
         isCoverUnlocked, setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
@@ -4337,6 +4335,20 @@ const App = () => {
         isActivated, setIsActivated,
         resetAppState,
         installPromptEvent,
+    };
+
+    // === BARU: Fungsi untuk menangani penutupan SadHourReminder dari dalam ===
+    const handleSadHourReminderClose = () => {
+        setIsSadHourReminderVisible(false); // Sembunyikan pop-up
+        setHasSadHourReminderBeenShownThisSession(true); // Tandai sudah tampil di sesi ini
+        setCurrentPageKey('kata-pengantar'); // Navigasi ke kata pengantar sebagai default setelah tutup
+    };
+
+    // === BARU: Fungsi untuk menangani navigasi dari SadHourReminder ke ruangan spesifik ===
+    const handleSadHourReminderNavigate = (roomKey) => {
+        setIsSadHourReminderVisible(false); // Sembunyikan pop-up
+        setHasSadHourReminderBeenShownThisSession(true); // Tandai sudah tampil di sesi ini
+        setCurrentPageKey(roomKey); // Navigasi ke ruangan yang dipilih
     };
 
     return (
@@ -4350,16 +4362,9 @@ const App = () => {
                     currentPageKey !== 'affirmation-room' && currentPageKey !== 'secret-room-rezeki' && (
                         <SadHourReminder
                             isVisible={isSadHourReminderVisible}
-                            onClose={() => {
-                                setIsSadHourReminderVisible(false);
-                                setHasSadHourReminderBeenShownThisSession(true);
-                                setCurrentPageKey('kata-pengantar');
-                            }}
-                            onNavigateToRoom={(room) => {
-                                setIsSadHourReminderVisible(false);
-                                setHasSadHourReminderBeenShownThisSession(true);
-                                setCurrentPageKey(room);
-                            }}
+                            // === PERBAIKAN: Gunakan fungsi handler yang baru ===
+                            onClose={handleSadHourReminderClose} // Menggunakan handler khusus untuk tombol 'Tutup Pop-up'
+                            onNavigateToRoom={handleSadHourReminderNavigate} // Menggunakan handler khusus untuk tombol navigasi
                         />
                     )
                 )
