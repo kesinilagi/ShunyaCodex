@@ -4319,7 +4319,7 @@ const App = () => {
                     : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
                         : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
                             : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                                : <MainLayout />
+                               
 )}
         </AppContext.Provider>
     );
