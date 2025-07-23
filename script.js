@@ -4143,7 +4143,7 @@ const App = () => {
     const [fontSizes, setFontSizes] = useState(initialFontSizes);
     const [fontSizeIndex, setFontSizeIndex] = useState(1);
 
-    const [currentPageKey, setCurrentPageKey] = useState('home');
+    const [currentPageKey, setCurrentPageKey] = useState('home'); // Default ke 'home'
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80);
@@ -4156,10 +4156,15 @@ const App = () => {
         return storedActivation;
     });
 
+    // States untuk kontrol SadHourReminder
     const [isSadHourReminderVisible, setIsSadHourReminderVisible] = useState(false);
     const [hasSadHourReminderBeenShownThisSession, setHasSadHourReminderBeenShownThisSession] = useState(false);
     const [customGoalsForReminder, setCustomGoalsForReminder] = useState([]);
+    // === BARU: Flag untuk melacak apakah navigasi awal sudah terjadi ===
+    const [initialNavigationDone, setInitialNavigationDone] = useState(false);
 
+
+    // --- Efek untuk memuat opacity tersimpan ---
     useEffect(() => {
         const savedOpacity = localStorage.getItem('ebookBgOpacity');
         if (savedOpacity) {
@@ -4167,6 +4172,7 @@ const App = () => {
         }
     }, []);
 
+    // --- EFEK UNTUK MENGUBAH CSS VARIABEL ---
     useEffect(() => {
         document.documentElement.style.setProperty('--content-bg-opacity', bgOpacity / 100);
     }, [bgOpacity]);
@@ -4195,10 +4201,10 @@ const App = () => {
         document.documentElement.style.setProperty('--dynamic-font-size', fontSizes[fontSizeIndex]);
     }, [fontSizeIndex, fontSizes]);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [currentPageKey]);
+    // Hapus useEffect untuk window.scrollTo(0,0) di sini.
+    // Jika masih dibutuhkan, sebaiknya letakkan di dalam komponen halaman individual.
 
+    // Efek untuk memantau perubahan localStorage untuk isActivated dan userName
     useEffect(() => {
         const handleStorageChange = () => {
             const newActivationStatus = localStorage.getItem('ebookActivated') === 'true';
@@ -4206,7 +4212,8 @@ const App = () => {
                 console.log("localStorage 'ebookActivated' changed! Updating App state to", newActivationStatus);
                 setIsActivated(newActivationStatus);
                 if (newActivationStatus) {
-                    setHasSadHourReminderBeenShownThisSession(false);
+                    setHasSadHourReminderBeenShownThisSession(false); // Reset flag reminder jika baru diaktivasi
+                    setInitialNavigationDone(false); // Penting: reset ini agar alur awal berjalan lagi
                 }
             }
             const newUserName = localStorage.getItem('ebookUserName') || '';
@@ -4218,45 +4225,56 @@ const App = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [isActivated, userName]);
 
+    // === PERBAIKAN AKAR MASALAH LOOP & NAVIGASI AWAL ===
     useEffect(() => {
-        const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
-        setCustomGoalsForReminder(storedGoals);
+        // Logika ini akan berjalan HANYA SEKALI setelah cover dibuka dan semua state utama siap.
+        // Ini adalah controller utama untuk navigasi awal dan SadHourReminder.
+        if (isCoverUnlocked && !initialNavigationDone) {
+            console.log("[App Effect] Starting initial navigation/reminder logic.");
+            setInitialNavigationDone(true); // Tandai bahwa navigasi awal sudah dicoba
 
-        if (isCoverUnlocked && isActivated && !hasSadHourReminderBeenShownThisSession && 
-            !isSadHourReminderVisible && 
-            currentPageKey !== 'pixel-thoughts' && 
-            currentPageKey !== 'affirmation-room' && 
-            currentPageKey !== 'secret-room-rezeki' && 
-            currentPageKey !== 'activation-screen' &&
-            currentPageKey !== 'home' && 
-            isSidebarOpen === false) {
-            
-            console.log("[App Effect] Conditions met to show SadHourReminder. Setting visible.");
-            setIsSadHourReminderVisible(true);
-        } else if (isCoverUnlocked && !isSadHourReminderVisible) {
+            // 1. Jika belum diaktivasi, pergi ke ActivationScreen
             if (!isActivated) {
                 setCurrentPageKey('activation-screen');
-            } else if (!hasSadHourReminderBeenShownThisSession) {
+                console.log("[App Effect] Navigating to ActivationScreen.");
+            }
+            // 2. Jika sudah diaktivasi TAPI SadHourReminder belum tampil di sesi ini
+            else if (!hasSadHourReminderBeenShownThisSession) {
+                // Load custom goals untuk reminder
+                const storedGoals = JSON.parse(localStorage.getItem('customReminders')) || [];
+                setCustomGoalsForReminder(storedGoals);
+
+                // Tampilkan SadHourReminder
+                setIsSadHourReminderVisible(true);
+                console.log("[App Effect] Showing SadHourReminder.");
+                // Jangan set currentPageKey di sini agar SadHourReminder muncul di atas layar kosong/latar belakang.
+                // Navigasi akan terjadi setelah SadHourReminder ditutup.
+            }
+            // 3. Jika sudah diaktivasi DAN SadHourReminder sudah tampil di sesi ini
+            else {
                 setCurrentPageKey('kata-pengantar');
-            } else {
-                setCurrentPageKey('kata-pengantar');
+                console.log("[App Effect] Navigating directly to Kata Pengantar.");
             }
         }
-    }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, currentPageKey, isSidebarOpen, isSadHourReminderVisible, setCurrentPageKey]);
+    }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, initialNavigationDone, setCurrentPageKey]); // Tambahkan semua dependensi
 
+
+    // Fungsi reset state aplikasi (dipanggil dari handleCloseBook di MainLayout)
     const resetAppState = () => {
         console.log("Resetting app state for new session...");
         setIsCoverUnlocked(false);
-        setCurrentPageKey('home');
+        setCurrentPageKey('home'); // Kembali ke halaman 'home' untuk memicu ulang logika App
         setIsSidebarOpen(false);
         setThemeKey(localStorage.getItem('ebookThemeKey') || 'blue');
         setFontSizeIndex(1);
         setBgOpacity(Number(localStorage.getItem('ebookBgOpacity')) || 80);
         setIsDoaLooping(false);
-        setHasSadHourReminderBeenShownThisSession(false);
-        localStorage.removeItem('lastSadHourReminder');
+        setHasSadHourReminderBeenShownThisSession(false); // Reset flag ini agar SadHourReminder muncul lagi di sesi baru
+        setInitialNavigationDone(false); // PENTING: Reset ini agar efek navigasi awal di atas terpicu lagi
+        localStorage.removeItem('lastSadHourReminder'); 
     };
 
+    // Context Value
     const contextValue = {
         themes, setThemeKey, themeKey,
         fontSizes, fontSizeIndex, setFontSizeIndex,
@@ -4272,45 +4290,35 @@ const App = () => {
         installPromptEvent,
     };
 
+    // Fungsi ini dipanggil dari dalam SadHourReminder saat interaksi
     const handleSadHourReminderInteraction = (destinationPageKey) => {
         console.log(`[App] SadHourReminder interaction: Navigating to ${destinationPageKey}`);
-        setIsSadHourReminderVisible(false);
-        setHasSadHourReminderBeenShownThisSession(true);
-        setCurrentPageKey(destinationPageKey);
+        setIsSadHourReminderVisible(false); // Sembunyikan pop-up
+        setHasSadHourReminderBeenShownThisSession(true); // Tandai sudah tampil di sesi ini
+        setCurrentPageKey(destinationPageKey); // Navigasi ke halaman yang dipilih/default
     };
 
     return (
         <AppContext.Provider value={contextValue}>
-            {/* === PERUBAHAN: Starfield dirender di sini saat pop-up aktif === */}
-            {/* Ini akan memastikan Starfield muncul di atas cover screen saat pop-up aktif,
-               dan di bawah pop-up itu sendiri */}
-            {isSadHourReminderVisible && <Starfield />} 
-
+            <Starfield />
             {
                 !isCoverUnlocked ? (
                     <CoverScreen />
                 ) : (
-                    isSadHourReminderVisible && !isSidebarOpen && 
-                    currentPageKey !== 'pixel-thoughts' && 
-                    currentPageKey !== 'affirmation-room' && 
-                    currentPageKey !== 'secret-room-rezeki' && 
-                    currentPageKey !== 'activation-screen' 
-                    ? (
+                    // Render SadHourReminder HANYA JIKA isSadHourReminderVisible true
+                    // Ini akan dirender sebagai overlay di atas konten utama yang sudah dimuat.
+                    isSadHourReminderVisible && (
                         <SadHourReminder
                             userName={userName}
                             customGoals={customGoalsForReminder}
-                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')}
-                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)}
+                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tutup pop-up, lalu ke kata pengantar
+                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tutup pop-up, lalu ke ruangan spesifik
                         />
-                    ) : null
+                    )
                 )
             }
             {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
-            {/* Starfield juga dirender di sini, di bawah MainLayout/halaman lain saat normal,
-                kecuali saat SadHourReminder aktif */}
-            {!isSadHourReminderVisible && <Starfield />} 
-
-            {isCoverUnlocked && (
+            {isCoverUnlocked && ( // Render konten ini HANYA JIKA cover sudah terbuka
                 !isActivated ? <ActivationScreen />
                     : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
                         : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
@@ -4325,6 +4333,7 @@ const App = () => {
 ReactDOM.render(<App />, document.getElementById('root'));
 
 // CSS untuk variabel font size
+// GANTI SELURUH BLOK CSS LAMA ANDA DENGAN YANG INI
 /* GANTI SELURUH BLOK CSS LAMA ANDA DENGAN YANG INI */
 const style = document.createElement('style');
 style.innerHTML = `
@@ -4415,7 +4424,7 @@ style.innerHTML = `
     }
 
     .custom-affirmation-image.image-zoom-fade {
-        animation: imageFlash 7s infinite linear; 
+        animation: imageFlash 3s infinite linear; 
         transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
     }
 
@@ -4453,7 +4462,7 @@ style.innerHTML = `
     .affirmation-flasher {
         position: absolute;
         z-index: 10;
-        font-size: clamp(5rem, 10vw, 5rem); /* Mengurangi ukuran seperti yang kamu minta */
+        font-size: clamp(5rem, 10vw, 5rem);
         font-weight: extrabold;
         color: white;
         text-shadow: 0 0 25px white, 0 0 40px #0ea5e9;
@@ -4461,7 +4470,7 @@ style.innerHTML = `
         left: 50%;
         transform: translate(-50%, -50%);
         width: 90%;
-        max-width: 800px;
+        max-width: 679px;
         text-align: center;
         text-transform: uppercase;
         transition: opacity 0.2s ease-in-out; 
@@ -4505,7 +4514,7 @@ style.innerHTML = `
         width: 90vw;
         max-width: 450px;
         aspect-ratio: 2 / 3;
-        max-height: 85vh;
+        max-height: 85vh; /* Perbaiki typo, tambahkan semicolon */
         background-color: #382e28;
         background-image: url('icons/Coverijo.png');
         background-size: cover;
@@ -4834,107 +4843,38 @@ style.innerHTML = `
         color: #F8FAFC !important; /* Warna putih bersinar, karena ini fitur khusus */
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
     }
-    /* === Gaya untuk Pop-up SadHourReminder di tengah layar === */
     .sad-hour-reminder-popup {
-        position: fixed;
-        top: 50%; /* Pindah ke tengah vertikal */
-        left: 50%; /* Pindah ke tengah horizontal */
-        transform: translate(-50%, -50%); /* Geser kembali sebesar setengah lebar dan tinggi elemen */
-        
-        width: 60vw; /* Lebar 60% dari viewport width */
-        max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
-        
-        background-color: rgba(63, 63, 70, 0.85); /* Latar belakang semi-transparan untuk efek glow */
-        color: #ffffff; /* Warna teks utama */
-        padding: 1.5rem;
-        border-radius: 0.75rem;
-        box-shadow: 0 0 30px rgba(255, 255, 0, 0.6), /* Cahaya kuning cerah */
-                    0 0 60px rgba(0, 255, 255, 0.4); /* Cahaya tosca/cyan untuk kontras */
-        
-        z-index: 1000; /* Pastikan di atas elemen lain */
-        animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
+    position: fixed;
+    top: 50%; /* Pindah ke tengah vertikal */
+    left: 50%; /* Pindah ke tengah horizontal */
+    transform: translate(-50%, -50%); /* Geser kembali sebesar setengah lebar dan tinggi elemen */
+    
+    width: 60vw; /* Lebar 60% dari viewport width */
+    max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
+    
+    background-color: #3f3f46;
+    color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1000; /* Pastikan di atas elemen lain */
+    animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
+}
 
-        /* Efek cahaya samping (border-image atau radial-gradient) - opsional */
-        border: 2px solid transparent; /* Border transparan untuk menampung border-image */
-        border-image: linear-gradient(to right, rgba(255, 215, 0, 0.8), transparent, rgba(0, 255, 255, 0.8)) 1; /* Efek cahaya dari kiri-kanan */
-        /* Atau bisa juga dengan pseudo-element untuk efek yang lebih kompleks */
-    }
+/* Menggunakan kembali keyframes fadeInScaleUp dari popup-animate-in jika sudah didefinisikan */
+/* Kalau belum, kamu bisa copy definisi @keyframes fadeInScaleUp dari blok popup-animate-in yang lama */
 
-    /* Gaya untuk tombol di dalam pop-up (diseragamkan) */
-    .sad-hour-reminder-popup button {
-        margin: 0.25rem;
-        padding: 0.5rem 0.75rem; /* Ukuran padding yang seragam */
-        font-size: 0.75rem; /* Ukuran font yang lebih kecil untuk tombol */
-        font-weight: bold;
-        border-radius: 0.5rem; /* Sudut membulat */
-        transition: all 0.2s ease-in-out;
-        color: #FFFFFF !important; /* Teks putih untuk semua tombol */
-        text-shadow: none !important; /* Hapus bayangan teks yang mungkin mengganggu */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Bayangan umum untuk semua tombol */
-        border: none; /* Hapus border default */
+/* Contoh: */
+/*
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9); 
     }
-
-    /* Warna spesifik untuk tombol SadHourReminder */
-    .sad-hour-reminder-popup button.bg-blue-600 { /* Ruang Pelepasan */
-        background-color: #3B82F6 !important; /* Tailwind blue-500 */
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
-    .sad-hour-reminder-popup button.bg-purple-600 { /* Ruang Afirmasi */
-        background-color: #9333EA !important; /* Tailwind purple-500 */
-        box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-yellow-600 { /* Doa LoA Codex */
-        background-color: #EAB308 !important; /* Tailwind yellow-500 */
-        color: #333 !important; /* Teks gelap agar kontras dengan kuning */
-        text-shadow: none !important;
-        box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-teal-600 { /* Ruang Rahasia */
-        background-color: #14B8A6 !important; /* Tailwind teal-500 */
-        box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-green-600 { /* Doa Pilihan */
-        background-color: #22C55E !important; /* Tailwind green-500 */
-        box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-red-400 { /* Daftar List Goal */
-        background-color: #F87171 !important; /* Tailwind red-400 */
-        box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-gray-600 { /* Tutup Pop-up */
-        background-color: #4B5563 !important; /* Tailwind gray-600 */
-        box-shadow: 0 0 10px rgba(75, 85, 99, 0.5);
-    }
-
-    /* Efek hover untuk semua tombol di pop-up */
-    .sad-hour-reminder-popup button:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    }
-
-    /* Efek cahaya samping untuk pop-up */
-    .sad-hour-reminder-popup::before,
-    .sad-hour-reminder-popup::after {
-        content: '';
-        position: absolute;
-        top: -10px; /* Sedikit di luar */
-        bottom: -10px; /* Sedikit di luar */
-        width: 20px; /* Lebar efek cahaya */
-        background: linear-gradient(to bottom, #FFD700, transparent, #00FFFF); /* Cahaya gold ke tosca */
-        z-index: -1; /* Di belakang pop-up */
-        filter: blur(15px); /* Efek blur untuk cahaya */
-        opacity: 0.7;
-    }
-
-    .sad-hour-reminder-popup::before {
-        left: -10px; /* Cahaya di sisi kiri */
-        transform: skewY(5deg); /* Sedikit miring */
-    }
-
-    .sad-hour-reminder-popup::after {
-        right: -10px; /* Cahaya di sisi kanan */
-        transform: skewY(-5deg); /* Sedikit miring ke arah berlawanan */
-    }
+}
 `;
 document.head.appendChild(style);
