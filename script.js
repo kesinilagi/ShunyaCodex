@@ -1853,7 +1853,7 @@ const PixelThoughts = () => {
     const messages = [
         "Tarik napas dalam-dalam... ",
         "tahan .",
-        "Perhatikan pikiran itu menyusut.\nLihatlah ia menjadi kecil dan jauh.....",
+        "Perhatikan pikiran itu menyusut.\nLihatlah ia menjadi kecil dan jauh......",
         "Ia hanyalah setitik kecil di alam semesta yang luas......",
         "hembuskan nafasmu \nbersama rasa itu",
         "Biarkan ia pergi.",
@@ -1878,11 +1878,12 @@ const PixelThoughts = () => {
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     const startMeditation = async thoughtText => {
-        if (!thoughtText.trim()) return; // Pastikan tidak kosong
+        if (!thoughtText.trim()) return;
 
         const audio = audioRef.current;
         if (!audio) return;
 
+        // Hentikan audio jika sedang bermain dan reset
         audio.pause();
         audio.currentTime = 0;
 
@@ -1890,32 +1891,29 @@ const PixelThoughts = () => {
         setHeading(''); // Hapus heading input
         setView('meditation_started'); // Transisi ke fase meditasi, bola sudah siap
 
+        // Mainkan audio
         audio.play().catch(e => console.error("Gagal memulai audio:", e));
 
-        await sleep(100); // Sedikit delay sebelum animasi bola dimulai
-        setBallAnimationClass('recede'); // Bola mulai menyusut
-        await sleep(1000); // Tunggu animasi recede selesai
-
-        messageIndexRef.current = 0; // Reset index pesan
-        setMessage(messages[messageIndexRef.current]); // Tampilkan pesan pertama
-
+        // Animasi bola: dimulai dari posisi stabil, lalu mengecil
+        setBallAnimationClass('meditation-recede'); // Kelas baru untuk animasi bola menyusut
+        
+        // Atur interval pesan meditasi setelah animasi recede dimulai
         meditationIntervalRef.current = setInterval(() => {
             messageIndexRef.current++;
             if (messageIndexRef.current < messages.length) {
                 setMessage(messages[messageIndexRef.current]);
                 if (messages[messageIndexRef.current] === "Biarkan ia pergi.") {
-                    setBallAnimationClass('recede vanish'); // Tambah animasi vanish
+                    setBallAnimationClass('meditation-recede meditation-vanish'); // Tambah animasi vanish
                 }
             } else {
                 clearInterval(meditationIntervalRef.current);
                 audio.pause();
                 audio.currentTime = 0;
-                setTimeout(() => { // Sedikit delay sebelum final state
+                setTimeout(() => {
                     setView('finished');
-                }, 1000);
+                }, 1000); // Sedikit delay sebelum final state
             }
         }, 5000); // Ganti pesan setiap 5 detik
-
     };
 
     const handleKeyPress = event => {
@@ -1925,7 +1923,7 @@ const PixelThoughts = () => {
     };
 
     const handleRestart = () => {
-        clearInterval(meditationIntervalRef.current); // Pastikan interval dibersihkan
+        clearInterval(meditationIntervalRef.current);
         if (audioRef.current) {
             audioRef.current.pause();
             audioRef.current.currentTime = 0;
@@ -1940,7 +1938,7 @@ const PixelThoughts = () => {
     // Cleanup saat komponen di-unmount
     useEffect(() => {
         return () => {
-            clearInterval(meditationIntervalRef.current); // Penting untuk mencegah memory leak
+            clearInterval(meditationIntervalRef.current);
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
@@ -1952,7 +1950,7 @@ const PixelThoughts = () => {
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20">
             <Starfield />
-            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi Pelepasan Panning 3d.mp3" loop={true} preload="auto"></audio>
+            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik/Afirmasi Pelepasan Panning 3d.mp3" loop={true} preload="auto"></audio>
 
             {/* Tombol kembali di pojok bawah */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
@@ -1968,20 +1966,21 @@ const PixelThoughts = () => {
                 )}
 
                 {/* Container untuk Bola Energi (Input atau Teks) */}
-                <div className={`thought-bubble glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 rounded-full text-center p-6 ${ballAnimationClass}`}>
+                {/* Bola itu sendiri sekarang posisinya fixed dan di tengah layar */}
+                <div className={`thought-ball-container ${ballAnimationClass}`}>
                     {view === 'input' && (
                         <textarea
                             value={thought}
                             onChange={(e) => setThought(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            className="thought-bubble-input" // Kelas baru untuk styling input di dalam bola
+                            className="thought-ball-input-content" 
                             placeholder="UNGKAPKAN DISINI..."
-                            autoFocus // Agar kursor langsung di sini saat masuk halaman
+                            autoFocus
                         ></textarea>
                     )}
                     
-                    {(view === 'meditation_started' || view === 'message') && thought && ( // Tampilkan teks input yang sudah di-uppercase
-                        <span className="thought-bubble-text">
+                    {(view === 'meditation_started' || view === 'message') && thought && (
+                        <span className="thought-ball-text-content">
                             {thought}
                         </span>
                     )}
@@ -4508,99 +4507,112 @@ style.innerHTML = `
     }
     /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
     /* === CSS untuk PIXEL THOUGHTS (Yang sudah diperbarui) === */
-.thought-bubble {
-    transition: transform 20s ease-in-out, opacity 1s ease-out, background-color 0.5s ease-in-out, border 0.5s ease-in-out; 
-    transform: scale(1);
-    opacity: 1;
-    /* Gaya untuk bola energi */
-    background: radial-gradient(circle at center, rgba(173, 216, 230, 0.5) 0%, rgba(96, 165, 250, 0.4) 50%, transparent 100%); /* Biru muda ke transparan */
-    border: 2px solid rgba(173, 216, 230, 0.8); /* Border luar yang bersinar */
-    position: relative; 
-    box-sizing: border-box; /* Pastikan padding dihitung dalam width/height */
-    display: flex; /* Untuk mempusatkan konten */
-    align-items: center; /* Mempusatkan vertikal */
-    justify-content: center; /* Mempusatkan horizontal */
-    overflow: hidden; /* Penting untuk menyembunyikan teks yang terlalu panjang */
-}
-.thought-bubble.recede {
-    transform: scale(0.02);
-}
-.thought-bubble.vanish {
-    transform: scale(0.015) translateY(-3500vh);
-    opacity: 0.5;
-    transition: transform 9s cubic-bezier(0.5, 0, 1, 1), opacity 1.5s ease-out;
-}
-.glowing-border {
+.thought-ball-container {
+    position: fixed; /* Tetap di tengah layar */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1); /* Posisi tengah dan skala awal */
+    
+    width: 250px; /* Lebar dan tinggi default bola */
+    height: 250px;
+    max-width: 80vw; /* Batasan agar tidak terlalu besar di layar kecil */
+    max-height: 80vw; /* Buat selalu lingkaran */
+    aspect-ratio: 1 / 1; /* Pastikan selalu lingkaran */
+
+    background: radial-gradient(circle at center, rgba(173, 216, 230, 0.5) 0%, rgba(96, 165, 250, 0.4) 50%, transparent 100%); 
+    border: 2px solid rgba(173, 216, 230, 0.8);
+    border-radius: 50%; /* Bentuk lingkaran */
     box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.5), /* Glow putih */
                 0 0 30px 10px rgba(79, 70, 229, 0.4); /* Glow ungu/biru */
-}
-.message-fade-in {
-    animation: messageFade 1.5s ease-in-out forwards;
-    white-space: pre-line;
-}
-@keyframes messageFade {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    
+    display: flex; /* Untuk mempusatkan konten di dalamnya */
+    align-items: center; /* Pusatkan vertikal */
+    justify-content: center; /* Pusatkan horizontal */
+    text-align: center; /* Pusatkan teks */
+    padding: 1rem; /* Padding agar teks tidak terlalu mepet ke pinggir */
+    box-sizing: border-box; /* Pastikan padding tidak menambah ukuran total */
+    overflow: hidden; /* Sembunyikan jika teks meluap */
+    
+    transition: transform 2s ease-in-out, opacity 1s ease-out, background 0.5s ease-in-out, border 0.5s ease-in-out; /* Tambah transisi untuk properti yang akan berubah */
+    z-index: 10; /* Di atas Starfield, di bawah heading/pesan */
 }
 
-/* === BARU: Gaya untuk TEXTAREA di dalam thought-bubble === */
-.thought-bubble-input {
-    width: 100%; /* Ambil 100% lebar parent */
-    height: 100%; /* Ambil 100% tinggi parent */
-    background-color: transparent; /* Pastikan background transparan */
-    border: none; /* Hapus border default textarea */
+/* Animasi REVISI untuk bola */
+@keyframes meditationRecede {
+    from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    to { transform: translate(-50%, -50%) scale(0.02); opacity: 0.8; } /* Kecilkan tapi masih terlihat */
+}
+
+@keyframes meditationVanish {
+    from { transform: translate(-50%, -50%) scale(0.02); opacity: 0.8; }
+    to { transform: translate(-50%, -50%) scale(0.01) translateY(-3500vh); opacity: 0; } /* Animasi menghilang total */
+}
+
+.thought-ball-container.meditation-recede {
+    animation: meditationRecede 1s forwards; /* Durasi 1 detik */
+}
+
+.thought-ball-container.meditation-vanish {
+    animation: meditationVanish 9s forwards; /* Durasi 9 detik untuk vanish */
+}
+
+
+/* === BARU: Gaya untuk TEXTAREA di dalam bola === */
+.thought-ball-input-content {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
     color: #3B82F6; /* Warna teks di dalam bola (biru cerah) */
     font-weight: extrabold;
     text-align: center;
-    resize: none; /* Nonaktifkan resize oleh pengguna */
-    padding: 0; /* Hapus padding default textarea */
-    display: flex; /* Untuk mempusatkan teks secara vertikal */
+    resize: none;
+    padding: 0;
+    display: flex;
     align-items: center; /* Pusatkan teks vertikal */
     justify-content: center; /* Pusatkan teks horizontal */
     font-size: 2rem; /* Ukuran font default untuk input */
     line-height: 1.2;
-    overflow: hidden; /* Sembunyikan overflow teks jika terlalu panjang */
-    white-space: pre-wrap; /* Pertahankan line breaks dari user */
-    word-break: break-word; /* Potong kata jika terlalu panjang */
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+    box-sizing: border-box; /* Pastikan padding dihitung dalam ukuran */
 }
-.thought-bubble-input::placeholder {
+.thought-ball-input-content::placeholder {
     color: rgba(59, 130, 246, 0.6); /* Warna placeholder */
-    opacity: 1; /* Pastikan placeholder terlihat */
+    opacity: 1;
 }
-.thought-bubble-input:focus {
-    box-shadow: none; /* Hapus fokus border/shadow default */
+.thought-ball-input-content:focus {
+    box-shadow: none;
     outline: none;
 }
 
-/* === BARU: Gaya untuk SPAN teks yang sudah dieksekusi di dalam thought-bubble === */
-.thought-bubble-text {
+/* === BARU: Gaya untuk SPAN teks yang sudah dieksekusi di dalam bola === */
+.thought-ball-text-content {
     color: #3B82F6; /* Warna teks di dalam bola (biru cerah) */
     font-weight: extrabold;
     text-align: center;
-    white-space: pre-wrap; /* Pertahankan line breaks */
-    word-break: break-word; /* Potong kata jika terlalu panjang */
-    font-size: 2rem; /* Ukuran font default untuk teks yang dieksekusi */
+    white-space: pre-wrap;
+    word-break: break-word;
     line-height: 1.2;
     padding: 0;
     margin: 0;
     max-width: 90%; /* Batasi lebar teks agar tidak terlalu ke pinggir */
     max-height: 90%; /* Batasi tinggi teks */
-    overflow: hidden; /* Sembunyikan overflow jika teks terlalu banyak */
-    display: flex; /* Agar bisa di-align */
+    overflow: hidden;
+    display: flex;
     align-items: center;
     justify-content: center;
-    transform-origin: center center; /* Pastikan skala dari tengah */
-    transition: font-size 0.5s ease-in-out, transform 0.5s ease-in-out; /* Transisi font-size */
+    transform-origin: center center;
+    transition: font-size 0.5s ease-in-out, transform 0.5s ease-in-out;
+    /* Tambahan agar ukuran font menyesuaikan panjang teks */
+    font-size: 2rem; /* Ukuran default untuk span */
 }
 
-/* Kondisi ukuran font untuk teks yang dieksekusi berdasarkan panjangnya */
-.thought-bubble-text.text-xl { font-size: 1.25rem; } /* Tailwind default */
-.thought-bubble-text.text-2xl { font-size: 1.5rem; }
-.thought-bubble-text.text-3xl { font-size: 1.875rem; }
-.thought-bubble-text.text-4xl { font-size: 2.25rem; }
-
-/* Menyesuaikan ukuran font berdasarkan panjang teks, seperti sebelumnya */
-.thought-bubble-text[style*="font-size: 1.25rem"] { /* Example for smaller text */ }
+/* Logika untuk menyesuaikan font size berdasarkan panjang teks (jika kamu punya JS yang menambahkannya) */
+/* Contoh: ini perlu diatur oleh JavaScript di PixelThoughts jika teksnya terlalu panjang */
+.thought-ball-text-content.small-font { font-size: 1.5rem; }
+.thought-ball-text-content.xsmall-font { font-size: 1.2rem; }
 
     .affirmation-flasher {
         position: absolute;
