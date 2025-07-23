@@ -6,27 +6,38 @@ const { useState, useEffect, useRef, createContext, useContext } = React;
 // --- Context untuk State Global ---
 // Ini akan menjadi "pusat data" untuk aplikasi kita.
 const AppContext = createContext();
+// --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
 const ActivationScreen = () => {
     const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
     const [activationKey, setActivationKey] = useState('');
-    const [userName, setUserName] = useState('');
+    const [userName, setUserName] = useState(() => localStorage.getItem('ebookUserName') || ''); // Pastikan userName diinisialisasi dari localStorage
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const GOOGLE_APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyvtJwSHb0rJLX4p1PYHAS9RSdU2H2fBPdyJoYIZygCUz3NSvEuAhB9NefBjpHIbp5u/exec'; 
 
-    const verifyKeyWithBackend = async (keyToVerify) => { 
+    const verifyKeyWithBackend = async (keyToVerify, signal) => { // Terima signal dari AbortController
         try {
-            const response = await fetch(`${GOOGLE_APPS_SCRIPT_API_URL}?key=${encodeURIComponent(keyToVerify.trim())}`);
+            const response = await fetch(`${GOOGLE_APPS_SCRIPT_API_URL}?key=${encodeURIComponent(keyToVerify.trim())}`, { signal }); // Teruskan signal
             const data = await response.json(); 
             return data; 
         } catch (error) {
+            // Tangani AbortError secara khusus agar tidak menampilkan pesan error ke user
+            if (error.name === 'AbortError') {
+                console.log("Fetch aborted for ActivationScreen.");
+                return { success: false, message: "Aktivasi dibatalkan." }; // Pesan internal jika dibatalkan
+            }
             console.error("Error verifying key with backend:", error);
             return { success: false, message: "Terjadi kesalahan koneksi. Mohon periksa koneksi internet Anda." };
         }
     };
 
     const handleActivate = async () => {
+        // Karena kita akan menggunakan AbortController, kita tidak akan menginisialisasinya di sini
+        // Tapi di useEffect, dan passed as prop. Untuk tombol klik, kita bisa buat baru.
+        const abortController = new AbortController();
+        const signal = abortController.signal;
+
         if (!userName.trim()) {
             setMessage('Mohon masukkan nama Anda.');
             return;
@@ -39,7 +50,13 @@ const ActivationScreen = () => {
         setIsLoading(true);
         setMessage('Memverifikasi kunci...');
 
-        const result = await verifyKeyWithBackend(activationKey); 
+        const result = await verifyKeyWithBackend(activationKey, signal); 
+
+        // Penting: Hanya update state jika komponen masih mounted.
+        // Dalam kasus ini, karena navigasi setelah aktivasi, kita TIDAK perlu
+        // memeriksa mounted, tapi kita batalkan request-nya agar tidak ada
+        // Promise yang masih pending saat komponen unmount.
+        // Navigasi setIsActivated(true) akan menyebabkan unmount.
 
         if (result.success) {
             localStorage.setItem('ebookActivated', 'true'); 
@@ -47,33 +64,51 @@ const ActivationScreen = () => {
             localStorage.setItem('ebookUserName', userName.trim()); 
             
             setIsActivated(true); // Ini akan memicu useEffect di App.js untuk navigasi
-            setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
+            setMessage('Aktivasi Berhasil! Selamat menikmati E-book.'); // Ini mungkin tidak terlihat karena navigasi cepat
 
-            // === PENTING: Hapus setTimeout ini! Navigasi awal diatur sepenuhnya oleh App.js ===
-            // setTimeout(() => {
-            //     setCurrentPageKey('kata-pengantar');
-            // }, 1500); 
-
+            // Tidak ada setTimeout yang navigasi ke kata-pengantar di sini lagi
         } else {
             setMessage(`Aktivasi Gagal: ${result.message}`);
+            setIsLoading(false); // Pastikan loading dihentikan jika gagal
         }
-        setIsLoading(false);
     };
 
     // Saat komponen dimuat, cek status aktivasi lokal terlebih dahulu
     useEffect(() => {
-        const storedActivated = localStorage.getItem('ebookActivated') === 'true';
-        const storedName = localStorage.getItem('ebookUserName');
+        let timeoutId;
+        const abortController = new AbortController(); // Inisialisasi AbortController di dalam useEffect
+        const signal = abortController.signal;
 
-        if (storedActivated) {
-            setMessage(`E-book sudah aktif di perangkat ini, ${storedName || 'Sahabat'}.`); 
-            setIsActivated(true); // Ini memicu App.js untuk menangani navigasi awal
-            // === PENTING: Hapus setTimeout ini! Navigasi awal diatur sepenuhnya oleh App.js ===
-            // setTimeout(() => {
-            //     setCurrentPageKey('kata-pengantar');
-            // }, 500);
-        }
-    }, []);
+        const checkActivation = async () => {
+            const storedActivated = localStorage.getItem('ebookActivated') === 'true';
+            const storedName = localStorage.getItem('ebookUserName');
+
+            if (storedActivated) {
+                setMessage(`E-book sudah aktif di perangkat ini, ${storedName || 'Sahabat'}.`); 
+                setIsActivated(true); // Ini memicu App.js untuk menangani navigasi awal
+
+                // Tidak ada setTimeout di sini lagi yang langsung navigasi.
+                // Logika navigasi sepenuhnya di App.js setelah setIsActivated(true).
+            }
+            // else if (!storedActivated) { // Jika belum aktif, tidak perlu validasi key di sini saat start up
+            //    // Ini adalah kondisi startup normal, biarkan user input
+            // }
+        };
+
+        checkActivation();
+
+        // === PENTING: Cleanup function untuk useEffect ini ===
+        return () => {
+            console.log("[ActivationScreen Cleanup] Aborting pending fetch requests and clearing timeouts.");
+            abortController.abort(); // Batalkan semua fetch request yang mungkin masih berjalan
+            if (timeoutId) {
+                clearTimeout(timeoutId); // Hapus semua timeout yang mungkin masih berjalan
+            }
+            // Hapus juga pesan jika komponen di-unmount sebelum sempat dibaca
+            setMessage(''); 
+            setIsLoading(false);
+        };
+    }, []); // Dependensi kosong, hanya berjalan sekali saat mount
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
