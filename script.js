@@ -1840,134 +1840,166 @@ const AffirmationFlasher = ({ phrase }) => {
 
 // ### GANTI SELURUH PIXELTHOUGHTS ANDA DENGAN VERSI INI ###
 const PixelThoughts = () => {
-  const { setCurrentPageKey } = useContext(AppContext);
-  const [view, setView] = useState('input');
-  const [thought, setThought] = useState('');
-  const [message, setMessage] = useState('');
-  const [heading, setHeading] = useState('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
-  const [animationClass, setAnimationClass] = useState('');
-  const audioRef = useRef(null);
+    const { setCurrentPageKey } = useContext(AppContext);
+    const [view, setView] = useState('input'); // 'input', 'thought', 'message', 'finished'
+    const [thought, setThought] = useState(''); // Teks yang dimasukkan pengguna
+    const [message, setMessage] = useState(''); // Pesan meditasi
+    const [heading, setHeading] = useState('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
+    const [animationClass, setAnimationClass] = useState(''); // Kelas CSS untuk animasi
+    const audioRef = useRef(null);
 
-  const messages = [
-    "Tarik napas dalam-dalam... ",
-    "tahan .",
-    "Perhatikan pikiran itu menyusut.\nLihatlah ia menjadi kecil dan jauh.....",
-    "Ia hanyalah setitik kecil di alam semesta yang luas......",
-    "hembuskan nafasmu \nbersama rasa itu",
-    "Biarkan ia pergi.",
-    "Menghilang di antara bintang-bintang...... \nRasakan kelegaan saat ia menghilang......",
-    " ",
-    " ",
-    "Dari keheningan, aku terbuka. \nDari ketiadaan",
-    "aku menerima... ",
-    "Aku adalah tempat aliran rezeki-Mu mengalir... ",
-    "Aku sekarang merasa lebih ringan.\nAku sekarang merasa berlimpah",
-    "Aku sekarang merasa bahagia \nAku memiliki energi yang baru.",
-    "Aku Sangat tenang. \nAku berkelimpahan. ",
-    "Aku Sejahtera \nAllah sebaik baiknya pengurus",
-    "Jalan-jalan baru terbuka. \nPertolongan datang dari arah tak kusangka. ",
-    "Hatiku ringan.\nLangkahku lapang",
-    "Aku mengalir bersama-Mu, ya Allah. ",
-    "Aku mengalir bersama-Mu, ya Allah \nAku mengalir bersama-Mu, ya Allah",
-    "Tutup dengan sholawat Tiga Kali",
-    "Rasakan sampai musiknya berhenti \nNikmati momen ketenangan ini."];
+    const messages = [
+        "Tarik napas dalam-dalam... ",
+        "tahan .",
+        "Perhatikan pikiran itu menyusut.\nLihatlah ia menjadi kecil dan jauh.....",
+        "Ia hanyalah setitik kecil di alam semesta yang luas......",
+        "hembuskan nafasmu \nbersama rasa itu",
+        "Biarkan ia pergi.",
+        "Menghilang di antara bintang-bintang...... \nRasakan kelegaan saat ia menghilang......",
+        " ",
+        " ",
+        "Dari keheningan, aku terbuka. \nDari ketiadaan",
+        "aku menerima... ",
+        "Aku adalah tempat aliran rezeki-Mu mengalir... ",
+        "Aku sekarang merasa lebih ringan.\nAku sekarang merasa berlimpah",
+        "Aku sekarang merasa bahagia \nAku memiliki energi yang baru.",
+        "Aku Sangat tenang. \nAku berkelimpahan. ",
+        "Aku Sejahtera \nAllah sebaik baiknya pengurus",
+        "Jalan-jalan baru terbuka. \nPertolongan datang dari arah tak kusangka. ",
+        "Hatiku ringan.\nLangkahku lapang",
+        "Aku mengalir bersama-Mu, ya Allah. ",
+        "Aku mengalir bersama-Mu, ya Allah \nAku mengalir bersama-Mu, ya Allah",
+        "Tutup dengan sholawat Tiga Kali",
+        "Rasakan sampai musiknya berhenti \nNikmati momen ketenangan ini."
+    ];
 
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-  const startMeditation = async thoughtText => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const startMeditation = async thoughtText => {
+        const audio = audioRef.current;
+        if (!audio) return;
 
-    audio.pause();
-    audio.currentTime = 0;
-
-    setThought(thoughtText);
-    setView('thought');
-
-    audio.play().catch(e => console.error("Gagal memulai audio:", e));
-
-    await sleep(100);
-    setAnimationClass('recede');
-    await sleep(1000);
-    setView('message');
-
-    for (let i = 0; i < messages.length; i++) {
-      setMessage(messages[i]);
-      if (messages[i] === "Biarkan ia pergi.") {
-        setAnimationClass('recede vanish');
-      }
-      await sleep(i === messages.length - 1 ? 12000 : 5000);
-    }
-
-    audio.pause();
-    await sleep(1000);
-    setView('finished');
-  };
-
-  const handleKeyPress = event => {
-    if (event.key === 'Enter' && event.target.value.trim() !== '') {
-      startMeditation(event.target.value.trim());
-    }
-  };
-
-  const handleRestart = () => {
-    setView('input');
-    setThought('');
-    setAnimationClass('');
-    setHeading('Ada lagi yang ingin dilepaskan?');
-  };
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    return () => {
-      if (audio) {
         audio.pause();
         audio.currentTime = 0;
-      }
+
+        setThought(thoughtText); // Simpan teks yang dimasukkan
+        setView('thought'); // Ubah view ke mode "bola energi"
+        setHeading(''); // Sembunyikan heading saat meditasi dimulai
+
+        audio.play().catch(e => console.error("Gagal memulai audio:", e));
+
+        await sleep(100);
+        setAnimationClass('recede'); // Mulai animasi menyusut (jika diinginkan)
+        await sleep(1000);
+        
+        // Setelah bola menyusut sedikit, kita bisa mulai menampilkan pesan meditasi
+        // Jika kamu ingin bola tetap terlihat saat pesan meditasi, jangan langsung ubah ke 'message'
+        // Jika kamu ingin bola menghilang dan pesan muncul, setView ke 'message' setelah delay ini
+        // Untuk saat ini, kita akan biarkan bola ada dan pesan muncul di bawahnya/di atasnya.
+        // Pilihan: setView('message');
+
+        for (let i = 0; i < messages.length; i++) {
+            setMessage(messages[i]);
+            if (messages[i] === "Biarkan ia pergi.") {
+                setAnimationClass('recede vanish'); // Animasi vanish saat pesan ini muncul
+            }
+            await sleep(i === messages.length - 1 ? 12000 : 5000); // Durasi per pesan
+        }
+
+        audio.pause();
+        await sleep(1000);
+        setView('finished'); // Akhiri sesi
     };
-  }, []);
 
-  return React.createElement("div", { className: "fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20" },
-    React.createElement(Starfield, null),
-    React.createElement("audio", { ref: audioRef, src: "https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi Pelepasan Panning 3d.mp3", loop: true }),
+    const handleKeyPress = event => {
+        if (event.key === 'Enter' && event.target.value.trim() !== '') {
+            startMeditation(event.target.value.trim());
+        }
+    };
 
-    // Tombol kembali kita pindah ke bawah agar tidak mengganggu
-    React.createElement("div", { className: "absolute bottom-8 left-1/2 -translate-x-1/2 z-10" },
-      React.createElement("button", { onClick: () => setCurrentPageKey('daftar-isi'), className: "bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors" }, "\u2190 Kembali ke Daftar Isi")
-    ),
+    const handleRestart = () => {
+        setView('input');
+        setThought('');
+        setAnimationClass('');
+        setMessage(''); // Bersihkan pesan meditasi
+        setHeading('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?'); // Reset heading
+    };
 
-    // --- STRUKTUR BARU DIMULAI DARI SINI ---
-    React.createElement("div", { className: "z-10 w-full max-w-2xl text-center flex flex-col items-center" },
+    useEffect(() => {
+        const audio = audioRef.current;
+        return () => {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        };
+    }, []);
 
-      // Area 1: Khusus untuk Teks (Input, Pesan, atau Tombol Selesai)
-      React.createElement("div", { className: "w-full h-48 flex flex-col justify-center items-center" },
-        view === 'input' && React.createElement("div", { className: "animate-fade-in w-full" },
-          React.createElement("h1", { className: "text-3xl md:text-5xl font-bold mb-6" }, heading),
-          React.createElement("input", { onKeyPress: handleKeyPress, type: "text", className: "w-full bg-gray-800 border border-gray-700 rounded-lg text-xl md:text-2xl text-center p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 force-uppercase", placeholder: "Ungkapkan Disini...." })
-        ),
+    // === PERBAHAN PENTING: Struktur JSX untuk bola energi yang berfungsi sebagai input ===
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20">
+            <Starfield />
+            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi Pelepasan Panning 3d.mp3" loop={true} autoPlay={false}></audio>
 
-        view === 'message' && React.createElement("p", { key: message, className: "message-fade-in text-2xl md:text-4xl font-light" }, message),
+            {/* Tombol kembali kita pindah ke bawah agar tidak mengganggu */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+                <button onClick={() => setCurrentPageKey('daftar-isi')} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    &larr; Kembali ke Daftar Isi
+                </button>
+            </div>
 
-        view === 'finished' && React.createElement("div", { className: "animate-fade-in" },
-          React.createElement("h2", { className: "text-2xl md:text-4xl font-bold mb-8" }, "Pelepasan Selesai. Apa selanjutnya?"),
-          React.createElement("div", { className: "flex flex-col md:flex-row gap-4 justify-center" },
-            React.createElement("button", { onClick: handleRestart, className: "bg-white/20 px-6 py-3 rounded-lg hover:bg-white/30 transition-colors" }, "Ada Lagi yang Mau Dilepaskan"),
-            React.createElement("button", { onClick: () => setCurrentPageKey('affirmation-room'), className: "bg-sky-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-sky-700 transition-colors" }, "Lanjut ke Ruang Afirmasi \u2728")
-          )
-        )
-      ),
+            <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
+                {/* Heading untuk input fase */}
+                {(view === 'input' || view === 'thought') && ( // Tampilkan heading di fase input dan awal thought
+                    <h1 className="text-3xl md:text-5xl font-bold mb-6">{heading}</h1>
+                )}
 
-      // Area 2: Khusus untuk Gelembung Animasi
-      React.createElement("div", { className: "w-full flex justify-center items-center" },
-        (view === 'thought' || view === 'message' || view === 'finished') &&
-        React.createElement("div", { className: `thought-bubble ${animationClass} glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 bg-white/80 rounded-full text-center p-6` },
-          React.createElement("span", { className: `font-extrabold text-indigo-600 break-words ${thought.length > 40 ? 'text-xl md:text-3xl' : 'text-2xl md:text-4xl'} force-uppercase` },
-            thought
-          )
-        )
-      )
-    )
-  );
+                {/* AREA BOLA ENERGI / INPUT */}
+                {view === 'input' && (
+                    <div className="thought-bubble glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 bg-white/10 rounded-full text-center p-6">
+                        <textarea
+                            value={thought}
+                            onChange={(e) => setThought(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            className="w-full h-full bg-transparent border-none text-xl md:text-2xl text-center p-0 focus:outline-none resize-none force-uppercase"
+                            placeholder="Ungkapkan Disini...."
+                        ></textarea>
+                    </div>
+                )}
+                
+                {/* Bola Energi saat Meditasi */}
+                {view === 'thought' && (
+                    <div className={`thought-bubble ${animationClass} glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 bg-white/10 rounded-full text-center p-6`}>
+                        <span className={`font-extrabold text-indigo-600 break-words ${thought.length > 40 ? 'text-xl md:text-3xl' : 'text-2xl md:text-4xl'} force-uppercase`}>
+                            {thought}
+                        </span>
+                    </div>
+                )}
+
+                {/* Pesan Meditasi yang Muncul di bawah bola */}
+                {view === 'message' && (
+                    <p key={message} className="message-fade-in text-2xl md:text-4xl font-light mt-8">
+                        {message}
+                    </p>
+                )}
+
+                {/* Tombol Selesai Sesi */}
+                {view === 'finished' && (
+                    <div className="animate-fade-in mt-8">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-8">Pelepasan Selesai. Apa selanjutnya?</h2>
+                        <div className="flex flex-col md:flex-row gap-4 justify-center">
+                            <button onClick={handleRestart} className="bg-white/20 px-6 py-3 rounded-lg hover:bg-white/30 transition-colors">
+                                Ada Lagi yang Mau Dilepaskan
+                            </button>
+                            <button onClick={() => setCurrentPageKey('affirmation-room')} className="bg-sky-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-sky-700 transition-colors">
+                                Lanjut ke Ruang Afirmasi ✨
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 
@@ -4465,29 +4497,54 @@ style.innerHTML = `
     }
     /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
     .thought-bubble {
-        transition: transform 20s ease-in-out, opacity 1s ease-out;
-        transform: scale(1);
-        opacity: 1;
-    }
-    .thought-bubble.recede {
-        transform: scale(0.02);
-    }
-    .thought-bubble.vanish {
-        transform: scale(0.015) translateY(-3500vh);
-        opacity: 0.5;
-        transition: transform 9s cubic-bezier(0.5, 0, 1, 1), opacity 1.5s ease-out;
-    }
-    .glowing-border {
-        box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.5), 0 0 30px 10px rgba(79, 70, 229, 0.4);
-    }
-    .message-fade-in {
-        animation: messageFade 1.5s ease-in-out forwards;
-        white-space: pre-line;
-    }
-    @keyframes messageFade {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
+    transition: transform 20s ease-in-out, opacity 1s ease-out, background-color 0.5s ease-in-out; /* Tambah transisi untuk warna */
+    transform: scale(1);
+    opacity: 1;
+    /* Gaya untuk bola energi */
+    background: radial-gradient(circle at center, rgba(173, 216, 230, 0.5) 0%, rgba(96, 165, 250, 0.4) 50%, transparent 100%); /* Biru muda ke transparan */
+    border: 2px solid rgba(173, 216, 230, 0.8); /* Border luar yang bersinar */
+    position: relative; /* Penting untuk z-index di dalam flex */
+    box-sizing: border-box; /* Pastikan padding dihitung dalam width/height */
+}
+.thought-bubble.recede {
+    transform: scale(0.02);
+}
+.thought-bubble.vanish {
+    transform: scale(0.015) translateY(-3500vh);
+    opacity: 0.5;
+    transition: transform 9s cubic-bezier(0.5, 0, 1, 1), opacity 1.5s ease-out;
+}
+.glowing-border {
+    box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.5), /* Glow putih */
+                0 0 30px 10px rgba(79, 70, 229, 0.4); /* Glow ungu/biru */
+}
+.message-fade-in {
+    animation: messageFade 1.5s ease-in-out forwards;
+    white-space: pre-line;
+}
+@keyframes messageFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Gaya untuk TEXTAREA di dalam thought-bubble */
+.thought-bubble textarea {
+    background-color: transparent; /* Pastikan background transparan */
+    border: none; /* Hapus border default textarea */
+    color: #3B82F6; /* Warna teks di dalam bola (sesuaikan dengan warna biru cerah) */
+    font-weight: extrabold;
+    text-align: center;
+    resize: none; /* Nonaktifkan resize oleh pengguna */
+    padding: 0; /* Hapus padding default textarea */
+}
+.thought-bubble textarea::placeholder {
+    color: rgba(59, 130, 246, 0.6); /* Warna placeholder */
+    opacity: 1; /* Pastikan placeholder terlihat */
+}
+.thought-bubble textarea:focus {
+    box-shadow: none; /* Hapus fokus border/shadow default */
+    outline: none;
+}
     .affirmation-flasher {
         position: absolute;
         z-index: 10;
