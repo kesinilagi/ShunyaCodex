@@ -3889,7 +3889,9 @@ const WordRainBackground = () => {
     const [words, setWords] = React.useState([]);
 
     React.useEffect(() => {
-        const wordPool = [ 'Kaya', 'Berkelimpahan', 'Tenang', 'Rileks', 'Damai', 'Sejahtera', 'Syukur', 'Ikhlas', 'Wealth', 'Abundance', 'Rich', 'Calm', 'Relax', 'Peace', 'Grateful', 'Flow', 'Sugih', 'Tentrem', 'Ayem', 'Luber', 'Makmur', 'Nrimo', 'Legowo' ];
+        const defaultWordPool = [ 'Kaya', 'Berkelimpahan', 'Tenang', 'Rileks', 'Damai', 'Sejahtera', 'Syukur', 'Ikhlas', 'Wealth', 'Abundance', 'Rich', 'Calm', 'Relax', 'Peace', 'Grateful', 'Flow', 'Sugih', 'Tentrem', 'Ayem', 'Luber', 'Makmur', 'Nrimo', 'Legowo' ];
+        // === PERUBAHAN LOGIKA: Pilih wordPool berdasarkan customWords ===
+        const currentWordPool = (customWords && customWords.length > 0) ? customWords : defaultWordPool;
 
         const generateWords = () => {
             const newWords = Array.from({ length: 120 }).map(() => ({
@@ -3904,7 +3906,7 @@ const WordRainBackground = () => {
         };
 
         generateWords();
-    }, []);
+    }, [customWords]);
 
     return (
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -4083,7 +4085,7 @@ const SidebarMenu = () => {
 
 // --- GANTI COVER SCREEN ANDA DENGAN VERSI AMAN INI ---
 const CoverScreen = () => {
-    const { setIsCoverUnlocked, isActivated } = useContext(AppContext); // Hapus setCurrentPageKey karena App.js yang mengurusnya
+    const { setIsCoverUnlocked, isActivated, customGoalsForReminder } = useContext(AppContext); // Hapus setCurrentPageKey karena App.js yang mengurusnya
     const [isExiting, setIsExiting] = useState(false);
 
     const handleUnlock = () => {
@@ -4096,7 +4098,7 @@ const CoverScreen = () => {
 
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col items-center justify-center p-4 overflow-hidden">
-            <WordRainBackground rainColor="#f0e68c" />
+            <WordRainBackground rainColor="#f0e68c" customWords={customGoalsForReminder} />
             <div className="book-container animate-fade-in">
                 <div className="relative z-10 text-center flex flex-col items-center justify-center h-full p-5">
                     <p className="mb-11 text-gray-300/80 text-sm"></p>
@@ -4285,6 +4287,7 @@ const App = () => {
         isActivated, setIsActivated,
         resetAppState,
         installPromptEvent,
+        customGoalsForReminder,
     };
 
     // Fungsi ini dipanggil dari dalam SadHourReminder saat interaksi
