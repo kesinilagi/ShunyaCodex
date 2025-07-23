@@ -1838,15 +1838,17 @@ const AffirmationFlasher = ({ phrase }) => {
     );
 };
 
-// ### GANTI SELURUH PIXELTHOUGHTS ANDA DENGAN VERSI INI ###
+// ### GANTI SELURUH PIXELTHOUGHTS ANDA DENGAN VERSI INI (FIXED ALIGNMENT & JUMPING BALL) ###
 const PixelThoughts = () => {
     const { setCurrentPageKey } = useContext(AppContext);
-    const [view, setView] = useState('input'); // 'input', 'thought', 'message', 'finished'
+    const [view, setView] = useState('input'); // 'input', 'meditation_started', 'message', 'finished'
     const [thought, setThought] = useState(''); // Teks yang dimasukkan pengguna
-    const [message, setMessage] = useState(''); // Pesan meditasi
+    const [message, setMessage] = useState(''); // Pesan meditasi yang sedang tampil
     const [heading, setHeading] = useState('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
-    const [animationClass, setAnimationClass] = useState(''); // Kelas CSS untuk animasi
+    const [ballAnimationClass, setBallAnimationClass] = useState(''); // Kelas CSS untuk animasi bola
     const audioRef = useRef(null);
+    const meditationIntervalRef = useRef(null); // Untuk membersihkan interval pesan meditasi
+    const messageIndexRef = useRef(0); // Melacak indeks pesan
 
     const messages = [
         "Tarik napas dalam-dalam... ",
@@ -1876,39 +1878,44 @@ const PixelThoughts = () => {
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     const startMeditation = async thoughtText => {
+        if (!thoughtText.trim()) return; // Pastikan tidak kosong
+
         const audio = audioRef.current;
         if (!audio) return;
 
         audio.pause();
         audio.currentTime = 0;
 
-        setThought(thoughtText); // Simpan teks yang dimasukkan
-        setView('thought'); // Ubah view ke mode "bola energi"
-        setHeading(''); // Sembunyikan heading saat meditasi dimulai
+        setThought(thoughtText.toUpperCase()); // Simpan teks dan langsung jadikan uppercase
+        setHeading(''); // Hapus heading input
+        setView('meditation_started'); // Transisi ke fase meditasi, bola sudah siap
 
         audio.play().catch(e => console.error("Gagal memulai audio:", e));
 
-        await sleep(100);
-        setAnimationClass('recede'); // Mulai animasi menyusut (jika diinginkan)
-        await sleep(1000);
-        
-        // Setelah bola menyusut sedikit, kita bisa mulai menampilkan pesan meditasi
-        // Jika kamu ingin bola tetap terlihat saat pesan meditasi, jangan langsung ubah ke 'message'
-        // Jika kamu ingin bola menghilang dan pesan muncul, setView ke 'message' setelah delay ini
-        // Untuk saat ini, kita akan biarkan bola ada dan pesan muncul di bawahnya/di atasnya.
-        // Pilihan: setView('message');
+        await sleep(100); // Sedikit delay sebelum animasi bola dimulai
+        setBallAnimationClass('recede'); // Bola mulai menyusut
+        await sleep(1000); // Tunggu animasi recede selesai
 
-        for (let i = 0; i < messages.length; i++) {
-            setMessage(messages[i]);
-            if (messages[i] === "Biarkan ia pergi.") {
-                setAnimationClass('recede vanish'); // Animasi vanish saat pesan ini muncul
+        messageIndexRef.current = 0; // Reset index pesan
+        setMessage(messages[messageIndexRef.current]); // Tampilkan pesan pertama
+
+        meditationIntervalRef.current = setInterval(() => {
+            messageIndexRef.current++;
+            if (messageIndexRef.current < messages.length) {
+                setMessage(messages[messageIndexRef.current]);
+                if (messages[messageIndexRef.current] === "Biarkan ia pergi.") {
+                    setBallAnimationClass('recede vanish'); // Tambah animasi vanish
+                }
+            } else {
+                clearInterval(meditationIntervalRef.current);
+                audio.pause();
+                audio.currentTime = 0;
+                setTimeout(() => { // Sedikit delay sebelum final state
+                    setView('finished');
+                }, 1000);
             }
-            await sleep(i === messages.length - 1 ? 12000 : 5000); // Durasi per pesan
-        }
+        }, 5000); // Ganti pesan setiap 5 detik
 
-        audio.pause();
-        await sleep(1000);
-        setView('finished'); // Akhiri sesi
     };
 
     const handleKeyPress = event => {
@@ -1918,30 +1925,36 @@ const PixelThoughts = () => {
     };
 
     const handleRestart = () => {
+        clearInterval(meditationIntervalRef.current); // Pastikan interval dibersihkan
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
         setView('input');
         setThought('');
-        setAnimationClass('');
-        setMessage(''); // Bersihkan pesan meditasi
-        setHeading('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?'); // Reset heading
+        setBallAnimationClass('');
+        setMessage('');
+        setHeading('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
     };
 
+    // Cleanup saat komponen di-unmount
     useEffect(() => {
-        const audio = audioRef.current;
         return () => {
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
+            clearInterval(meditationIntervalRef.current); // Penting untuk mencegah memory leak
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
             }
         };
     }, []);
 
-    // === PERBAHAN PENTING: Struktur JSX untuk bola energi yang berfungsi sebagai input ===
+    // === STRUKTUR JSX YANG DIREVISI ===
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20">
             <Starfield />
-            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi Pelepasan Panning 3d.mp3" loop={true} autoPlay={false}></audio>
+            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik@main/Afirmasi Pelepasan Panning 3d.mp3" loop={true} preload="auto"></audio>
 
-            {/* Tombol kembali kita pindah ke bawah agar tidak mengganggu */}
+            {/* Tombol kembali di pojok bawah */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
                 <button onClick={() => setCurrentPageKey('daftar-isi')} className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
                     &larr; Kembali ke Daftar Isi
@@ -1949,35 +1962,33 @@ const PixelThoughts = () => {
             </div>
 
             <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
-                {/* Heading untuk input fase */}
-                {(view === 'input' || view === 'thought') && ( // Tampilkan heading di fase input dan awal thought
+                {/* Heading (selalu ada di bagian atas, sesuai view) */}
+                {heading && (
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">{heading}</h1>
                 )}
 
-                {/* AREA BOLA ENERGI / INPUT */}
-                {view === 'input' && (
-                    <div className="thought-bubble glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 bg-white/10 rounded-full text-center p-6">
+                {/* Container untuk Bola Energi (Input atau Teks) */}
+                <div className={`thought-bubble glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 rounded-full text-center p-6 ${ballAnimationClass}`}>
+                    {view === 'input' && (
                         <textarea
                             value={thought}
                             onChange={(e) => setThought(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            className="w-full h-full bg-transparent border-none text-xl md:text-2xl text-center p-0 focus:outline-none resize-none force-uppercase"
-                            placeholder="Ungkapkan Disini...."
+                            className="thought-bubble-input" // Kelas baru untuk styling input di dalam bola
+                            placeholder="UNGKAPKAN DISINI..."
+                            autoFocus // Agar kursor langsung di sini saat masuk halaman
                         ></textarea>
-                    </div>
-                )}
-                
-                {/* Bola Energi saat Meditasi */}
-                {view === 'thought' && (
-                    <div className={`thought-bubble ${animationClass} glowing-border flex items-center justify-center w-64 h-64 md:w-80 md:h-80 bg-white/10 rounded-full text-center p-6`}>
-                        <span className={`font-extrabold text-indigo-600 break-words ${thought.length > 40 ? 'text-xl md:text-3xl' : 'text-2xl md:text-4xl'} force-uppercase`}>
+                    )}
+                    
+                    {(view === 'meditation_started' || view === 'message') && thought && ( // Tampilkan teks input yang sudah di-uppercase
+                        <span className="thought-bubble-text">
                             {thought}
                         </span>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {/* Pesan Meditasi yang Muncul di bawah bola */}
-                {view === 'message' && (
+                {/* Pesan Meditasi yang muncul di bawah bola */}
+                {(view === 'meditation_started' || view === 'message') && message && (
                     <p key={message} className="message-fade-in text-2xl md:text-4xl font-light mt-8">
                         {message}
                     </p>
@@ -4496,15 +4507,20 @@ style.innerHTML = `
         100% { opacity: 0.1; }
     }
     /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
-    .thought-bubble {
-    transition: transform 20s ease-in-out, opacity 1s ease-out, background-color 0.5s ease-in-out; /* Tambah transisi untuk warna */
+    /* === CSS untuk PIXEL THOUGHTS (Yang sudah diperbarui) === */
+.thought-bubble {
+    transition: transform 20s ease-in-out, opacity 1s ease-out, background-color 0.5s ease-in-out, border 0.5s ease-in-out; 
     transform: scale(1);
     opacity: 1;
     /* Gaya untuk bola energi */
     background: radial-gradient(circle at center, rgba(173, 216, 230, 0.5) 0%, rgba(96, 165, 250, 0.4) 50%, transparent 100%); /* Biru muda ke transparan */
     border: 2px solid rgba(173, 216, 230, 0.8); /* Border luar yang bersinar */
-    position: relative; /* Penting untuk z-index di dalam flex */
+    position: relative; 
     box-sizing: border-box; /* Pastikan padding dihitung dalam width/height */
+    display: flex; /* Untuk mempusatkan konten */
+    align-items: center; /* Mempusatkan vertikal */
+    justify-content: center; /* Mempusatkan horizontal */
+    overflow: hidden; /* Penting untuk menyembunyikan teks yang terlalu panjang */
 }
 .thought-bubble.recede {
     transform: scale(0.02);
@@ -4527,24 +4543,65 @@ style.innerHTML = `
     to { opacity: 1; }
 }
 
-/* Gaya untuk TEXTAREA di dalam thought-bubble */
-.thought-bubble textarea {
+/* === BARU: Gaya untuk TEXTAREA di dalam thought-bubble === */
+.thought-bubble-input {
+    width: 100%; /* Ambil 100% lebar parent */
+    height: 100%; /* Ambil 100% tinggi parent */
     background-color: transparent; /* Pastikan background transparan */
     border: none; /* Hapus border default textarea */
-    color: #3B82F6; /* Warna teks di dalam bola (sesuaikan dengan warna biru cerah) */
+    color: #3B82F6; /* Warna teks di dalam bola (biru cerah) */
     font-weight: extrabold;
     text-align: center;
     resize: none; /* Nonaktifkan resize oleh pengguna */
     padding: 0; /* Hapus padding default textarea */
+    display: flex; /* Untuk mempusatkan teks secara vertikal */
+    align-items: center; /* Pusatkan teks vertikal */
+    justify-content: center; /* Pusatkan teks horizontal */
+    font-size: 2rem; /* Ukuran font default untuk input */
+    line-height: 1.2;
+    overflow: hidden; /* Sembunyikan overflow teks jika terlalu panjang */
+    white-space: pre-wrap; /* Pertahankan line breaks dari user */
+    word-break: break-word; /* Potong kata jika terlalu panjang */
 }
-.thought-bubble textarea::placeholder {
+.thought-bubble-input::placeholder {
     color: rgba(59, 130, 246, 0.6); /* Warna placeholder */
     opacity: 1; /* Pastikan placeholder terlihat */
 }
-.thought-bubble textarea:focus {
+.thought-bubble-input:focus {
     box-shadow: none; /* Hapus fokus border/shadow default */
     outline: none;
 }
+
+/* === BARU: Gaya untuk SPAN teks yang sudah dieksekusi di dalam thought-bubble === */
+.thought-bubble-text {
+    color: #3B82F6; /* Warna teks di dalam bola (biru cerah) */
+    font-weight: extrabold;
+    text-align: center;
+    white-space: pre-wrap; /* Pertahankan line breaks */
+    word-break: break-word; /* Potong kata jika terlalu panjang */
+    font-size: 2rem; /* Ukuran font default untuk teks yang dieksekusi */
+    line-height: 1.2;
+    padding: 0;
+    margin: 0;
+    max-width: 90%; /* Batasi lebar teks agar tidak terlalu ke pinggir */
+    max-height: 90%; /* Batasi tinggi teks */
+    overflow: hidden; /* Sembunyikan overflow jika teks terlalu banyak */
+    display: flex; /* Agar bisa di-align */
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center; /* Pastikan skala dari tengah */
+    transition: font-size 0.5s ease-in-out, transform 0.5s ease-in-out; /* Transisi font-size */
+}
+
+/* Kondisi ukuran font untuk teks yang dieksekusi berdasarkan panjangnya */
+.thought-bubble-text.text-xl { font-size: 1.25rem; } /* Tailwind default */
+.thought-bubble-text.text-2xl { font-size: 1.5rem; }
+.thought-bubble-text.text-3xl { font-size: 1.875rem; }
+.thought-bubble-text.text-4xl { font-size: 2.25rem; }
+
+/* Menyesuaikan ukuran font berdasarkan panjang teks, seperti sebelumnya */
+.thought-bubble-text[style*="font-size: 1.25rem"] { /* Example for smaller text */ }
+
     .affirmation-flasher {
         position: absolute;
         z-index: 10;
