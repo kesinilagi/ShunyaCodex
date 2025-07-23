@@ -1838,17 +1838,17 @@ const AffirmationFlasher = ({ phrase }) => {
     );
 };
 
-// ### GANTI SELURUH PIXELTHOUGHTS ANDA DENGAN VERSI INI (FIXED ALIGNMENT & JUMPING BALL) ###
+// ### GANTI SELURUH PIXELTHOUGHTS ANDA DENGAN VERSI INI (Fokus Stabilitas & No Jumps) ###
 const PixelThoughts = () => {
     const { setCurrentPageKey } = useContext(AppContext);
-    const [view, setView] = useState('input'); // 'input', 'meditation_started', 'message', 'finished'
-    const [thought, setThought] = useState(''); // Teks yang dimasukkan pengguna
-    const [message, setMessage] = useState(''); // Pesan meditasi yang sedang tampil
+    const [view, setView] = useState('input'); // 'input', 'meditation_active', 'message', 'finished'
+    const [thought, setThought] = useState('');
+    const [message, setMessage] = useState('');
     const [heading, setHeading] = useState('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
     const [ballAnimationClass, setBallAnimationClass] = useState(''); // Kelas CSS untuk animasi bola
     const audioRef = useRef(null);
-    const meditationIntervalRef = useRef(null); // Untuk membersihkan interval pesan meditasi
-    const messageIndexRef = useRef(0); // Melacak indeks pesan
+    const meditationIntervalRef = useRef(null);
+    const messageIndexRef = useRef(0);
 
     const messages = [
         "Tarik napas dalam-dalam... ",
@@ -1883,21 +1883,21 @@ const PixelThoughts = () => {
         const audio = audioRef.current;
         if (!audio) return;
 
-        // Hentikan audio jika sedang bermain dan reset
         audio.pause();
         audio.currentTime = 0;
 
-        setThought(thoughtText.toUpperCase()); // Simpan teks dan langsung jadikan uppercase
-        setHeading(''); // Hapus heading input
-        setView('meditation_started'); // Transisi ke fase meditasi, bola sudah siap
+        setThought(thoughtText.toUpperCase());
+        setHeading(''); // Sembunyikan heading saat meditasi dimulai
+        setView('meditation_active'); // Aktifkan view meditasi (bola tanpa input)
 
-        // Mainkan audio
         audio.play().catch(e => console.error("Gagal memulai audio:", e));
 
-        // Animasi bola: dimulai dari posisi stabil, lalu mengecil
-        setBallAnimationClass('meditation-recede'); // Kelas baru untuk animasi bola menyusut
-        
-        // Atur interval pesan meditasi setelah animasi recede dimulai
+        // Inisialisasi dan jalankan animasi bola dan pesan meditasi
+        setBallAnimationClass('meditation-recede'); // Bola mulai menyusut
+        messageIndexRef.current = 0;
+        setMessage(messages[messageIndexRef.current]);
+
+        // Interval untuk mengganti pesan meditasi
         meditationIntervalRef.current = setInterval(() => {
             messageIndexRef.current++;
             if (messageIndexRef.current < messages.length) {
@@ -1911,9 +1911,9 @@ const PixelThoughts = () => {
                 audio.currentTime = 0;
                 setTimeout(() => {
                     setView('finished');
-                }, 1000); // Sedikit delay sebelum final state
+                }, 1000);
             }
-        }, 5000); // Ganti pesan setiap 5 detik
+        }, 5000); 
     };
 
     const handleKeyPress = event => {
@@ -1935,7 +1935,6 @@ const PixelThoughts = () => {
         setHeading('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
     };
 
-    // Cleanup saat komponen di-unmount
     useEffect(() => {
         return () => {
             clearInterval(meditationIntervalRef.current);
@@ -1946,7 +1945,6 @@ const PixelThoughts = () => {
         };
     }, []);
 
-    // === STRUKTUR JSX YANG DIREVISI ===
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20">
             <Starfield />
@@ -1959,35 +1957,34 @@ const PixelThoughts = () => {
                 </button>
             </div>
 
+            {/* Area Konten Utama - Heading dan Bola Energi */}
             <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
-                {/* Heading (selalu ada di bagian atas, sesuai view) */}
                 {heading && (
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">{heading}</h1>
                 )}
 
-                {/* Container untuk Bola Energi (Input atau Teks) */}
-                {/* Bola itu sendiri sekarang posisinya fixed dan di tengah layar */}
-                <div className={`thought-ball-container ${ballAnimationClass}`}>
+                {/* Kontainer Bola Energi: Selalu di tengah, dengan konten dinamis di dalamnya */}
+                <div className={`thought-ball-wrapper glowing-border ${ballAnimationClass}`}>
                     {view === 'input' && (
                         <textarea
                             value={thought}
                             onChange={(e) => setThought(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            className="thought-ball-input-content" 
+                            className="thought-ball-content-element" /* Kelas untuk konten di dalam bola */
                             placeholder="UNGKAPKAN DISINI..."
                             autoFocus
                         ></textarea>
                     )}
                     
-                    {(view === 'meditation_started' || view === 'message') && thought && (
-                        <span className="thought-ball-text-content">
+                    {(view === 'meditation_active' || view === 'message') && thought && (
+                        <span className="thought-ball-content-element">
                             {thought}
                         </span>
                     )}
                 </div>
 
                 {/* Pesan Meditasi yang muncul di bawah bola */}
-                {(view === 'meditation_started' || view === 'message') && message && (
+                {(view === 'meditation_active' || view === 'message') && message && (
                     <p key={message} className="message-fade-in text-2xl md:text-4xl font-light mt-8">
                         {message}
                     </p>
@@ -2007,58 +2004,6 @@ const PixelThoughts = () => {
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
-    );
-};
-
-
-// QUOTE
-const RandomQuote = () => {
-    const quotes = ["Ketenangan sejati bukan berarti tanpa badai, tapi menari di tengah badai.", "Hati yang bersyukur adalah magnet bagi keajaiban.", "Lepaskan apa yang tidak bisa kau kendalikan, dan fokus pada apa yang bisa.","Saat aku melepaskan siapa diriku, aku menjadi siapa yang seharusnya kutumbuhkan - Lao TSe","Apa pun yang kamu lawan, akan menguat. Dan apa yang kamu tolak, akan menetap - Eckhart Tolle","Jangan lawan perubahan yang datang. Biarkan hidup mengalir melalui dirimu - Jalaludin Rumi","Ingatlah, hanya dengan mengingat Allah, hati menjadi tenang","Dunia ini hanyalah bayangan. Jika kau kejar, ia akan lari.Tapi jika kau berpaling darinya, ia akan mengikutimu"];
-    const [quote, setQuote] = useState(quotes[Math.floor(Math.random() * quotes.length)]);
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-        }, 10000);
-        return () => clearInterval(intervalId);
-    }, []);
-    return (<div className="text-sm italic text-white/70 mt-2 text-center w-full transition-opacity duration-1000">"{quote}"</div>);
-};
-
-// --- KOMPONEN HALAMAN & KONTEN ---
-
-const LoginScreen = () => {
-    const { setUserName } = useContext(AppContext);
-    const [name, setName] = useState('');
-
-    const handleLogin = () => {
-        if (name.trim()) {
-            const trimmedName = name.trim();
-            localStorage.setItem('ebookUserName', trimmedName);
-            setUserName(trimmedName);
-        }
-    };
-
-    return (
-        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
-            <Starfield />
-            <div className="z-10 text-center animate-fade-in">
-                 <h1 className="text-4xl md:text-6xl font-bold mb-4">Selamat Datang</h1>
-                <p className="text-xl md:text-2xl mb-8 text-gray-300">Silakan masukkan nama Anda untuk memulai.</p>
-                <div className="flex">
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                        className="bg-gray-800 border border-gray-700 rounded-l-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="Nama Anda..."
-                    />
-                    <button onClick={handleLogin} className="bg-indigo-600 text-white px-6 py-3 rounded-r-lg hover:bg-indigo-700 font-bold transition-colors">
-                        Masuk
-                    </button>
-                </div>
             </div>
         </div>
     );
@@ -4507,16 +4452,17 @@ style.innerHTML = `
     }
     /* === CSS UNTUK PIXEL THOUGHTS (YANG KEMARIN HILANG) === */
     /* === CSS untuk PIXEL THOUGHTS (Yang sudah diperbarui) === */
-.thought-ball-container {
-    position: fixed; /* Tetap di tengah layar */
+.thought-ball-wrapper {
+    position: fixed; /* Posisi bola independen di tengah layar */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(1); /* Posisi tengah dan skala awal */
+    transform: translate(-50%, -50%) scale(1); /* PENTING: Untuk pemusatan awal dan base scale */
+    transform-origin: center center; /* Pastikan semua transformasi berawal dari tengah */
     
-    width: 250px; /* Lebar dan tinggi default bola */
-    height: 250px;
+    width: 250px; /* Lebar default bola */
+    height: 250px; /* Tinggi default bola */
     max-width: 80vw; /* Batasan agar tidak terlalu besar di layar kecil */
-    max-height: 80vw; /* Buat selalu lingkaran */
+    max-height: 80vw; /* Batasan agar selalu lingkaran di layar kecil */
     aspect-ratio: 1 / 1; /* Pastikan selalu lingkaran */
 
     background: radial-gradient(circle at center, rgba(173, 216, 230, 0.5) 0%, rgba(96, 165, 250, 0.4) 50%, transparent 100%); 
@@ -4533,86 +4479,60 @@ style.innerHTML = `
     box-sizing: border-box; /* Pastikan padding tidak menambah ukuran total */
     overflow: hidden; /* Sembunyikan jika teks meluap */
     
-    transition: transform 2s ease-in-out, opacity 1s ease-out, background 0.5s ease-in-out, border 0.5s ease-in-out; /* Tambah transisi untuk properti yang akan berubah */
-    z-index: 10; /* Di atas Starfield, di bawah heading/pesan */
+    /* Transition untuk animasi skala dan opacity */
+    transition: transform 1s ease-in-out, opacity 1s ease-out; 
+    z-index: 10; /* Di atas Starfield, di bawah heading/pesan yang lain */
 }
 
 /* Animasi REVISI untuk bola */
-@keyframes meditationRecede {
+/* Nama keyframes diubah agar lebih spesifik dan tidak konflik */
+@keyframes meditationScaleOut {
     from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     to { transform: translate(-50%, -50%) scale(0.02); opacity: 0.8; } /* Kecilkan tapi masih terlihat */
 }
 
-@keyframes meditationVanish {
+@keyframes meditationVanishOut {
     from { transform: translate(-50%, -50%) scale(0.02); opacity: 0.8; }
-    to { transform: translate(-50%, -50%) scale(0.01) translateY(-3500vh); opacity: 0; } /* Animasi menghilang total */
+    to { transform: translate(-50%, -50%) scale(0.01) translateY(-3500vh); opacity: 0; } /* Animasi menghilang total dengan geser ke atas */
 }
 
-.thought-ball-container.meditation-recede {
-    animation: meditationRecede 1s forwards; /* Durasi 1 detik */
+.thought-ball-wrapper.meditation-recede {
+    animation: meditationScaleOut 1s forwards; /* Terapkan animasi skala keluar */
 }
 
-.thought-ball-container.meditation-vanish {
-    animation: meditationVanish 9s forwards; /* Durasi 9 detik untuk vanish */
+.thought-ball-wrapper.meditation-vanish {
+    animation: meditationVanishOut 9s forwards; /* Terapkan animasi menghilang total */
 }
 
-
-/* === BARU: Gaya untuk TEXTAREA di dalam bola === */
-.thought-ball-input-content {
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-    border: none;
+/* === BARU: Gaya untuk KONTEN (textarea atau span) di dalam bola === */
+.thought-ball-content-element {
+    width: 100%; /* Ambil 100% lebar parent */
+    height: 100%; /* Ambil 100% tinggi parent */
+    background-color: transparent; /* Pastikan background transparan */
+    border: none; /* Hapus border default */
     color: #3B82F6; /* Warna teks di dalam bola (biru cerah) */
     font-weight: extrabold;
     text-align: center;
-    resize: none;
-    padding: 0;
-    display: flex;
+    resize: none; /* Nonaktifkan resize oleh pengguna */
+    padding: 0; /* Hapus padding default */
+    display: flex; /* Untuk mempusatkan teks secara vertikal */
     align-items: center; /* Pusatkan teks vertikal */
     justify-content: center; /* Pusatkan teks horizontal */
-    font-size: 2rem; /* Ukuran font default untuk input */
+    font-size: 2rem; /* Ukuran font default untuk input/teks */
     line-height: 1.2;
     overflow: hidden;
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: pre-wrap; /* Pertahankan line breaks dari user */
+    word-break: break-word; /* Potong kata jika terlalu panjang */
     box-sizing: border-box; /* Pastikan padding dihitung dalam ukuran */
 }
-.thought-ball-input-content::placeholder {
+.thought-ball-content-element::placeholder {
     color: rgba(59, 130, 246, 0.6); /* Warna placeholder */
     opacity: 1;
 }
-.thought-ball-input-content:focus {
+.thought-ball-content-element:focus {
     box-shadow: none;
     outline: none;
 }
-
-/* === BARU: Gaya untuk SPAN teks yang sudah dieksekusi di dalam bola === */
-.thought-ball-text-content {
-    color: #3B82F6; /* Warna teks di dalam bola (biru cerah) */
-    font-weight: extrabold;
-    text-align: center;
-    white-space: pre-wrap;
-    word-break: break-word;
-    line-height: 1.2;
-    padding: 0;
-    margin: 0;
-    max-width: 90%; /* Batasi lebar teks agar tidak terlalu ke pinggir */
-    max-height: 90%; /* Batasi tinggi teks */
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform-origin: center center;
-    transition: font-size 0.5s ease-in-out, transform 0.5s ease-in-out;
-    /* Tambahan agar ukuran font menyesuaikan panjang teks */
-    font-size: 2rem; /* Ukuran default untuk span */
-}
-
-/* Logika untuk menyesuaikan font size berdasarkan panjang teks (jika kamu punya JS yang menambahkannya) */
-/* Contoh: ini perlu diatur oleh JavaScript di PixelThoughts jika teksnya terlalu panjang */
-.thought-ball-text-content.small-font { font-size: 1.5rem; }
-.thought-ball-text-content.xsmall-font { font-size: 1.2rem; }
 
     .affirmation-flasher {
         position: absolute;
