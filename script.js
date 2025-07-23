@@ -4294,35 +4294,48 @@ const App = () => {
         setCurrentPageKey(destinationPageKey); // Navigasi ke halaman yang dipilih/default
     };
 
-    return (
+   return (
         <AppContext.Provider value={contextValue}>
-            <Starfield />
-            {
-                !isCoverUnlocked ? (
-                    <CoverScreen />
-                ) : (
-                    // Render SadHourReminder HANYA JIKA isSadHourReminderVisible true
-                    // Ini akan dirender sebagai overlay di atas konten utama yang sudah dimuat.
-                    isSadHourReminderVisible && (
+            {/* Starfield selalu ada di lapisan paling bawah (z-index -1 di CSS) */}
+            <Starfield /> 
+
+            {/* Logika render utama aplikasi: Menentukan apa yang terlihat di layar */}
+            {isCoverUnlocked ? ( // Jika cover sudah dibuka
+                isSadHourReminderVisible ? (
+                    // KONDISI 1: SadHourReminder aktif.
+                    // HANYA merender overlay gelap dan pop-up.
+                    // Konten MainLayout, ActivationScreen, CoverScreen TIDAK dirender SAMA SEKALI di sini.
+                    <>
+                        {/* Overlay gelap di atas Starfield, di bawah pop-up */}
+                        <div className="full-screen-overlay-dark"></div> 
                         <SadHourReminder
                             userName={userName}
                             customGoals={customGoalsForReminder}
-                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tutup pop-up, lalu ke kata pengantar
-                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tutup pop-up, lalu ke ruangan spesifik
+                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')}
+                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)}
                         />
-                    )
+                    </>
+                ) : (
+                    // KONDISI 2: Cover sudah terbuka TAPI SadHourReminder TIDAK aktif (sudah ditutup/tidak perlu tampil).
+                    // Render KONTEN UTAMA aplikasi: ActivationScreen atau MainLayout.
+                    <>
+                        {!isActivated ? (
+                            <ActivationScreen />
+                        ) : (
+                            currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
+                                : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
+                                    : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
+                                        : <MainLayout /> // MainLayout untuk semua halaman buku lainnya
+                        )}
+                    </>
                 )
-            }
-            {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
-            {isCoverUnlocked && ( // Render konten ini HANYA JIKA cover sudah terbuka
-                !isActivated ? <ActivationScreen />
-                    : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
-                        : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
-                            : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                               : <MainLayout />
-)}
+            ) : (
+                // KONDISI 3: Cover belum terbuka. Render CoverScreen.
+                <CoverScreen />
+            )}
         </AppContext.Provider>
     );
+        
 };
 
 // Perintah Final untuk merender Aplikasi
