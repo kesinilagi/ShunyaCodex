@@ -4302,7 +4302,7 @@ const App = () => {
         <AppContext.Provider value={contextValue}>
             {/* Starfield selalu ada di lapisan paling bawah (z-index -1 di CSS) */}
             <Starfield /> 
-            <WordRainBackground /> 
+            
             {/* Logika render utama aplikasi: Menentukan apa yang terlihat di layar */}
             {isCoverUnlocked ? ( // Jika cover sudah dibuka
                 isSadHourReminderVisible ? (
