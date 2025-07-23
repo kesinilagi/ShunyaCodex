@@ -4313,7 +4313,14 @@ const App = () => {
                     )
                 )
             }
-            
+            {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
+            {isCoverUnlocked && ( // Render konten ini HANYA JIKA cover sudah terbuka
+                !isActivated ? <ActivationScreen />
+                    : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
+                        : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
+                            : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
+                                : <MainLayout />
+)}
         </AppContext.Provider>
     );
 };
