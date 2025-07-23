@@ -4300,50 +4300,40 @@ const App = () => {
 
     return (
         <AppContext.Provider value={contextValue}>
-            {/* Starfield selalu ada di lapisan paling bawah (z-index -1 di CSS) */}
-            <Starfield /> 
-
-            {/* Logika render utama aplikasi: Menentukan apa yang terlihat di layar */}
-            {isCoverUnlocked ? ( // Jika cover sudah dibuka
-                isSadHourReminderVisible ? (
-                    // KONDISI 1: SadHourReminder aktif.
-                    // HANYA RENDER Starfield (sudah dirender di atas) dan pop-up itu sendiri.
-                    // Konten MainLayout, header, footer TIDAK dirender di sini.
-                    <>
-                        {/* Overlay gelap di atas Starfield, di bawah pop-up */}
-                        <div className="full-screen-overlay-dark"></div> 
+            <Starfield />
+            {
+                !isCoverUnlocked ? (
+                    <CoverScreen />
+                ) : (
+                    // Render SadHourReminder HANYA JIKA isSadHourReminderVisible true
+                    // Ini akan dirender sebagai overlay di atas konten utama yang sudah dimuat.
+                    isSadHourReminderVisible && (
                         <SadHourReminder
                             userName={userName}
                             customGoals={customGoalsForReminder}
-                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')}
-                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)}
+                            onClose={() => handleSadHourReminderInteraction('kata-pengantar')} // Tutup pop-up, lalu ke kata pengantar
+                            onNavigateToRoom={(roomKey) => handleSadHourReminderInteraction(roomKey)} // Tutup pop-up, lalu ke ruangan spesifik
                         />
-                    </>
-                ) : (
-                    // KONDISI 2: Cover sudah terbuka TAPI SadHourReminder TIDAK aktif (sudah ditutup/tidak perlu tampil).
-                    // Render MainLayout/ActivationScreen. Starfield di sini akan tetap menjadi background global.
-                    <>
-                        {!isActivated ? (
-                            <ActivationScreen />
-                        ) : (
-                            currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
-                                : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
-                                    : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                                        : <MainLayout />
-                        )}
-                    </>
+                    )
                 )
-            ) : (
-                // KONDISI 3: Cover belum terbuka. Render CoverScreen. Starfield sudah jadi background global.
-                <CoverScreen />
+            }
+            {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
+            {isCoverUnlocked && ( // Render konten ini HANYA JIKA cover sudah terbuka
+                !isActivated ? <ActivationScreen />
+                    : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
+                        : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
+                            : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
+                                : <MainLayout />
             )}
         </AppContext.Provider>
     );
+};
 
 // Perintah Final untuk merender Aplikasi
 ReactDOM.render(<App />, document.getElementById('root'));
 
 // CSS untuk variabel font size
+// GANTI SELURUH BLOK CSS LAMA ANDA DENGAN YANG INI
 /* GANTI SELURUH BLOK CSS LAMA ANDA DENGAN YANG INI */
 const style = document.createElement('style');
 style.innerHTML = `
@@ -4434,7 +4424,7 @@ style.innerHTML = `
     }
 
     .custom-affirmation-image.image-zoom-fade {
-        animation: imageFlash 7s infinite linear; 
+        animation: imageFlash 3s infinite linear; 
         transition: max-width 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out; 
     }
 
@@ -4472,7 +4462,7 @@ style.innerHTML = `
     .affirmation-flasher {
         position: absolute;
         z-index: 10;
-        font-size: clamp(5rem, 10vw, 5rem); /* Mengurangi ukuran seperti yang kamu minta */
+        font-size: clamp(5rem, 10vw, 5rem);
         font-weight: extrabold;
         color: white;
         text-shadow: 0 0 25px white, 0 0 40px #0ea5e9;
@@ -4480,7 +4470,7 @@ style.innerHTML = `
         left: 50%;
         transform: translate(-50%, -50%);
         width: 90%;
-        max-width: 800px;
+        max-width: 679px;
         text-align: center;
         text-transform: uppercase;
         transition: opacity 0.2s ease-in-out; 
@@ -4524,7 +4514,7 @@ style.innerHTML = `
         width: 90vw;
         max-width: 450px;
         aspect-ratio: 2 / 3;
-        max-height: 85vh;
+        max-height: 85vh; /* Perbaiki typo, tambahkan semicolon */
         background-color: #382e28;
         background-image: url('icons/Coverijo.png');
         background-size: cover;
@@ -4853,107 +4843,38 @@ style.innerHTML = `
         color: #F8FAFC !important; /* Warna putih bersinar, karena ini fitur khusus */
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
     }
-    /* === Gaya untuk Pop-up SadHourReminder di tengah layar === */
     .sad-hour-reminder-popup {
-        position: fixed;
-        top: 50%; /* Pindah ke tengah vertikal */
-        left: 50%; /* Pindah ke tengah horizontal */
-        transform: translate(-50%, -50%); /* Geser kembali sebesar setengah lebar dan tinggi elemen */
-        
-        width: 60vw; /* Lebar 60% dari viewport width */
-        max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
-        
-        background-color: rgba(63, 63, 70, 0.85); /* Latar belakang semi-transparan untuk efek glow */
-        color: #ffffff; /* Warna teks utama */
-        padding: 1.5rem;
-        border-radius: 0.75rem;
-        box-shadow: 0 0 30px rgba(255, 255, 0, 0.6), /* Cahaya kuning cerah */
-                    0 0 60px rgba(0, 255, 255, 0.4); /* Cahaya tosca/cyan untuk kontras */
-        
-        z-index: 1000; /* Pastikan di atas elemen lain */
-        animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
+    position: fixed;
+    top: 50%; /* Pindah ke tengah vertikal */
+    left: 50%; /* Pindah ke tengah horizontal */
+    transform: translate(-50%, -50%); /* Geser kembali sebesar setengah lebar dan tinggi elemen */
+    
+    width: 60vw; /* Lebar 60% dari viewport width */
+    max-width: 500px; /* Batasan lebar maksimum agar tidak terlalu besar di desktop */
+    
+    background-color: #3f3f46;
+    color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1000; /* Pastikan di atas elemen lain */
+    animation: fadeInScaleUp 0.5s ease-out forwards; /* Animasi masuk */
+}
 
-        /* Efek cahaya samping (border-image atau radial-gradient) - opsional */
-        border: 2px solid transparent; /* Border transparan untuk menampung border-image */
-        border-image: linear-gradient(to right, rgba(255, 215, 0, 0.8), transparent, rgba(0, 255, 255, 0.8)) 1; /* Efek cahaya dari kiri-kanan */
-        /* Atau bisa juga dengan pseudo-element untuk efek yang lebih kompleks */
-    }
+/* Menggunakan kembali keyframes fadeInScaleUp dari popup-animate-in jika sudah didefinisikan */
+/* Kalau belum, kamu bisa copy definisi @keyframes fadeInScaleUp dari blok popup-animate-in yang lama */
 
-    /* Gaya untuk tombol di dalam pop-up (diseragamkan) */
-    .sad-hour-reminder-popup button {
-        margin: 0.25rem;
-        padding: 0.5rem 0.75rem; /* Ukuran padding yang seragam */
-        font-size: 0.75rem; /* Ukuran font yang lebih kecil untuk tombol */
-        font-weight: bold;
-        border-radius: 0.5rem; /* Sudut membulat */
-        transition: all 0.2s ease-in-out;
-        color: #FFFFFF !important; /* Teks putih untuk semua tombol */
-        text-shadow: none !important; /* Hapus bayangan teks yang mungkin mengganggu */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Bayangan umum untuk semua tombol */
-        border: none; /* Hapus border default */
+/* Contoh: */
+/*
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9); 
     }
-
-    /* Warna spesifik untuk tombol SadHourReminder */
-    .sad-hour-reminder-popup button.bg-blue-600 { /* Ruang Pelepasan */
-        background-color: #3B82F6 !important; /* Tailwind blue-500 */
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
-    .sad-hour-reminder-popup button.bg-purple-600 { /* Ruang Afirmasi */
-        background-color: #9333EA !important; /* Tailwind purple-500 */
-        box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-yellow-600 { /* Doa LoA Codex */
-        background-color: #EAB308 !important; /* Tailwind yellow-500 */
-        color: #333 !important; /* Teks gelap agar kontras dengan kuning */
-        text-shadow: none !important;
-        box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-teal-600 { /* Ruang Rahasia */
-        background-color: #14B8A6 !important; /* Tailwind teal-500 */
-        box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-green-600 { /* Doa Pilihan */
-        background-color: #22C55E !important; /* Tailwind green-500 */
-        box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-red-400 { /* Daftar List Goal */
-        background-color: #F87171 !important; /* Tailwind red-400 */
-        box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-gray-600 { /* Tutup Pop-up */
-        background-color: #4B5563 !important; /* Tailwind gray-600 */
-        box-shadow: 0 0 10px rgba(75, 85, 99, 0.5);
-    }
-
-    /* Efek hover untuk semua tombol di pop-up */
-    .sad-hour-reminder-popup button:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    }
-
-    /* Efek cahaya samping untuk pop-up */
-    .sad-hour-reminder-popup::before,
-    .sad-hour-reminder-popup::after {
-        content: '';
-        position: absolute;
-        top: -10px; /* Sedikit di luar */
-        bottom: -10px; /* Sedikit di luar */
-        width: 20px; /* Lebar efek cahaya */
-        background: linear-gradient(to bottom, #FFD700, transparent, #00FFFF); /* Cahaya gold ke tosca */
-        z-index: -1; /* Di belakang pop-up */
-        filter: blur(15px); /* Efek blur untuk cahaya */
-        opacity: 0.7;
-    }
-
-    .sad-hour-reminder-popup::before {
-        left: -10px; /* Cahaya di sisi kiri */
-        transform: skewY(5deg); /* Sedikit miring */
-    }
-
-    .sad-hour-reminder-popup::after {
-        right: -10px; /* Cahaya di sisi kanan */
-        transform: skewY(-5deg); /* Sedikit miring ke arah berlawanan */
-    }
+}
 `;
 document.head.appendChild(style);
