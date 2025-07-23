@@ -191,37 +191,37 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
                 onClick={() => onNavigateToRoom('pixel-thoughts')}
                 className="golden-reminder-button"
             >
-                Ruang Pelepasan ✨
+                Ruang Pelepasan
             </button>
             <button
                 onClick={() => onNavigateToRoom('affirmation-room')}
                 className="golden-reminder-button"
             >
-                Ruang Afirmasi 🌟
+                Ruang Afirmasi
             </button>
             <button
                 onClick={() => onNavigateToRoom('doa-loa-codex')}
                 className="golden-reminder-button"
             >
-                Doa LoA Codex 📜
+                Doa LoA Codex
             </button>
             <button
                 onClick={() => onNavigateToRoom('secret-room-rezeki')}
                 className="golden-reminder-button"
             >
-                Ruang Rahasia 🗝️
+                Ruang Rahasia
             </button>
             <button
                 onClick={() => onNavigateToRoom('doapilihan')}
                 className="golden-reminder-button"
             >
-                Doa Pilihan 🙏
+                Doa Pilihan
             </button>
             <button
                 onClick={() => onNavigateToRoom('reminder-settings')}
                 className="golden-reminder-button"
             >
-                Daftar List Goal 🔔
+                Daftar List Goal
             </button>
                 <button
                     onClick={() => onNavigateToRoom('daftar-isi')}
@@ -4878,33 +4878,37 @@ style.innerHTML = `
         border-image: linear-gradient(to right, rgba(255, 215, 0, 0.8), transparent, rgba(0, 255, 255, 0.8)) 1; /* Efek cahaya dari kiri-kanan */
         /* Atau bisa juga dengan pseudo-element untuk efek yang lebih kompleks */
     }
-/* === BARU: Gaya seragam untuk semua tombol pengingat === */
 .golden-reminder-button {
-    display: inline-flex; /* Agar ikon dan teks tetap satu baris */
-    align-items: center;
-    justify-content: center;
-    margin: 0.25rem; /* Jarak antar tombol */
-    padding: 0.75rem 1rem; /* Ukuran padding yang seragam, sedikit lebih besar untuk kenyamanan klik */
-    font-size: 0.85rem; /* Ukuran font yang seragam */
-    font-weight: bold;
-    border-radius: 0.5rem; /* Sudut membulat */
-    transition: all 0.2s ease-in-out;
-    color: #4B3B00 !important; /* Teks gelap agar kontras dengan emas */
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3); /* Sedikit bayangan teks agar lebih terbaca */
-    border: 1px solid #DAA520; /* Border tipis warna emas */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Bayangan umum */
+        display: flex; /* Gunakan flexbox untuk centering konten */
+        align-items: center; /* Pusatkan vertikal */
+        justify-content: center; /* Pusatkan horizontal */
+        
+        /* === PERUBAHAN DI SINI: Ukuran seragam === */
+        min-width: 140px; /* Lebar minimum untuk tombol, sesuaikan angka ini */
+        /* Alternatif: width: 150px; jika ingin lebar tetap dan tidak peduli teks terlalu panjang */
 
-    /* WARNA EMAS (GOLDEN) */
-    background: linear-gradient(to right, #FFD700, #DAA520, #FFD700) !important; 
-    background-size: 200% auto; /* Untuk efek hover yang halus */
-}
+        margin: 0.25rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        font-weight: bold;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease-in-out;
+        color: #4B3B00 !important;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+        border: 1px solid #DAA520;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        
+        background: linear-gradient(to right, #FFD700, #DAA520, #FFD700) !important; 
+        background-size: 200% auto;
+        white-space: nowrap; /* Mencegah teks melipat baris */
+    }
 
-.golden-reminder-button:hover {
-    background-position: right center !important; /* Geser gradient saat hover */
-    opacity: 0.95;
-    transform: translateY(-2px) scale(1.02); /* Sedikit naik dan membesar */
-    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.6); /* Efek bayangan glow saat hover */
-}
+    .golden-reminder-button:hover {
+        background-position: right center !important;
+        opacity: 0.95;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 4px 10px rgba(255, 215, 0, 0.6);
+    }
     /* Gaya untuk tombol di dalam pop-up (diseragamkan) */
     .sad-hour-reminder-popup button {
         margin: 0.25rem;
