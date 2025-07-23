@@ -168,60 +168,61 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
     const finalMessage = `Hai ${displayedUserName}, ${messageToDisplay}`;
 
     return (
-        <div className="sad-hour-reminder-popup animate-slide-up"> 
-            <p className="mb-3 text-lg font-semibold text-yellow-300">SHORTCUT</p>
-            <p className="mb-4 text-gray-200 leading-snug text-sm">
-                {finalMessage}
-            </p>
-            {customGoals && customGoals.length > 0 && (
-                // === PERBAIKAN STYLING: Tambahkan border dan padding untuk memisahkan List Goal ===
-                <div className="mt-4 pt-3 pb-3 px-3 border border-gray-600 rounded-lg bg-gray-700/50"> 
-                    <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
-                    <ul className="text-xs text-gray-300 list-disc list-inside max-h-20 overflow-y-auto text-left"> {/* Tambahkan text-left */}
-                        {customGoals.map((goal, index) => (
-                            <li key={index} className="py-0.5">{goal}</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
-                <button
-                    onClick={() => onNavigateToRoom('pixel-thoughts')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
-                >
-                    Ruang Pelepasan ✨
-                </button>
-                <button
-                    onClick={() => onNavigateToRoom('affirmation-room')}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
-                >
-                    Ruang Afirmasi 🌟
-                </button>
-                <button
-                    onClick={() => onNavigateToRoom('doa-loa-codex')}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-black px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
-                >
-                    Doa LoA Codex 📜
-                </button>
-                <button
-                    onClick={() => onNavigateToRoom('secret-room-rezeki')}
-                    className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
-                >
-                    Ruang Rahasia 🗝️
-                </button>
-                <button
-                    onClick={() => onNavigateToRoom('doapilihan')}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
-                >
-                    Doa Pilihan 🙏
-                </button>
-                <button
-                    onClick={() => onNavigateToRoom('reminder-settings')}
-                    className="bg-red-400 hover:bg-red-500 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap"
-                >
-                    Daftar List Goal 🔔
-                </button>
+    <div className="sad-hour-reminder-popup animate-slide-up"> 
+        <p className="mb-3 text-lg font-semibold text-yellow-300">💡 Pengingat Hati</p>
+        <p className="mb-4 text-gray-200 leading-snug text-sm">
+            {finalMessage}
+        </p>
+
+        {customGoals && customGoals.length > 0 && (
+            <div className="mt-4 pt-3 pb-3 px-3 border border-gray-600 rounded-lg bg-gray-700/50"> 
+                <p className="text-sm font-semibold text-sky-300 mb-2">🚀 Goals Anda:</p>
+                <ul className="text-xs text-gray-300 list-disc list-inside max-h-20 overflow-y-auto text-left">
+                    {customGoals.map((goal, index) => (
+                        <li key={index} className="py-0.5">{goal}</li>
+                    ))}
+                </ul>
+            </div>
+        )}
+
+        <div className="flex flex-wrap justify-center gap-3 mt-4">
+            {/* === PERUBAHAN DI SINI: Semua tombol menggunakan kelas "golden-reminder-button" === */}
+            <button
+                onClick={() => onNavigateToRoom('pixel-thoughts')}
+                className="golden-reminder-button"
+            >
+                Ruang Pelepasan ✨
+            </button>
+            <button
+                onClick={() => onNavigateToRoom('affirmation-room')}
+                className="golden-reminder-button"
+            >
+                Ruang Afirmasi 🌟
+            </button>
+            <button
+                onClick={() => onNavigateToRoom('doa-loa-codex')}
+                className="golden-reminder-button"
+            >
+                Doa LoA Codex 📜
+            </button>
+            <button
+                onClick={() => onNavigateToRoom('secret-room-rezeki')}
+                className="golden-reminder-button"
+            >
+                Ruang Rahasia 🗝️
+            </button>
+            <button
+                onClick={() => onNavigateToRoom('doapilihan')}
+                className="golden-reminder-button"
+            >
+                Doa Pilihan 🙏
+            </button>
+            <button
+                onClick={() => onNavigateToRoom('reminder-settings')}
+                className="golden-reminder-button"
+            >
+                Daftar List Goal 🔔
+            </button>
                 <button
                     onClick={() => onNavigateToRoom('daftar-isi')}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
@@ -4877,7 +4878,33 @@ style.innerHTML = `
         border-image: linear-gradient(to right, rgba(255, 215, 0, 0.8), transparent, rgba(0, 255, 255, 0.8)) 1; /* Efek cahaya dari kiri-kanan */
         /* Atau bisa juga dengan pseudo-element untuk efek yang lebih kompleks */
     }
+/* === BARU: Gaya seragam untuk semua tombol pengingat === */
+.golden-reminder-button {
+    display: inline-flex; /* Agar ikon dan teks tetap satu baris */
+    align-items: center;
+    justify-content: center;
+    margin: 0.25rem; /* Jarak antar tombol */
+    padding: 0.75rem 1rem; /* Ukuran padding yang seragam, sedikit lebih besar untuk kenyamanan klik */
+    font-size: 0.85rem; /* Ukuran font yang seragam */
+    font-weight: bold;
+    border-radius: 0.5rem; /* Sudut membulat */
+    transition: all 0.2s ease-in-out;
+    color: #4B3B00 !important; /* Teks gelap agar kontras dengan emas */
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3); /* Sedikit bayangan teks agar lebih terbaca */
+    border: 1px solid #DAA520; /* Border tipis warna emas */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Bayangan umum */
 
+    /* WARNA EMAS (GOLDEN) */
+    background: linear-gradient(to right, #FFD700, #DAA520, #FFD700) !important; 
+    background-size: 200% auto; /* Untuk efek hover yang halus */
+}
+
+.golden-reminder-button:hover {
+    background-position: right center !important; /* Geser gradient saat hover */
+    opacity: 0.95;
+    transform: translateY(-2px) scale(1.02); /* Sedikit naik dan membesar */
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.6); /* Efek bayangan glow saat hover */
+}
     /* Gaya untuk tombol di dalam pop-up (diseragamkan) */
     .sad-hour-reminder-popup button {
         margin: 0.25rem;
@@ -4890,34 +4917,6 @@ style.innerHTML = `
         text-shadow: none !important; /* Hapus bayangan teks yang mungkin mengganggu */
         box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Bayangan umum untuk semua tombol */
         border: none; /* Hapus border default */
-    }
-
-    /* Warna spesifik untuk tombol SadHourReminder */
-    .sad-hour-reminder-popup button.bg-blue-600 { /* Ruang Pelepasan */
-        background-color: #3B82F6 !important; /* Tailwind blue-500 */
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-purple-600 { /* Ruang Afirmasi */
-        background-color: #9333EA !important; /* Tailwind purple-500 */
-        box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-yellow-600 { /* Doa LoA Codex */
-        background-color: #EAB308 !important; /* Tailwind yellow-500 */
-        color: #333 !important; /* Teks gelap agar kontras dengan kuning */
-        text-shadow: none !important;
-        box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-teal-600 { /* Ruang Rahasia */
-        background-color: #14B8A6 !important; /* Tailwind teal-500 */
-        box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-green-600 { /* Doa Pilihan */
-        background-color: #22C55E !important; /* Tailwind green-500 */
-        box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-    }
-    .sad-hour-reminder-popup button.bg-red-400 { /* Daftar List Goal */
-        background-color: #F87171 !important; /* Tailwind red-400 */
-        box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
     }
     .sad-hour-reminder-popup button.bg-gray-600 { /* Tutup Pop-up */
         background-color: #4B5563 !important; /* Tailwind gray-600 */
