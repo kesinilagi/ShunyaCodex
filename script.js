@@ -4250,11 +4250,7 @@ const App = () => {
                 // Jangan set currentPageKey di sini agar SadHourReminder muncul di atas layar kosong/latar belakang.
                 // Navigasi akan terjadi setelah SadHourReminder ditutup.
             }
-            // 3. Jika sudah diaktivasi DAN SadHourReminder sudah tampil di sesi ini
-            else {
-                setCurrentPageKey('kata-pengantar');
-                console.log("[App Effect] Navigating directly to Kata Pengantar.");
-            }
+           
         }
     }, [isCoverUnlocked, isActivated, hasSadHourReminderBeenShownThisSession, initialNavigationDone, setCurrentPageKey]); // Tambahkan semua dependensi
 
@@ -4317,14 +4313,7 @@ const App = () => {
                     )
                 )
             }
-            {/* Konten utama App (dirender di bawah SadHourReminder jika aktif) */}
-            {isCoverUnlocked && ( // Render konten ini HANYA JIKA cover sudah terbuka
-                !isActivated ? <ActivationScreen />
-                    : currentPageKey === 'pixel-thoughts' ? <PixelThoughts />
-                        : currentPageKey === 'affirmation-room' ? <AffirmationRoom />
-                            : currentPageKey === 'secret-room-rezeki' ? <SecretRoomRezeki />
-                                : <MainLayout />
-            )}
+            
         </AppContext.Provider>
     );
 };
