@@ -201,7 +201,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
 
     return (
     <div className="sad-hour-reminder-popup animate-slide-up"> 
-        <p className="mb-3 text-lg font-semibold text-yellow-300">💡 Pengingat Hati</p>
+        <p className="mb-3 text-lg font-semibold text-yellow-300">SHORCUT</p>
         <p className="mb-4 text-gray-200 leading-snug text-sm">
             {finalMessage}
         </p>
@@ -259,7 +259,7 @@ const SadHourReminder = ({ onClose, onNavigateToRoom, userName, customGoals }) =
                     onClick={() => onNavigateToRoom('daftar-isi')}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
                 >
-                    Tutup Pop-up
+                    Daftar Isi
                 </button>
             </div>
         </div>
