@@ -2008,6 +2008,56 @@ const PixelThoughts = () => {
         </div>
     );
 };
+// QUOTE
+const RandomQuote = () => {
+    const quotes = ["Ketenangan sejati bukan berarti tanpa badai, tapi menari di tengah badai.", "Hati yang bersyukur adalah magnet bagi keajaiban.", "Lepaskan apa yang tidak bisa kau kendalikan, dan fokus pada apa yang bisa.","Saat aku melepaskan siapa diriku, aku menjadi siapa yang seharusnya kutumbuhkan - Lao TSe","Apa pun yang kamu lawan, akan menguat. Dan apa yang kamu tolak, akan menetap - Eckhart Tolle","Jangan lawan perubahan yang datang. Biarkan hidup mengalir melalui dirimu - Jalaludin Rumi","Ingatlah, hanya dengan mengingat Allah, hati menjadi tenang","Dunia ini hanyalah bayangan. Jika kau kejar, ia akan lari.Tapi jika kau berpaling darinya, ia akan mengikutimu"];
+    const [quote, setQuote] = useState(quotes[Math.floor(Math.random() * quotes.length)]);
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+        }, 10000);
+        return () => clearInterval(intervalId);
+    }, []);
+    return (<div className="text-sm italic text-white/70 mt-2 text-center w-full transition-opacity duration-1000">"{quote}"</div>);
+};
+
+// --- KOMPONEN HALAMAN & KONTEN ---
+
+const LoginScreen = () => {
+    const { setUserName } = useContext(AppContext);
+    const [name, setName] = useState('');
+
+    const handleLogin = () => {
+        if (name.trim()) {
+            const trimmedName = name.trim();
+            localStorage.setItem('ebookUserName', trimmedName);
+            setUserName(trimmedName);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4">
+            <Starfield />
+            <div className="z-10 text-center animate-fade-in">
+                 <h1 className="text-4xl md:text-6xl font-bold mb-4">Selamat Datang</h1>
+                <p className="text-xl md:text-2xl mb-8 text-gray-300">Silakan masukkan nama Anda untuk memulai.</p>
+                <div className="flex">
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                        className="bg-gray-800 border border-gray-700 rounded-l-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Nama Anda..."
+                    />
+                    <button onClick={handleLogin} className="bg-indigo-600 text-white px-6 py-3 rounded-r-lg hover:bg-indigo-700 font-bold transition-colors">
+                        Masuk
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 // --- KOMPONEN BARU: PENGATURAN PESAN REMINDER KUSTOM ---
 // --- KOMPONEN BARU: PENGATURAN PESAN REMINDER KUSTOM ---
