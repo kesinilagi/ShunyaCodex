@@ -1912,7 +1912,7 @@ const PixelThoughts = () => {
                 audio.currentTime = 0;
                 setTimeout(() => {
                     setView('finished');
-                }, 15000);
+                }, 9000);
             }
         }, 5000); 
     };
@@ -4548,11 +4548,11 @@ style.innerHTML = `
 }
 
 .thought-ball-wrapper.meditation-recede {
-    animation: meditationScaleOut 1s forwards; /* Terapkan animasi skala keluar */
+    animation: meditationScaleOut 15s forwards; /* Terapkan animasi skala keluar */
 }
 
 .thought-ball-wrapper.meditation-vanish {
-    animation: meditationVanishOut 15s forwards; /* === PERUBAHAN: Durasi menjadi 15 detik === */
+    animation: meditationVanishOut 9s forwards; /* === PERUBAHAN: Durasi menjadi 15 detik === */
     /* Kamu bisa coba 20s, 25s, atau 30s juga jika ingin lebih lambat.
        Pastikan durasi di JavaScript (setTimeout) SAMA dengan durasi ini. */
 }
