@@ -3895,7 +3895,7 @@ const WordRainBackground = ({ customWords = [], rainColor }) => { // Terima cust
 
         const generateWords = () => {
             const newWords = Array.from({ length: 120 }).map(() => ({
-                text: wordPool[Math.floor(Math.random() * wordPool.length)],
+                text: currentWordPool[Math.floor(Math.random() * currentWordPool.length)], // Gunakan currentWordPool
                 left: `${Math.random() * 100}%`,
                 fontSize: `${Math.random() * 12 + 10 + 3}px`, 
                 animationDuration: `${Math.random() * 2 + 1 + 3}s`,
