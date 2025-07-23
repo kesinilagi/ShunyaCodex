@@ -1403,52 +1403,41 @@ const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBack
 };
 
 // --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
+// --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
 const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
-    // State untuk mengelola fase saat ini
     const [currentPhase, setCurrentPhase] = useState('time_check'); 
     
-    // State untuk mengelola audio utama setiap fase
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
-    const audioGratitudeRef = useRef(null); // <--- KOREKSI INI: CUKUP useRef(null)
+    const audioGratitudeRef = useRef(null);
 
-    // State untuk melacak apakah audio di fase saat ini sedang bermain
     const [isCurrentAudioPlaying, setIsCurrentAudioPlaying] = useState(false);
 
-    // State untuk audio latar (background ambient sound)
     const backgroundAudioRef = useRef(null);
-    const [selectedBackgroundSound, setSelectedBackgroundSound] = useState(''); // URL audio latar
+    const [selectedBackgroundSound, setSelectedBackgroundSound] = useState('');
     const [isBackgroundPlaying, setIsBackgroundPlaying] = useState(false);
-    const [isCandleLit, setIsCandleLit] = useState(false); // State baru untuk lilin menyala
+    const [isCandleLit, setIsCandleLit] = useState(false);
 
-    // States for Password & Time Check
-    // passwordInput, passwordError, CORRECT_PASSWORD dihapus
     const [timeError, setTimeError] = useState('');
 
-    // Allowed time: 12 AM (0) to 4 AM (4). Note: JavaScript uses 0-23 for hours.
     const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
-    const ALLOW_END_HOUR = 4;   // 04:00 (4 AM) -- Mengembalikan ke jam 4 pagi sesuai instruksi awal
+    const ALLOW_END_HOUR = 4;   // 04:00 (4 AM)
 
-    // Data audio latar
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
-    { name: 'Angel Abundance', src: 'musik/AngelAmbient.mp3' },
-    { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
-    { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
-    { name: 'Hening (Mati)', src: '' }
+        { name: 'Angel Abundance', src: 'musik/AngelAmbient.mp3' },
+        { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
+        { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
+        { name: 'Hening (Mati)', src: '' }
     ];
 
-    // Audio sources untuk setiap fase utama
     const phaseAudios = {
         release: 'musik/Clearing.mp3',
-    manifestation: 'musik/Afirmasi.mp3',
-    gratitude: 'musik/Gratitude.mp3',
+        manifestation: 'musik/Afirmasi.mp3',
+        gratitude: 'musik/Gratitude.mp3',
     };
 
-    // --- FUNGSI-FUNGSI PEMBANTU ---
-
-    // Fungsi untuk menghentikan semua audio utama
     const stopAllPhaseAudios = () => {
         [audioReleaseRef, audioManifestationRef, audioGratitudeRef].forEach(ref => {
             if (ref.current) {
@@ -1459,7 +1448,6 @@ const SecretRoomRezeki = () => {
         setIsCurrentAudioPlaying(false);
     };
 
-    // Fungsi untuk memulai audio fase tertentu (atau memutar ulang)
     const startOrRestartPhaseAudio = (phaseName) => {
         stopAllPhaseAudios();
         
@@ -1482,7 +1470,6 @@ const SecretRoomRezeki = () => {
         }
     };
 
-    // Fungsi untuk transisi ke fase berikutnya
     const goToNextPhase = (nextPhase) => {
         stopAllPhaseAudios();
         setCurrentPhase(nextPhase);
@@ -1491,10 +1478,9 @@ const SecretRoomRezeki = () => {
         }
     };
 
-    // Fungsi untuk memeriksa waktu akses
+    // === PERUBAHAN FUNGSI: handleTimeCheck sekarang akan langsung navigasi jika waktu valid ===
     const handleTimeCheck = () => {
         const currentHour = new Date().getHours(); 
-
         const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
 
         setTimeError(''); // Reset error messages
@@ -1503,19 +1489,21 @@ const SecretRoomRezeki = () => {
             const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
             const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
             setTimeError(`Ruangan ini hanya bisa diakses antara pukul ${formattedStartTime}:00 hingga ${formattedEndTime}:00 WIB.`);
-            return false; // Mengembalikan false jika waktu tidak valid
+            return false;
+        } else {
+            // === BARU: Navigasi ke 'intro' jika waktu valid dan tombol diklik ===
+            setCurrentPhase('intro'); 
+            return true;
         }
-        return true; // Mengembalikan true jika waktu valid
     };
 
     // Auto-check waktu saat komponen dimuat
     useEffect(() => {
-        if (!handleTimeCheck()) {
-            // Jika waktu tidak valid saat dimuat, maka tetap di time_check
-            // Pesan error sudah dihandle oleh handleTimeCheck
-        } else {
-            setCurrentPhase('intro'); // Jika waktu valid, langsung ke intro
-        }
+        // Panggil handleTimeCheck saat komponen dimuat.
+        // Jika handleTimeCheck() mengembalikan false, maka tombol akan tetap disabled.
+        // Jika handleTimeCheck() mengembalikan true, tombol akan enabled,
+        // DAN handleTimeCheck() juga akan secara langsung mengubah currentPhase ke 'intro'.
+        handleTimeCheck(); 
     }, []); // Hanya berjalan sekali saat komponen dimount
     
     // --- AKHIR FUNGSI-FUNGSI PEMBANTU ---
@@ -1542,7 +1530,6 @@ const SecretRoomRezeki = () => {
     }, [selectedBackgroundSound]);
 
     // Efek untuk memantau status audio dari REF saat ini dan mengatur isCurrentAudioPlaying
-    // Serta memicu tampilan tombol "Lanjut" saat audio selesai
     useEffect(() => {
         const refs = {
             'release': audioReleaseRef,
@@ -1575,9 +1562,9 @@ const SecretRoomRezeki = () => {
 
     const resetSession = () => {
         stopAllPhaseAudios();
-        setCurrentPhase('time_check'); // Kembali ke time_check (atau intro jika tanpa time check)
+        setCurrentPhase('time_check');
         setIsCandleLit(false);
-        setTimeError(''); // Reset error waktu
+        setTimeError('');
         if (backgroundAudioRef.current) {
             backgroundAudioRef.current.pause();
             backgroundAudioRef.current.currentTime = 0;
@@ -1588,7 +1575,7 @@ const SecretRoomRezeki = () => {
 
     const getPhaseTitle = () => {
         switch (currentPhase) {
-            case 'time_check': return "Akses Ruang Rahasia"; // Judul untuk pengecekan waktu
+            case 'time_check': return "Akses Ruang Rahasia";
             case 'intro': return "Sambutan Malam Kelimpahan";
             case 'idle': return "Pilih Suasana Sesi Anda";
             case 'release': return "Fase 1: Pelepasan Beban";
@@ -1600,7 +1587,6 @@ const SecretRoomRezeki = () => {
     };
 
     const renderPhaseContent = () => {
-        // New: Time Check Phase (menggantikan password_check)
         if (currentPhase === 'time_check') {
             const now = new Date();
             const currentHour = now.getHours();
@@ -1629,8 +1615,9 @@ const SecretRoomRezeki = () => {
                     {timeError && <p className="text-red-500 mt-2">{timeError}</p>}
                     
                     <button
-                        onClick={() => { handleTimeCheck(); }} 
-                        disabled={isTimeValid} 
+                        onClick={handleTimeCheck} // Panggil fungsi yang sudah diubah
+                        // === PERBAHAN PENTING: Tombol hanya DISABLED jika waktu TIDAK valid ===
+                        disabled={!isTimeValid} 
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
                         {isTimeValid ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
@@ -1670,7 +1657,6 @@ const SecretRoomRezeki = () => {
                         {isCandleLit && <div className="flame animate-flicker"></div>}
                     </div>
                     <p className="mb-4 text-gray-300">Lilin sudah menyala. Sekarang, pilih suasana sesi Anda:</p>
-                    {/* Menggunakan komponen AmbientSoundAccordion */}
                     <div className="w-full max-w-sm space-y-3">
                         {ambientSounds.map(sound => (
                             <AmbientSoundAccordion
