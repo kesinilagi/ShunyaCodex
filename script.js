@@ -3885,7 +3885,7 @@ const MainLayout = () => {
 
 //hujankata
 // ### TAMBAHKAN KEMBALI KOMPONEN ASLI INI ###
-const WordRainBackground = () => {
+const WordRainBackground = ({ customWords = [], rainColor }) => { // Terima customWords sebagai prop
     const [words, setWords] = React.useState([]);
 
     React.useEffect(() => {
