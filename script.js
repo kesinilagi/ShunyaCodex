@@ -1894,6 +1894,7 @@ const PixelThoughts = () => {
 
         // Inisialisasi dan jalankan animasi bola dan pesan meditasi
         setBallAnimationClass('meditation-recede'); // Bola mulai menyusut
+        await sleep(1000);
         messageIndexRef.current = 0;
         setMessage(messages[messageIndexRef.current]);
 
@@ -1911,7 +1912,7 @@ const PixelThoughts = () => {
                 audio.currentTime = 0;
                 setTimeout(() => {
                     setView('finished');
-                }, 1000);
+                }, 15000);
             }
         }, 5000); 
     };
@@ -4543,7 +4544,7 @@ style.innerHTML = `
 
 @keyframes meditationVanishOut {
     from { transform: translate(-50%, -50%) scale(0.02); opacity: 0.8; }
-    to { transform: translate(-50%, -50%) scale(0.01) translateY(-3500vh); opacity: 0; } /* Animasi menghilang total dengan geser ke atas */
+    to { transform: translate(-50%, -50%) scale(0.01) translateY(-3500vh); opacity: 0; }
 }
 
 .thought-ball-wrapper.meditation-recede {
@@ -4551,7 +4552,9 @@ style.innerHTML = `
 }
 
 .thought-ball-wrapper.meditation-vanish {
-    animation: meditationVanishOut 9s forwards; /* Terapkan animasi menghilang total */
+    animation: meditationVanishOut 15s forwards; /* === PERUBAHAN: Durasi menjadi 15 detik === */
+    /* Kamu bisa coba 20s, 25s, atau 30s juga jika ingin lebih lambat.
+       Pastikan durasi di JavaScript (setTimeout) SAMA dengan durasi ini. */
 }
 
 /* === BARU: Gaya untuk KONTEN (textarea atau span) di dalam bola === */
