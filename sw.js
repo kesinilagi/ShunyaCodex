@@ -1,5 +1,5 @@
 // sw.js (di folder ROOT aplikasi Anda)
-const CACHE_NAME = 'loa-codex-cache-v1'; // Ubah versi cache jika ada perubahan aset
+const CACHE_NAME = 'loa-codex-cache-v2'; // Ubah versi cache jika ada perubahan aset
 const urlsToCache = [
   '/', // Root URL aplikasi Anda
   '/index.html',
