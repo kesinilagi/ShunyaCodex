@@ -1,8 +1,8 @@
 
 {
-  "name": "LOA Codex - Law Of Allah Framework",
-  "short_name": "LOA Codex",
-  "description": "E-book Interaktif LOA Codex: Law Of Allah Framework untuk ketenangan hati dan kelimpahan rezeki.",
+  "name": "The Path ash Siratal Mustaqim",
+  "short_name": "The Path",
+  "description": "Panduan Digital The Path untuk ketenangan hati dan kelimpahan rezeki.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#111827",
