@@ -1489,7 +1489,7 @@ const SecretRoomRezeki = () => {
         stopAllPhaseAudios();
         setCurrentPhase(nextPhase);
         // Kita tidak langsung putar audio di sini karena 'topic_selection' tidak punya audio otomatis
-        if (nextPhase === 'release' || nextPhase === 'gratitude') { // Audio manifestasi diputar setelah topik dipilih
+        if (nextPhase === 'release' || nextPhase === 'manifestation') { // Audio manifestasi diputar setelah topik dipilih
             startOrRestartPhaseAudio(nextPhase);
         }
     };
