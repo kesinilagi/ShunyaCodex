@@ -1407,7 +1407,7 @@ const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     const [currentPhase, setCurrentPhase] = useState('time_check');
     const [selectedTopic, setSelectedTopic] = useState(''); // NEW STATE for selected topic
-
+const [isAdminReviewMode, setIsAdminReviewMode] = useState(false);
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
     const audioGratitudeRef = useRef(null);
@@ -1421,8 +1421,8 @@ const SecretRoomRezeki = () => {
 
     const [timeError, setTimeError] = useState('');
 
-    const ALLOW_START_HOUR = 22; 
-    const ALLOW_END_HOUR = 0;   
+    const ALLOW_START_HOUR = 0; 
+    const ALLOW_END_HOUR = 4;   
 
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
@@ -1496,6 +1496,13 @@ const SecretRoomRezeki = () => {
     };
 
     const handleTimeCheck = () => {
+        // --- PERUBAHAN BARU: Mode Admin Review ---
+        if (isAdminReviewMode) {
+            setTimeError(''); // Pastikan tidak ada pesan error waktu
+            setCurrentPhase('intro'); // Langsung pindah ke intro
+            return true; // Waktu selalu valid dalam mode admin
+        }
+        // --- AKHIR PERUBAHAN BARU ---
         const currentHour = new Date().getHours();
         const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
 
@@ -1652,8 +1659,31 @@ useEffect(() => {
 
             const formattedCurrentTime =
                 `${currentHour < 10 ? '0' : ''}${currentHour}:${currentMinute < 10 ? '0' : ''}${currentMinute}`;
+            let isTimeValidForDisplay = false; // Gunakan nama berbeda agar tidak bentrok dengan logika utama
 
-            const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
+            // --- PERUBAHAN BARU: Mode Admin Review untuk Tampilan ---
+            if (isAdminReviewMode) {
+                isTimeValidForDisplay = true; // Selalu valid untuk tampilan di mode admin
+            } else {
+                // ... (logika validasi yang sudah ada untuk rentang waktu normal dan lintas tengah malam)
+                if (ALLOW_START_HOUR < ALLOW_END_HOUR || (ALLOW_START_HOUR === ALLOW_END_HOUR && ALLOW_START_MINUTE < ALLOW_END_MINUTE)) {
+                    if (currentHour > ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR) {
+                        isTimeValidForDisplay = true;
+                    } else if (currentHour === ALLOW_START_HOUR) {
+                        isTimeValidForDisplay = currentMinute >= ALLOW_START_MINUTE;
+                    } else if (currentHour === ALLOW_END_HOUR) {
+                        isTimeValidForDisplay = currentMinute < ALLOW_END_MINUTE;
+                    }
+                } else {
+                    const isAfterStartTime = (currentHour > ALLOW_START_HOUR) ||
+                                             (currentHour === ALLOW_START_HOUR && currentMinute >= ALLOW_START_MINUTE);
+                    const isBeforeEndTime = (currentHour < ALLOW_END_HOUR) ||
+                                            (currentHour === ALLOW_END_HOUR && currentMinute < ALLOW_END_MINUTE);
+                    isTimeValidForDisplay = isAfterStartTime || isBeforeEndTime;
+                }
+            }
+            // --- AKHIR PERUBAHAN BARU ---
+            //const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
             const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
             const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
             const displayTimeRange = `${formattedStartTime}:00 - ${formattedEndTime}:00`;
@@ -1663,6 +1693,9 @@ useEffect(() => {
                     <p className="mb-4 text-gray-300 text-lg text-center">
                         Ruang Rahasia ini hanya bisa diakses pada waktu tertentu.
                     </p>
+                {isAdminReviewMode && (
+                        <p className="mb-4 text-yellow-500 font-bold">MODE ADMIN: Pemeriksaan Waktu Diabaikan.</p>
+                    )}
                     <p className="text-xl md:text-2xl font-bold text-yellow-300 mb-2">
                         Saat ini Pukul: {formattedCurrentTime} WIB
                     </p>
@@ -1677,9 +1710,9 @@ useEffect(() => {
                         disabled={!isTimeValid}
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
-                        {isTimeValid ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
+                        {isTimeValidForDisplay ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
                     </button>
-                    {!isTimeValid && <p className="text-gray-400 mt-4">Mohon tunggu hingga waktu akses yang ditentukan.</p>}
+                    {!isTimeValidForDisplay && !isAdminReviewMode && <p className="text-gray-400 mt-4">Mohon tunggu hingga waktu akses yang ditentukan.</p>}
                 </div>
             );
         }
@@ -4316,7 +4349,12 @@ const App = () => {
     // === BARU: Flag untuk melacak apakah navigasi awal sudah terjadi ===
     const [initialNavigationDone, setInitialNavigationDone] = useState(false);
 
-
+// Gunakan useEffect untuk membaca parameter URL saat komponen dimuat
+useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reviewMode = urlParams.get('adminReview') === 'true'; // Cek jika ada ?adminReview=true di URL
+    setIsAdminReviewMode(reviewMode);
+}, []);
     // --- Efek untuk memuat opacity tersimpan ---
     useEffect(() => {
         const savedOpacity = localStorage.getItem('ebookBgOpacity');
