@@ -1408,6 +1408,12 @@ const SecretRoomRezeki = () => {
     const [currentPhase, setCurrentPhase] = useState('time_check');
     const [selectedTopic, setSelectedTopic] = useState(''); // NEW STATE for selected topic
 const [isAdminReviewMode, setIsAdminReviewMode] = useState(false);
+    // Gunakan useEffect untuk membaca parameter URL saat komponen dimuat
+useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reviewMode = urlParams.get('adminReview') === 'true'; // Cek jika ada ?adminReview=true di URL
+    setIsAdminReviewMode(reviewMode);
+}, []);
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
     const audioGratitudeRef = useRef(null);
@@ -4349,12 +4355,7 @@ const App = () => {
     // === BARU: Flag untuk melacak apakah navigasi awal sudah terjadi ===
     const [initialNavigationDone, setInitialNavigationDone] = useState(false);
 
-// Gunakan useEffect untuk membaca parameter URL saat komponen dimuat
-useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const reviewMode = urlParams.get('adminReview') === 'true'; // Cek jika ada ?adminReview=true di URL
-    setIsAdminReviewMode(reviewMode);
-}, []);
+
     // --- Efek untuk memuat opacity tersimpan ---
     useEffect(() => {
         const savedOpacity = localStorage.getItem('ebookBgOpacity');
