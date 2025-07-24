@@ -1949,7 +1949,7 @@ const PixelThoughts = () => {
     return (
         <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-start items-center p-4 pt-16 md:pt-20">
             <Starfield />
-            <audio ref={audioRef} src="https://cdn.jsdelivr.net/gh/kesinilagi/asetmusik/Afirmasi Pelepasan Panning 3d.mp3" loop={true} preload="auto"></audio>
+            <audio ref={audioRef} src="musik/AfirmasiPelepasan.mp3" loop={true} preload="auto"></audio>
 
             {/* Tombol kembali di pojok bawah */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
