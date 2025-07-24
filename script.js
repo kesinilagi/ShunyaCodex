@@ -1421,8 +1421,8 @@ const SecretRoomRezeki = () => {
 
     const [timeError, setTimeError] = useState('');
 
-    const ALLOW_START_HOUR = 21; 
-    const ALLOW_END_HOUR = 4;   
+    const ALLOW_START_HOUR = 22; 
+    const ALLOW_END_HOUR = 1;   
 
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
