@@ -1402,18 +1402,19 @@ const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBack
     );
 };
 
+import React, { useState, useRef, useEffect, useContext } from 'react';
+// Ini adalah baris yang harus ada di sini.
+// Biasanya, setelah ini akan ada import untuk komponen atau konteks lain yang Anda gunakan.
+// Misalnya:
+// import { AppContext } from './AppContext';
+// import Starfield from './Starfield';
+// import AmbientSoundAccordion from './AmbientSoundAccordion';
 // --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
 const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     const [currentPhase, setCurrentPhase] = useState('time_check');
     const [selectedTopic, setSelectedTopic] = useState(''); // NEW STATE for selected topic
-const [isAdminReviewMode, setIsAdminReviewMode] = useState(false);
-    // Gunakan useEffect untuk membaca parameter URL saat komponen dimuat
-useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const reviewMode = urlParams.get('adminReview') === 'true'; // Cek jika ada ?adminReview=true di URL
-    setIsAdminReviewMode(reviewMode);
-}, []);
+
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
     const audioGratitudeRef = useRef(null);
