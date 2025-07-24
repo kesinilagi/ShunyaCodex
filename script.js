@@ -1422,7 +1422,7 @@ const SecretRoomRezeki = () => {
     const [timeError, setTimeError] = useState('');
 
     const ALLOW_START_HOUR = 22; 
-    const ALLOW_END_HOUR = 23;   
+    const ALLOW_END_HOUR = 00;   
 
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
@@ -1479,8 +1479,9 @@ const SecretRoomRezeki = () => {
         if (currentAudioRef && currentAudioRef.current && audioToPlay) {
             currentAudioRef.current.src = audioToPlay;
             currentAudioRef.current.load();
+            currentAudioRef.current.volume = 1.0; // Volume audio utama tetap 1.0
             currentAudioRef.current.play()
-                .then(() => setIsCurrentAudioPlaying(true))
+                .then(() => setIsCurrentAudioPlaying(true)) // Ini akan memicu ducking di useEffect latar
                 .catch(e => console.error(`Error playing ${phaseName} audio:`, e));
         }
     };
@@ -1517,25 +1518,73 @@ const SecretRoomRezeki = () => {
     }, []);
 
     // Effect untuk mengelola audio latar
-    useEffect(() => {
-        const audio = backgroundAudioRef.current;
-        if (!audio) return;
+    // Tambahkan isCurrentAudioPlaying sebagai dependensi
+useEffect(() => {
+    const backgroundAudio = backgroundAudioRef.current;
+    if (!backgroundAudio) return;
 
-        audio.loop = true;
-        audio.volume = 0.4;
+    backgroundAudio.loop = true;
+    // Volume default saat tidak ada audio utama
+    const NORMAL_BACKGROUND_VOLUME = 0.2; // Volume latar belakang normal
+    // Volume saat audio utama sedang diputar (ducked)
+    const DUCKED_BACKGROUND_VOLUME = 0.05; // Volume latar belakang saat diducking (misal, 5%)
 
-        if (selectedBackgroundSound) {
-            audio.src = selectedBackgroundSound;
-            audio.play().then(() => setIsBackgroundPlaying(true)).catch(e => console.error("Error playing background audio:", e));
-        } else {
-            audio.pause();
-            setIsBackgroundPlaying(false);
-        }
+    let fadeTimeout;
 
-        return () => {
-            if (audio) audio.pause();
+    const setVolumeSmoothly = (audioElem, targetVolume, duration) => {
+        const startVolume = audioElem.volume;
+        const volumeDiff = targetVolume - startVolume;
+        const steps = 20; // Jumlah langkah fade
+        const interval = duration / steps;
+
+        let currentStep = 0;
+
+        clearTimeout(fadeTimeout); // Hentikan fade sebelumnya jika ada
+
+        const fadeStep = () => {
+            currentStep++;
+            if (currentStep <= steps) {
+                audioElem.volume = startVolume + (volumeDiff * (currentStep / steps));
+                fadeTimeout = setTimeout(fadeStep, interval);
+            } else {
+                audioElem.volume = targetVolume; // Pastikan mencapai target akhir
+            }
         };
-    }, [selectedBackgroundSound]);
+        fadeStep();
+    };
+
+
+    if (isCurrentAudioPlaying) {
+        // Jika audio utama sedang bermain, duck background audio
+        if (backgroundAudio.volume > DUCKED_BACKGROUND_VOLUME) {
+            setVolumeSmoothly(backgroundAudio, DUCKED_BACKGROUND_VOLUME, 500); // Fade out selama 0.5 detik
+        }
+    } else {
+        // Jika audio utama tidak bermain, kembalikan volume background audio
+        if (backgroundAudio.volume < NORMAL_BACKGROUND_VOLUME) {
+            setVolumeSmoothly(backgroundAudio, NORMAL_BACKGROUND_VOLUME, 1000); // Fade in selama 1 detik
+        }
+    }
+
+    // Kelola pemutaran/penghentian latar belakang berdasarkan selectedBackgroundSound
+    if (selectedBackgroundSound) {
+        if (backgroundAudio.src !== selectedBackgroundSound) { // Hanya ubah src jika berbeda
+            backgroundAudio.src = selectedBackgroundSound;
+            backgroundAudio.load();
+        }
+        backgroundAudio.play().then(() => setIsBackgroundPlaying(true)).catch(e => console.error("Error playing background audio:", e));
+    } else {
+        backgroundAudio.pause();
+        setIsBackgroundPlaying(false);
+    }
+
+    return () => {
+        if (backgroundAudio) {
+            backgroundAudio.pause();
+        }
+        clearTimeout(fadeTimeout); // Bersihkan timeout saat unmount
+    };
+}, [selectedBackgroundSound, isCurrentAudioPlaying]);
 
     // Efek untuk memantau status audio dari REF saat ini dan mengatur isCurrentAudioPlaying
     useEffect(() => {
