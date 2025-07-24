@@ -1406,8 +1406,9 @@ const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBack
 // --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
 const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
-    const [currentPhase, setCurrentPhase] = useState('time_check'); 
-    
+    const [currentPhase, setCurrentPhase] = useState('time_check');
+    const [selectedTopic, setSelectedTopic] = useState(''); // NEW STATE for selected topic
+
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
     const audioGratitudeRef = useRef(null);
@@ -1428,13 +1429,23 @@ const SecretRoomRezeki = () => {
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
         { name: 'Angel Abundance', src: 'musik/AngelAmbient.mp3' },
         { name: 'Singing Bowl', src: 'musik/SingingBowl.mp3' },
-        { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' },
+        // { name: 'Rural Ambience', src: 'musik/RuralAmbient.mp3' }, // Dihilangkan
         { name: 'Hening (Mati)', src: '' }
     ];
 
+    const getManifestationAudioSrc = (topic) => {
+        switch (topic) {
+            case 'rejeki': return 'musik/RMRejeki.mp3';
+            case 'jodoh': return 'musik/RMJodoh.mp3';
+            case 'promil': return 'musik/RMPromil.mp3';
+            case 'sembuh': return 'musik/RMSembuh.mp3';
+            default: return ''; // Fallback
+        }
+    };
+
     const phaseAudios = {
         release: 'musik/Clearing.mp3',
-        manifestation: 'musik/Afirmasi.mp3',
+        // Manifestation audio will be determined dynamically
         gratitude: 'musik/Gratitude.mp3',
     };
 
@@ -1450,15 +1461,20 @@ const SecretRoomRezeki = () => {
 
     const startOrRestartPhaseAudio = (phaseName) => {
         stopAllPhaseAudios();
-        
-        const audioToPlay = phaseAudios[phaseName];
+
+        let audioToPlay;
         let currentAudioRef;
 
-        switch (phaseName) {
-            case 'release': currentAudioRef = audioReleaseRef; break;
-            case 'manifestation': currentAudioRef = audioManifestationRef; break;
-            case 'gratitude': currentAudioRef = audioGratitudeRef; break;
-            default: return;
+        if (phaseName === 'manifestation') {
+            audioToPlay = getManifestationAudioSrc(selectedTopic);
+            currentAudioRef = audioManifestationRef;
+        } else {
+            audioToPlay = phaseAudios[phaseName];
+            switch (phaseName) {
+                case 'release': currentAudioRef = audioReleaseRef; break;
+                case 'gratitude': currentAudioRef = audioGratitudeRef; break;
+                default: return;
+            }
         }
 
         if (currentAudioRef && currentAudioRef.current && audioToPlay) {
@@ -1473,14 +1489,14 @@ const SecretRoomRezeki = () => {
     const goToNextPhase = (nextPhase) => {
         stopAllPhaseAudios();
         setCurrentPhase(nextPhase);
-        if (nextPhase !== 'finished') {
+        // Kita tidak langsung putar audio di sini karena 'topic_selection' tidak punya audio otomatis
+        if (nextPhase === 'release' || nextPhase === 'gratitude') { // Audio manifestasi diputar setelah topik dipilih
             startOrRestartPhaseAudio(nextPhase);
         }
     };
 
-    // === PERUBAHAN FUNGSI: handleTimeCheck sekarang akan langsung navigasi jika waktu valid ===
     const handleTimeCheck = () => {
-        const currentHour = new Date().getHours(); 
+        const currentHour = new Date().getHours();
         const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
 
         setTimeError(''); // Reset error messages
@@ -1491,22 +1507,15 @@ const SecretRoomRezeki = () => {
             setTimeError(`Ruangan ini hanya bisa diakses antara pukul ${formattedStartTime}:00 hingga ${formattedEndTime}:00 WIB.`);
             return false;
         } else {
-            // === BARU: Navigasi ke 'intro' jika waktu valid dan tombol diklik ===
-            setCurrentPhase('intro'); 
+            setCurrentPhase('intro');
             return true;
         }
     };
 
     // Auto-check waktu saat komponen dimuat
     useEffect(() => {
-        // Panggil handleTimeCheck saat komponen dimuat.
-        // Jika handleTimeCheck() mengembalikan false, maka tombol akan tetap disabled.
-        // Jika handleTimeCheck() mengembalikan true, tombol akan enabled,
-        // DAN handleTimeCheck() juga akan secara langsung mengubah currentPhase ke 'intro'.
-        handleTimeCheck(); 
-    }, []); // Hanya berjalan sekali saat komponen dimount
-    
-    // --- AKHIR FUNGSI-FUNGSI PEMBANTU ---
+        handleTimeCheck();
+    }, []);
 
     // Effect untuk mengelola audio latar
     useEffect(() => {
@@ -1557,12 +1566,12 @@ const SecretRoomRezeki = () => {
             audio.removeEventListener('pause', handlePaused);
             audio.removeEventListener('ended', handleEnded);
         };
-    }, [currentPhase]); 
-
+    }, [currentPhase, selectedTopic]); // Tambahkan selectedTopic sebagai dependensi agar effect re-run jika manifestasi berubah
 
     const resetSession = () => {
         stopAllPhaseAudios();
         setCurrentPhase('time_check');
+        setSelectedTopic(''); // Reset topik
         setIsCandleLit(false);
         setTimeError('');
         if (backgroundAudioRef.current) {
@@ -1578,8 +1587,9 @@ const SecretRoomRezeki = () => {
             case 'time_check': return "Akses Ruang Rahasia";
             case 'intro': return "Sambutan Malam Kelimpahan";
             case 'idle': return "Pilih Suasana Sesi Anda";
+            case 'topic_selection': return "Pilih Fokus Sesi Anda"; // NEW TITLE
             case 'release': return "Fase 1: Pelepasan Beban";
-            case 'manifestation': return "Fase 2: Manifestasi Impian";
+            case 'manifestation': return `Fase 2: Manifestasi ${selectedTopic ? selectedTopic.charAt(0).toUpperCase() + selectedTopic.slice(1) : 'Impian'}`; // Dynamic title
             case 'gratitude': return "Fase 3: Syukur Mendalam";
             case 'finished': return "Sesi Selesai. Selamat, Kelimpahan Menanti!";
             default: return "";
@@ -1592,9 +1602,9 @@ const SecretRoomRezeki = () => {
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
 
-            const formattedCurrentTime = 
+            const formattedCurrentTime =
                 `${currentHour < 10 ? '0' : ''}${currentHour}:${currentMinute < 10 ? '0' : ''}${currentMinute}`;
-            
+
             const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
             const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
             const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
@@ -1611,13 +1621,12 @@ const SecretRoomRezeki = () => {
                     <p className="mb-8 text-gray-400 font-bold text-center">
                         Waktu Akses: {displayTimeRange} WIB
                     </p>
-                    
+
                     {timeError && <p className="text-red-500 mt-2">{timeError}</p>}
-                    
+
                     <button
-                        onClick={handleTimeCheck} // Panggil fungsi yang sudah diubah
-                        // === PERBAHAN PENTING: Tombol hanya DISABLED jika waktu TIDAK valid ===
-                        disabled={!isTimeValid} 
+                        onClick={handleTimeCheck}
+                        disabled={!isTimeValid}
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
                         {isTimeValid ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
@@ -1636,7 +1645,7 @@ const SecretRoomRezeki = () => {
                         Mari mulai dengan menyalakan lilin untuk fokus dan ketenangan.
                     </p>
                     <div className={`candle-container ${isCandleLit ? 'lit' : ''}`}>
-                        <img src="icons/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
                         {isCandleLit && <div className="flame animate-flicker"></div>}
                     </div>
                     <button
@@ -1665,12 +1674,12 @@ const SecretRoomRezeki = () => {
                                 selectedBackgroundSound={selectedBackgroundSound}
                                 setSelectedBackgroundSound={setSelectedBackgroundSound}
                                 isBackgroundPlaying={isBackgroundPlaying}
-                                onStartSession={() => { 
+                                onStartSession={() => {
                                     document.querySelectorAll('audio[id="preview-audio"]').forEach(audio => {
                                         audio.pause();
                                         audio.currentTime = 0;
                                     });
-                                    goToNextPhase('release'); 
+                                    goToNextPhase('topic_selection'); // Pindah ke fase pemilihan topik
                                 }}
                             />
                         ))}
@@ -1678,6 +1687,43 @@ const SecretRoomRezeki = () => {
                 </div>
             );
         }
+
+        // NEW PHASE: topic_selection
+        if (currentPhase === 'topic_selection') {
+            const topics = [
+                { key: 'rejeki', name: 'Rejeki' },
+                { key: 'jodoh', name: 'Jodoh' },
+                { key: 'promil', name: 'Promil' },
+                { key: 'sembuh', name: 'Sembuh' },
+            ];
+
+            return (
+                <div className="animate-fade-in flex flex-col items-center">
+                    <div className={`candle-container ${isCandleLit ? 'lit' : ''} mb-8`}>
+                        <img src="https://raw.githubusercontent.com/kesinilagi/asetmusik/main/lilin.png" alt="Batang Lilin" className="candle-image" />
+                        {isCandleLit && <div className="flame animate-flicker"></div>}
+                    </div>
+                    <p className="mb-4 text-gray-300 text-lg text-center">
+                        Pilih fokus utama sesi manifestasi Anda malam ini:
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                        {topics.map(topic => (
+                            <button
+                                key={topic.key}
+                                onClick={() => {
+                                    setSelectedTopic(topic.key);
+                                    goToNextPhase('release'); // Setelah memilih topik, langsung ke fase release (Clearing)
+                                }}
+                                className="bg-purple-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300"
+                            >
+                                {topic.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
 
         if (currentPhase === 'release' || currentPhase === 'manifestation' || currentPhase === 'gratitude') {
             return (
@@ -1691,7 +1737,7 @@ const SecretRoomRezeki = () => {
                         {isCurrentAudioPlaying ? (
                             <>
                                 {getPhaseTitle().split(': ')[1]} sedang diputar...
-                                <br/>
+                                <br />
                                 (Audio akan berhenti otomatis saat selesai.)
                             </>
                         ) : (
@@ -1774,7 +1820,7 @@ const SecretRoomRezeki = () => {
 
             {/* Cahaya lilin sebagai overlay */}
             {isCandleLit && (currentPhase !== 'finished' && currentPhase !== 'time_check') && <div className="candle-light-overlay"></div>}
-            
+
             <audio ref={audioReleaseRef} preload="auto"></audio>
             <audio ref={audioManifestationRef} preload="auto"></audio>
             <audio ref={audioGratitudeRef} preload="auto"></audio>
@@ -1787,14 +1833,14 @@ const SecretRoomRezeki = () => {
             </div>
 
             <div className={`relative z-10 w-full max-w-3xl text-center flex flex-col justify-center items-center p-8 rounded-xl shadow-lg
-                ${(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'finished' || currentPhase === 'time_check') ? 'bg-black/50' : 'bg-black/0'}`}>
-                
-                {(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'finished' || currentPhase === 'time_check') && (
+                ${(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'topic_selection' || currentPhase === 'finished' || currentPhase === 'time_check') ? 'bg-black/50' : 'bg-black/0'}`}>
+
+                {(currentPhase === 'intro' || currentPhase === 'idle' || currentPhase === 'topic_selection' || currentPhase === 'finished' || currentPhase === 'time_check') && (
                     <h1 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300">
                         {getPhaseTitle()}
                     </h1>
                 )}
-                
+
                 {renderPhaseContent()}
             </div>
         </div>
