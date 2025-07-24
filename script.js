@@ -1403,7 +1403,6 @@ const AmbientSoundAccordion = ({ sound, selectedBackgroundSound, setSelectedBack
 };
 
 // --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
-// --- KOMPONEN BARU: RUANG RAHASIA MENARIK REZEKI MALAM HARI ---
 const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     const [currentPhase, setCurrentPhase] = useState('time_check');
@@ -1422,7 +1421,7 @@ const SecretRoomRezeki = () => {
 
     const [timeError, setTimeError] = useState('');
 
-    const ALLOW_START_HOUR = 0; // 00:00 (12 AM)
+    const ALLOW_START_HOUR = 19; // 00:00 (12 AM)
     const ALLOW_END_HOUR = 4;   // 04:00 (4 AM)
 
     const ambientSounds = [
