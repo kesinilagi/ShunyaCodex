@@ -1430,8 +1430,11 @@ const SecretRoomRezeki = () => {
 
     const [timeError, setTimeError] = useState('');
 
-    const ALLOW_START_HOUR = 0; 
-    const ALLOW_END_HOUR = 4;   
+    const ALLOW_START_HOUR = 0; // Atau sesuai keinginan Anda, misalnya 19
+    const ALLOW_START_MINUTE = 0; // <--- TAMBAHKAN BARIS INI (misalnya 0 untuk pas jam)
+
+    const ALLOW_END_HOUR = 4;   // Atau sesuai keinginan Anda, misalnya 0 (untuk tengah malam berikutnya)
+    const ALLOW_END_MINUTE = 0; 
 
     const ambientSounds = [
         { name: 'Gamelan Ambient', src: 'musik/GamelanAmbient.mp3' },
