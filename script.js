@@ -1548,7 +1548,7 @@ useEffect(() => {
     // Volume default saat tidak ada audio utama
     const NORMAL_BACKGROUND_VOLUME = 0.2; // Volume latar belakang normal
     // Volume saat audio utama sedang diputar (ducked)
-    const DUCKED_BACKGROUND_VOLUME = 0.05; // Volume latar belakang saat diducking (misal, 5%)
+    const DUCKED_BACKGROUND_VOLUME = 0.35; // Volume latar belakang saat diducking (misal, 5%)
 
     let fadeTimeout;
 
@@ -1600,9 +1600,7 @@ useEffect(() => {
     }
 
     return () => {
-        if (backgroundAudio) {
-            backgroundAudio.pause();
-        }
+       
         clearTimeout(fadeTimeout); // Bersihkan timeout saat unmount
     };
 }, [selectedBackgroundSound, isCurrentAudioPlaying]);
