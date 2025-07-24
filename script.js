@@ -1408,7 +1408,15 @@ const SecretRoomRezeki = () => {
     const { setCurrentPageKey } = useContext(AppContext);
     const [currentPhase, setCurrentPhase] = useState('time_check');
     const [selectedTopic, setSelectedTopic] = useState(''); // NEW STATE for selected topic
-
+    // PASTIKAN BARIS INI TIDAK DIKOMENTARI DAN ADA:
+    const [isAdminReviewMode, setIsAdminReviewMode] = useState(false);
+    
+    // PASTIKAN BLOK useEffect INI TIDAK DIKOMENTARI DAN ADA:
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const reviewMode = urlParams.get('adminReview') === 'true'; // Cek jika ada ?adminReview=true di URL
+        setIsAdminReviewMode(reviewMode);
+    }, []);
     const audioReleaseRef = useRef(null);
     const audioManifestationRef = useRef(null);
     const audioGratitudeRef = useRef(null);
@@ -1497,17 +1505,19 @@ const SecretRoomRezeki = () => {
     };
 
     const handleTimeCheck = () => {
-        // --- PERUBAHAN BARU: Mode Admin Review ---
-        if (isAdminReviewMode) {
-            setTimeError(''); // Pastikan tidak ada pesan error waktu
-            setCurrentPhase('intro'); // Langsung pindah ke intro
-            return true; // Waktu selalu valid dalam mode admin
+        // --- PASTIKAN LOGIKA INI AKTIF (TIDAK DIKOMENTARI) ---
+        if (isAdminReviewMode) { // Ini menggunakan state isAdminReviewMode
+            setTimeError('');
+            setCurrentPhase('intro');
+            return true;
         }
-        // --- AKHIR PERUBAHAN BARU ---
+        // --- AKHIR LOGIKA INI ---
+        
         const currentHour = new Date().getHours();
-        const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
+        // Ganti kembali ke logika validasi waktu asli jika isAdminReviewMode tidak aktif
+        const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR; // Menggunakan ALLOW_START_HOUR dan ALLOW_END_HOUR yang Anda definisikan
 
-        setTimeError(''); // Reset error messages
+        setTimeError('');
 
         if (!isTimeValid) {
             const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
@@ -1660,41 +1670,43 @@ useEffect(() => {
 
             const formattedCurrentTime =
                 `${currentHour < 10 ? '0' : ''}${currentHour}:${currentMinute < 10 ? '0' : ''}${currentMinute}`;
-            let isTimeValidForDisplay = false; // Gunakan nama berbeda agar tidak bentrok dengan logika utama
+            
+            let isTimeValidForDisplay = false; // Default ke false, akan dihitung
 
-            // --- PERUBAHAN BARU: Mode Admin Review untuk Tampilan ---
-            if (isAdminReviewMode) {
-                isTimeValidForDisplay = true; // Selalu valid untuk tampilan di mode admin
+            // --- PASTIKAN LOGIKA INI AKTIF (TIDAK DIKOMENTARI) ---
+            if (isAdminReviewMode) { // Ini menggunakan state isAdminReviewMode
+                isTimeValidForDisplay = true;
             } else {
-                // ... (logika validasi yang sudah ada untuk rentang waktu normal dan lintas tengah malam)
+                // LOGIKA VALIDASI WAKTU LINTAS TENGAH MALAM DARI SEBELUMNYA
+                // Contoh (gunakan versi yang Anda sudah implementasikan untuk menit juga):
+                const startTimeInMinutes = ALLOW_START_HOUR * 60 + ALLOW_START_MINUTE;
+                const endTimeInMinutes = ALLOW_END_HOUR * 60 + ALLOW_END_MINUTE;
+                const currentTimeInMinutes = currentHour * 60 + currentMinute;
+
                 if (ALLOW_START_HOUR < ALLOW_END_HOUR || (ALLOW_START_HOUR === ALLOW_END_HOUR && ALLOW_START_MINUTE < ALLOW_END_MINUTE)) {
-                    if (currentHour > ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR) {
-                        isTimeValidForDisplay = true;
-                    } else if (currentHour === ALLOW_START_HOUR) {
-                        isTimeValidForDisplay = currentMinute >= ALLOW_START_MINUTE;
-                    } else if (currentHour === ALLOW_END_HOUR) {
-                        isTimeValidForDisplay = currentMinute < ALLOW_END_MINUTE;
-                    }
-                } else {
-                    const isAfterStartTime = (currentHour > ALLOW_START_HOUR) ||
-                                             (currentHour === ALLOW_START_HOUR && currentMinute >= ALLOW_START_MINUTE);
-                    const isBeforeEndTime = (currentHour < ALLOW_END_HOUR) ||
-                                            (currentHour === ALLOW_END_HOUR && currentMinute < ALLOW_END_MINUTE);
-                    isTimeValidForDisplay = isAfterStartTime || isBeforeEndTime;
+                    isTimeValidForDisplay = (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes);
+                } else { // Melintasi tengah malam
+                    isTimeValidForDisplay = (currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes);
                 }
             }
-            // --- AKHIR PERUBAHAN BARU ---
-            //const isTimeValid = currentHour >= ALLOW_START_HOUR && currentHour < ALLOW_END_HOUR;
+            // --- AKHIR LOGIKA INI ---
+
             const formattedStartTime = ALLOW_START_HOUR < 10 ? `0${ALLOW_START_HOUR}` : ALLOW_START_HOUR;
             const formattedEndTime = ALLOW_END_HOUR < 10 ? `0${ALLOW_END_HOUR}` : ALLOW_END_HOUR;
-            const displayTimeRange = `${formattedStartTime}:00 - ${formattedEndTime}:00`;
+            
+            // Jika Anda memiliki ALLOW_START_MINUTE dan ALLOW_END_MINUTE, gunakan juga untuk displayRange
+            const formattedStartMinute = ALLOW_START_MINUTE < 10 ? `0${ALLOW_START_MINUTE}` : ALLOW_START_MINUTE;
+            const formattedEndMinute = ALLOW_END_MINUTE < 10 ? `0${ALLOW_END_MINUTE}` : ALLOW_END_MINUTE;
+            const displayTimeRange = `${formattedStartTime}:${formattedStartMinute} - ${formattedEndTime}:${formattedEndMinute}`;
+
 
             return (
                 <div className="animate-fade-in flex flex-col items-center">
                     <p className="mb-4 text-gray-300 text-lg text-center">
                         Ruang Rahasia ini hanya bisa diakses pada waktu tertentu.
                     </p>
-                {isAdminReviewMode && (
+                    {/* PASTIKAN BARIS INI TIDAK DIKOMENTARI JIKA ANDA INGIN TEKS ADMIN MUNCUL */}
+                    {isAdminReviewMode && (
                         <p className="mb-4 text-yellow-500 font-bold">MODE ADMIN: Pemeriksaan Waktu Diabaikan.</p>
                     )}
                     <p className="text-xl md:text-2xl font-bold text-yellow-300 mb-2">
@@ -1708,11 +1720,12 @@ useEffect(() => {
 
                     <button
                         onClick={handleTimeCheck}
-                        disabled={!isTimeValid}
+                        disabled={!isTimeValidForDisplay} // Gunakan isTimeValidForDisplay
                         className="bg-purple-600 text-white font-bold py-3 px-8 mt-8 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
                         {isTimeValidForDisplay ? 'Waktu Sesuai, Silakan Lanjut' : 'Periksa Waktu Akses'}
                     </button>
+                    {/* PASTIKAN BARIS INI TIDAK DIKOMENTARI JIKA ANDA INGIN PESAN INI MUNCUL TANPA MODE ADMIN */}
                     {!isTimeValidForDisplay && !isAdminReviewMode && <p className="text-gray-400 mt-4">Mohon tunggu hingga waktu akses yang ditentukan.</p>}
                 </div>
             );
