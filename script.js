@@ -36,8 +36,10 @@ const ActivationScreen = () => {
         const abortController = new AbortController();
         const signal = abortController.signal;
 
-        if (!userName.trim())     {
+        const trimmedUserName = userName.trim(); // Trim input nama di ActivationScreen
+        if (!trimmedUserName) {
             setMessage('Mohon masukkan nama Anda.');
+            console.log("[ActivationScreen] Nama input kosong saat aktivasi.");
             return;
         }
         if (!activationKey.trim()) {
@@ -53,7 +55,9 @@ const ActivationScreen = () => {
         if (result.success) {
             localStorage.setItem('ebookActivated', 'true'); 
             localStorage.setItem('ebookActivationKey', activationKey.trim()); 
-            localStorage.setItem('ebookUserName', userName.trim()); 
+            localStorage.setItem('ebookUserName', trimmedUserName); // Menyimpan nama ke localStorage
+            setGlobalUserNameFromContext(trimmedUserName); // Mengupdate state global di AppContext
+            console.log("[ActivationScreen] Aktivasi berhasil. Nama disimpan:", trimmedUserName); 
             
             setIsActivated(true); // Ini akan memicu App.js untuk memperbarui state isActivated
             setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
@@ -2178,10 +2182,14 @@ const LoginScreen = () => {
     const [name, setName] = useState('');
 
     const handleLogin = () => {
-        if (name.trim()) {
-            const trimmedName = name.trim();
+        const trimmedName = name.trim(); // Penting: pastikan spasi sudah dihilangkan
+        console.log("[LoginScreen] Nama di input (setelah trim):", trimmedName);
+        if (trimmedName) {
             localStorage.setItem('ebookUserName', trimmedName);
-            setUserName(trimmedName);
+            setGlobalUserNameFromContext(trimmedName); // Mengatur state global di App
+            console.log("[LoginScreen] Nama berhasil disimpan ke localStorage dan Context.");
+        } else {
+            console.log("[LoginScreen] Nama yang dimasukkan kosong (setelah trim).");
         }
     };
 
@@ -3937,6 +3945,8 @@ const MainLayout = () => {
 
     // === PERBAIKAN PENTING: Fungsi getGroundedHeaderText dideklarasikan di sini ===
     const getGroundedFooterText = () => {
+        console.log("[MainLayout Footer] userName dari Context:", userName);
+        console.log("[MainLayout Footer] currentGroundedMessage:", currentGroundedMessage);
     if (userName) { // Ini akan menggunakan 'userName' yang diambil dari useContext
         return `Hai ${userName}, ${currentGroundedMessage}`;
     }
@@ -4444,7 +4454,11 @@ const App = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
     const [bgOpacity, setBgOpacity] = useState(80);
-    const [userName, setUserName] = useState(() => localStorage.getItem('ebookUserName') || '');
+    const [userName, setUserName] = useState(() => {
+        const stored = localStorage.getItem('ebookUserName');
+        console.log("[App Init] userName (dari localStorage):", stored); // Melihat nilai awal dari localStorage
+        return stored || ''; // Pastikan defaultnya string kosong jika null/undefined
+    });
     const [isDoaLooping, setIsDoaLooping] = useState(false);
 
     const [isActivated, setIsActivated] = useState(() => {
@@ -4520,6 +4534,7 @@ useEffect(() => {
             }
             const newUserName = localStorage.getItem('ebookUserName') || '';
             if (newUserName !== userName) {
+                console.log("[App Render] userName (state saat ini di App):", userName);
                 setUserName(newUserName);
             }
         };
