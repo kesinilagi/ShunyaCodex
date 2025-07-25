@@ -36,7 +36,7 @@ const ActivationScreen = () => {
         const abortController = new AbortController();
         const signal = abortController.signal;
 
-        if (!.trim()) {
+        if (!userName.trim())     {
             setMessage('Mohon masukkan nama Anda.');
             return;
         }
