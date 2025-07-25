@@ -3925,7 +3925,7 @@ const MainLayout = () => {
         "Jalanmu lapang, rezekimu berlimpah. Percayalah."
     ];
     const [currentGroundedMessage, setCurrentGroundedMessage] = useState(groundedMessages[0]);
-   
+   useEffect(() => {
         let messageIndex = 0;
         const interval = setInterval(() => {
             messageIndex = (messageIndex + 1) % groundedMessages.length;
