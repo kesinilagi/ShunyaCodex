@@ -9,7 +9,7 @@ const AppContext = createContext();
 // --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
 // --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
 const ActivationScreen = () => {
-    const { setCurrentPageKey, setIsActivated } = useContext(AppContext); 
+    const { setCurrentPageKey, setIsActivated, setUserName: setGlobalUserNameFromContext } = useContext(AppContext);
     const [activationKey, setActivationKey] = useState('');
     const [userName, setUserName] = useState(() => localStorage.getItem('ebookUserName') || '');
     const [message, setMessage] = useState('');
@@ -2178,7 +2178,7 @@ const PixelThoughts = () => {
 // --- KOMPONEN HALAMAN & KONTEN ---
 
 const LoginScreen = () => {
-    const { setUserName } = useContext(AppContext);
+    const { setUserName: setGlobalUserNameFromContext } = useContext(AppContext);
     const [name, setName] = useState('');
 
     const handleLogin = () => {
