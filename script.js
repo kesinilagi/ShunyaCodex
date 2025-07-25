@@ -3942,7 +3942,7 @@ const MainLayout = () => {
     }, []);
 
     // === PERBAIKAN PENTING: Fungsi getGroundedHeaderText dideklarasikan di sini ===
-    cconst getGroundedFooterText = () => {
+    const getGroundedFooterText = () => {
         if (userName) {
             return `Hai ${userName}, ${currentGroundedMessage}`;
         }
