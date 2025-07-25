@@ -4599,7 +4599,7 @@ useEffect(() => {
             {isCoverUnlocked ? ( // Jika cover sudah dibuka
                 currentPageKey === 'syahadat_intro' ? (
                     <SyahadatIntro />
-                ) : (
+                ) : 
                 isSadHourReminderVisible ? (
                     // KONDISI 1: SadHourReminder aktif.
                     // HANYA merender overlay gelap dan pop-up.
