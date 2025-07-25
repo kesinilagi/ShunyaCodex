@@ -36,7 +36,7 @@ const ActivationScreen = () => {
         const abortController = new AbortController();
         const signal = abortController.signal;
 
-        if (!userName.trim()) {
+        if (!.trim()) {
             setMessage('Mohon masukkan nama Anda.');
             return;
         }
@@ -53,7 +53,7 @@ const ActivationScreen = () => {
         if (result.success) {
             localStorage.setItem('ebookActivated', 'true'); 
             localStorage.setItem('ebookActivationKey', activationKey.trim()); 
-            localStorage.setItem('ebookUserName', userName.trim()); 
+            localStorage.setItem('ebook', .trim()); 
             
             setIsActivated(true); // Ini akan memicu App.js untuk memperbarui state isActivated
             setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
@@ -78,7 +78,7 @@ const ActivationScreen = () => {
 
         const checkActivation = async () => {
             const storedActivated = localStorage.getItem('ebookActivated') === 'true';
-            const storedName = localStorage.getItem('ebookUserName');
+            const storedName = localStorage.getItem('ebook');
 
             if (storedActivated) {
                 setMessage(`E-book sudah aktif di perangkat ini, ${storedName || 'Sahabat'}.`); 
@@ -118,7 +118,7 @@ const ActivationScreen = () => {
                 <div className="flex flex-col items-center">
                     <input
                         type="text"
-                        value={userName}
+                        value={}
                         onChange={(e) => setUserName(e.target.value)}
                         className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white mb-4"
                         placeholder="Nama Anda"
@@ -3943,9 +3943,9 @@ const MainLayout = () => {
 
     // === PERBAIKAN PENTING: Fungsi getGroundedHeaderText dideklarasikan di sini ===
     const getGroundedFooterText = () => {
-        if (userName) {
-            return `Hai ${userName}, ${currentGroundedMessage}`;
-        }
+                if (displayedUserName) {
+            return `Hai ${displayedUserName}, ${currentGroundedMessage}`;
+        }    
         return currentGroundedMessage;
     };
     // --- AKHIR PESAN GROUNDED ---
