@@ -2169,18 +2169,7 @@ const PixelThoughts = () => {
         </div>
     );
 };
-// QUOTE
-const RandomQuote = () => {
-    const quotes = ["Ketenangan sejati bukan berarti tanpa badai, tapi menari di tengah badai.", "Hati yang bersyukur adalah magnet bagi keajaiban.", "Lepaskan apa yang tidak bisa kau kendalikan, dan fokus pada apa yang bisa.","Saat aku melepaskan siapa diriku, aku menjadi siapa yang seharusnya kutumbuhkan - Lao TSe","Apa pun yang kamu lawan, akan menguat. Dan apa yang kamu tolak, akan menetap - Eckhart Tolle","Jangan lawan perubahan yang datang. Biarkan hidup mengalir melalui dirimu - Jalaludin Rumi","Ingatlah, hanya dengan mengingat Allah, hati menjadi tenang","Dunia ini hanyalah bayangan. Jika kau kejar, ia akan lari.Tapi jika kau berpaling darinya, ia akan mengikutimu"];
-    const [quote, setQuote] = useState(quotes[Math.floor(Math.random() * quotes.length)]);
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-        }, 10000);
-        return () => clearInterval(intervalId);
-    }, []);
-    return (<div className="text-sm italic text-white/70 mt-2 text-center w-full transition-opacity duration-1000">"{quote}"</div>);
-};
+
 
 // --- KOMPONEN HALAMAN & KONTEN ---
 
