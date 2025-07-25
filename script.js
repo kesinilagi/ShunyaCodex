@@ -3917,6 +3917,7 @@ const MainLayout = () => {
         setIsCoverUnlocked,
         isSidebarOpen, setIsSidebarOpen,
         isActivated,
+        setIsSadHourReminderVisible,
         resetAppState
     } = useContext(AppContext);
 
@@ -3997,9 +3998,17 @@ const MainLayout = () => {
     };
 
     const handleCloseBook = () => {
-        closeFullscreen();
-        resetAppState();
-        clearCacheStorage();
+        // Tampilkan konfirmasi sebelum menutup
+        const confirmClose = window.confirm("Apakah Anda yakin ingin keluar dari E-book?");
+        
+        if (confirmClose) {
+            closeFullscreen();
+            resetAppState();
+            clearCacheStorage();
+            console.log("E-book ditutup.");
+        } else {
+            console.log("Pembatalan penutupan E-book.");
+        }
     };
 
     const renderPage = () => {
@@ -4059,6 +4068,15 @@ const MainLayout = () => {
                             <p className="flex-grow text-center text-sm font-semibold text-white/90">
                                 {getGroundedHeaderText()}
                             </p>
+                            <div className="flex items-center gap-2 md:gap-4">
+                                {/* NEW: Tombol SHORCUT (Sad Hour Reminder) */}
+                                <button
+                                    onClick={() => setIsSadHourReminderVisible(true)}
+                                    className="p-2 rounded-full hover:bg-white/20"
+                                    title="Shortcut / Sad Hour Reminder"
+                                >
+                                    <span className="text-2xl">⚡SC</span> {/* Icon kilat atau sesuai gambar */}
+                                </button>        
                             <div className="flex items-center gap-2 md:gap-4">
                                 <button onClick={() => setCurrentPageKey('pengaturan')} className="p-2 rounded-full hover:bg-white/20" title="Pengaturan Tema">
                                     <span className="text-2xl">🎨</span>
@@ -4580,6 +4598,7 @@ useEffect(() => {
         resetAppState,
         installPromptEvent,
         customGoalsForReminder,
+        setIsSadHourReminderVisible,
     };
 
     // Fungsi ini dipanggil dari dalam SadHourReminder saat interaksi
