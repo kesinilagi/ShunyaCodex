@@ -4075,7 +4075,7 @@ const MainLayout = () => {
                                     className="p-2 rounded-full hover:bg-white/20"
                                     title="Shortcut / Sad Hour Reminder"
                                 >
-                                    <span className="text-2xl">⚡SC</span> {/* Icon kilat atau sesuai gambar */}
+                                    <span className="text-2xl">⚡SC</span> 
                                 </button>        
                             <div className="flex items-center gap-2 md:gap-4">
                                 <button onClick={() => setCurrentPageKey('pengaturan')} className="p-2 rounded-full hover:bg-white/20" title="Pengaturan Tema">
