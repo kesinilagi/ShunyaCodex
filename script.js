@@ -118,7 +118,7 @@ const ActivationScreen = () => {
                 <div className="flex flex-col items-center">
                     <input
                         type="text"
-                        value={}
+                        value={userName} 
                         onChange={(e) => setUserName(e.target.value)}
                         className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg text-xl text-center p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white mb-4"
                         placeholder="Nama Anda"
