@@ -53,7 +53,7 @@ const ActivationScreen = () => {
         if (result.success) {
             localStorage.setItem('ebookActivated', 'true'); 
             localStorage.setItem('ebookActivationKey', activationKey.trim()); 
-            localStorage.setItem('ebook', .trim()); 
+            localStorage.setItem('ebookUserName', userName.trim()); 
             
             setIsActivated(true); // Ini akan memicu App.js untuk memperbarui state isActivated
             setMessage('Aktivasi Berhasil! Selamat menikmati E-book.');
@@ -3907,7 +3907,8 @@ const MainLayout = () => {
         isSidebarOpen, setIsSidebarOpen,
         isActivated,
         setIsSadHourReminderVisible,
-        resetAppState
+        resetAppState,
+        userName
     } = useContext(AppContext);
 
     const currentTheme = themes[themeKey];
@@ -3924,14 +3925,7 @@ const MainLayout = () => {
         "Jalanmu lapang, rezekimu berlimpah. Percayalah."
     ];
     const [currentGroundedMessage, setCurrentGroundedMessage] = useState(groundedMessages[0]);
-    const [displayedUserName, setDisplayedUserName] = useState('');
-
-    useEffect(() => {
-        const storedUserName = localStorage.getItem('ebookUserName');
-        if (storedUserName) {
-            setDisplayedUserName(storedUserName);
-        }
-
+   
         let messageIndex = 0;
         const interval = setInterval(() => {
             messageIndex = (messageIndex + 1) % groundedMessages.length;
@@ -3943,11 +3937,11 @@ const MainLayout = () => {
 
     // === PERBAIKAN PENTING: Fungsi getGroundedHeaderText dideklarasikan di sini ===
     const getGroundedFooterText = () => {
-                if (displayedUserName) {
-            return `Hai ${displayedUserName}, ${currentGroundedMessage}`;
-        }    
-        return currentGroundedMessage;
-    };
+    if (userName) { // Ini akan menggunakan 'userName' yang diambil dari useContext
+        return `Hai ${userName}, ${currentGroundedMessage}`;
+    }
+    return currentGroundedMessage;
+};
     // --- AKHIR PESAN GROUNDED ---
 
     const goToPage = (direction) => {
