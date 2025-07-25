@@ -3953,11 +3953,11 @@ const MainLayout = () => {
     }, []);
 
     // === PERBAIKAN PENTING: Fungsi getGroundedHeaderText dideklarasikan di sini ===
-    const getGroundedHeaderText = () => {
-        if (displayedUserName) {
-            return `Hai ${displayedUserName}, ${currentGroundedMessage}`;
+    cconst getGroundedFooterText = () => {
+        if (userName) {
+            return `Hai ${userName}, ${currentGroundedMessage}`;
         }
-        return currentGroundedMessage; // Jika nama belum ada, tampilkan pesan saja
+        return currentGroundedMessage;
     };
     // --- AKHIR PESAN GROUNDED ---
 
@@ -4065,9 +4065,7 @@ const MainLayout = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                                 Daftar Isi
                             </button>
-                            <p className="flex-grow text-center text-sm font-semibold text-white/90">
-                                {getGroundedHeaderText()}
-                            </p>
+                            
                             <div className="flex items-center gap-2 md:gap-4">
                                 {/* Tombol SHORCUT (Sad Hour Reminder) */}
                                 <button
@@ -4108,7 +4106,9 @@ const MainLayout = () => {
                             <button onClick={() => goToPage(1)} disabled={pageIndex >= pages.findIndex(p => p === 'bab16')} className="px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-white/20">Berikutnya ›</button>
                         </div>
                         <div className="mt-3">
-                            <RandomQuote />
+                            <p className="text-sm italic text-white/70 mt-2 text-center w-full transition-opacity duration-1000">
+                                {getGroundedFooterText()}
+                            </p>
                         </div>
                     </footer>
                 )}
