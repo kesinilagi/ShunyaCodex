@@ -151,6 +151,24 @@ const ActivationScreen = () => {
         </div>
     );
 };
+// Konstanta untuk teks syahadat
+const syahadatTextArabic = `أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ، بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ
+وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللهِ
+وَأَشْهَدُ أَنْ لَا رَازِقَ إِلَّا اللهُ
+وَأَشْهَدُ أَنَّ رِزْقِي مِنَ اللهِ`;
+const syahadatTextLatin = `A'udzu billahi minasy-syaitonir-rojim, Bismillahir-rohmanir-rohim.
+Asyhadu an laa ilaaha illallaah.
+Wa asyhadu anna Muhammadar-rosulullah.
+Wa asyhadu an laa roziqo illallaah.
+Wa asyhadu anna rizqi minallah.`;
+const syahadatTextTranslation = `Aku berlindung kepada Allah dari godaan syaitan yang terkutuk. Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang.
+Aku bersaksi bahwa tiada Tuhan selain Allah.
+Dan aku bersaksi bahwa Muhammad adalah utusan Allah.
+Dan aku bersaksi bahwa tiada Pemberi Rezeki selain Allah.
+Dan aku bersaksi bahwa rezekiku adalah dari Allah.`;
+const SYAHADAT_AUDIO_SRC = "musik/syahadat.mp3"; // Pastikan path ini benar!
+
 // --- Definisikan data jam galau di luar komponen SadHourReminder ---
 // Ini akan membuat data ini tersedia dan tidak diinisialisasi ulang
 const defaultSadHoursData = [
@@ -3986,6 +4004,7 @@ const MainLayout = () => {
 
     const renderPage = () => {
         switch (currentPageKey) {
+            case 'syahadat_intro': return <SyahadatIntro />;
             case 'kata-pengantar': return <KataPengantar />;
             case 'daftar-isi': return <DaftarIsi />;
             case 'bab1': return <Bab1 />;
@@ -4323,9 +4342,84 @@ const CoverScreen = () => {
 };
 
 // Daftar halaman untuk navigasi
-  const pages = ['kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15','bab16','affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan','doa-harian','secret-room-rezeki','activation-screen','reminder-settings','doa-loa-codex' ];
+  const pages = ['syahadat_intro','kata-pengantar', 'daftar-isi', 'bab1', 'bab2', 'bab3', 'bab4', 'bab5', 'bab6', 'bab7', 'bab8', 'bab9', 'bab10', 'bab11', 'bab12', 'bab13', 'bab14a', 'bab14b', 'bab15','bab16','affirmation-room', 'doapilihan', 'pixel-thoughts', 'pengaturan','doa-harian','secret-room-rezeki','activation-screen','reminder-settings','doa-loa-codex' ];
 
+// ... (setelah komponen-komponen lain, sebelum App) ...
 
+const SyahadatIntro = () => {
+    const { setCurrentPageKey } = useContext(AppContext);
+    const audioRef = useRef(null);
+    // const [isAudioEnded, setIsAudioEnded] = useState(false); // HAPUS STATE INI, TIDAK PERLU LAGI
+
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        audio.src = SYAHADAT_AUDIO_SRC;
+        audio.load();
+        audio.volume = 1.0; // Pastikan volume penuh
+
+        const handleAudioEnded = () => {
+            console.log("[SyahadatIntro] Audio finished playing. Auto-advancing.");
+            // Langsung panggil handleContinue setelah audio selesai
+            handleContinue();
+        };
+
+        audio.addEventListener('ended', handleAudioEnded);
+
+        // Auto-play audio saat komponen dimuat
+        audio.play().catch(e => {
+            console.error("Error playing Syahadat audio:", e);
+            // Jika autoplay diblokir, tetap lanjut setelah delay singkat
+            alert("Browser memblokir pemutaran audio otomatis. E-book akan dilanjutkan secara otomatis.");
+            // Tetap panggil handleContinue setelah delay, meskipun audio tidak play otomatis
+            setTimeout(() => {
+                handleContinue();
+            }, 2000); // Beri waktu 2 detik agar pesan terlihat sebelum auto-lanjut
+        });
+
+        return () => {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+                audio.removeEventListener('ended', handleAudioEnded);
+            }
+        };
+    }, []); // Hanya berjalan sekali saat mount
+
+    // Fungsi untuk melanjutkan ke fase berikutnya setelah Syahadat
+    const handleContinue = () => {
+        setCurrentPageKey('home'); // Ini akan memicu App.js untuk mengevaluasi alur aktivasi/reminder
+    };
+
+    return (
+        <div className="fixed inset-0 bg-gray-900 text-white flex flex-col justify-center items-center p-4 overflow-hidden">
+            <Starfield /> {/* Latar belakang bintang */}
+            <audio ref={audioRef} preload="auto" crossOrigin="anonymous"></audio>
+
+            <div className="z-10 text-center animate-fade-in bg-black/70 p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
+                <h1 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300">Penyerahan Diri</h1>
+                <div className="mb-8 text-gray-200">
+                    <p className={`${paragraphClasses} text-center text-xl ${arabicTextClass} mb-4`}>{syahadatTextArabic}</p>
+                    <p className={`${paragraphClasses} text-center italic text-gray-400 mb-2`}>{syahadatTextLatin}</p>
+                    <p className={`${paragraphClasses} text-center`}><b>Terjemahan:</b> {syahadatTextTranslation}</p>
+                </div>
+
+                {/* HAPUS SELURUH BLOK TOMBOL INI */}
+                {/*
+                <button
+                    onClick={handleContinue}
+                    disabled={!isAudioEnded}
+                    className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                >
+                    {isAudioEnded ? 'Lanjut ke E-book' : 'Mohon Tunggu Audio Selesai...'}
+                </button>
+                */}
+                 <p className="text-gray-400 text-sm mt-4 animate-pulse">Mohon tunggu...</p> {/* Pesan tunggu opsional */}
+            </div>
+        </div>
+    );
+};
 // ... (import React, useState, useEffect, useRef, createContext, useContext tetap sama di atas file)
 
 const App = () => {
@@ -4437,7 +4531,9 @@ useEffect(() => {
         if (isCoverUnlocked && !initialNavigationDone) {
             console.log("[App Effect] Initializing post-cover logic.");
             setInitialNavigationDone(true); 
-
+            setCurrentPageKey('syahadat_intro'); // <-- LANGSUNG KE SYAHADAT INTRO SETELAH COVER UNLOCKED
+            console.log("[App Effect] Navigating to SyahadatIntro after cover unlocked.");
+            
             if (!isActivated) {
                 setCurrentPageKey('activation-screen');
                 console.log("[App Effect] Navigating to ActivationScreen as not activated.");
@@ -4501,6 +4597,8 @@ useEffect(() => {
             
             {/* Logika render utama aplikasi: Menentukan apa yang terlihat di layar */}
             {isCoverUnlocked ? ( // Jika cover sudah dibuka
+                currentPageKey === 'syahadat_intro' ? (
+                    <SyahadatIntro />
                 isSadHourReminderVisible ? (
                     // KONDISI 1: SadHourReminder aktif.
                     // HANYA merender overlay gelap dan pop-up.
