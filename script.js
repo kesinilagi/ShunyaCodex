@@ -726,7 +726,7 @@ const AffirmationRoom = () => {
                         </div>
 <button onClick={() => handleStart(false)} disabled={!affirmationText.trim()} 
                             className="mt-8 w-full max-w-sm bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-sky-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
-                            {isAudioReady ? 'Mulai Sesi Afirmasi' : 'Memuat Audio...'}
+                            {isAudioReady ? 'Mulai Sesi Afirmasi' : 'Load'}
                         </button>
                         
                         
@@ -4398,7 +4398,7 @@ const SyahadatIntro = () => {
             <audio ref={audioRef} preload="auto" crossOrigin="anonymous"></audio>
 
             <div className="z-10 text-center animate-fade-in bg-black/70 p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
-                <h1 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300">Penyerahan Diri</h1>
+                <h1 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300"></h1>
                 <div className="mb-8 text-gray-200">
                     <p className={`${paragraphClasses} text-center text-xl ${arabicTextClass} mb-4`}>{syahadatTextArabic}</p>
                     <p className={`${paragraphClasses} text-center italic text-gray-400 mb-2`}>{syahadatTextLatin}</p>
@@ -4412,7 +4412,7 @@ const SyahadatIntro = () => {
                     disabled={!isAudioEnded}
                     className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                 >
-                    {isAudioEnded ? 'Lanjut ke E-book' : 'Mohon Tunggu Audio Selesai...'}
+                    {isAudioEnded ? 'Lanjut ke E-book' : ''}
                 </button>
                 */}
                  <p className="text-gray-400 text-sm mt-4 animate-pulse">Mohon tunggu...</p> {/* Pesan tunggu opsional */}
