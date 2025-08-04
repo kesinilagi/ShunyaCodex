@@ -2735,87 +2735,61 @@ const Bab8 = () => (
 );
 
 const Bab9 = () => (
-    <div className={`${contentContainerClasses}`}>
-        <h2 className={`${sectionTitleClasses}`}>Bab 9. Langkah-Langkah Kawrooh</h2>
-        <p className={`${paragraphClasses}`}>
-            Metode Kawrooh memiliki alur sederhana namun sangat mendalam, dirancang untuk membantu kita kembali terhubung dengan diri sejati dan menemukan kedamaian batin. Berikut adalah langkah-langkahnya:
-        </p>
-        <h3 className={`${subHeadingClasses}`}>1. Keep Aware – Sadari Dulu</h3>
-        <p className={`${paragraphClasses}`}>
-            Banyak dari kita yang tanpa sadar berlari dari perasaan sendiri. Kita mencoba mengabaikan kecemasan, menekan kemarahan, atau berpura-pura baik-baik saja padahal hati sedang terluka. Ironisnya, perasaan yang kita tolak atau coba singkirkan itu justru akan menetap, bahkan bisa mengendap dan menjadi beban yang lebih berat.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Maka, langkah pertama yang paling krusial adalah <span className={highlightTextClasses}>menyadari</span>: *apa sih yang sedang saya rasakan sekarang?* Ini adalah momen untuk berhenti sejenak dan melakukan *scan* batin.
-        </p>
-        <p className={`${paragraphClasses} font-semibold`}>Bagaimana cara mengakses perasaan Anda?</p>
-        <ul className="list-disc list-inside mb-4">
-            <li className={`${paragraphClasses} !mb-0`}>**Ambil jeda sejenak.** Berhenti dari aktivitas apa pun yang sedang Anda lakukan, bahkan hanya untuk beberapa detik. Tarik napas dalam-dalam, hembuskan perlahan.</li>
-            <li className={`${paragraphClasses} !mb-0`}>**Perhatikan sensasi fisik.** Di mana Anda merasakan emosi itu di tubuh Anda? Apakah ada ketegangan di bahu? Perut terasa mual? Dada terasa sesak? Tangan dingin atau berkeringat? Sensasi fisik seringkali menjadi petunjuk pertama tentang apa yang sedang terjadi di dalam diri.</li>
-            <li className={`${paragraphClasses} !mb-0`}>**Identifikasi emosi yang muncul.** Berikan nama pada perasaan itu. Apakah Anda sedang merasa <span className={highlightTextClasses}>takut</span> (mungkin takut akan masa depan yang belum jelas)? Merasa <span className={highlightTextClasses}>iri</span> (melihat pencapaian orang lain)? Merasa <span className={highlightTextClasses}>malu</span> (karena kesalahan masa lalu)? Merasa <span className={highlightTextClasses}>bingung</span> (dengan pilihan hidup)? Atau mungkin ada rasa <span className={highlightTextClasses}>ketakutan yang tidak beralasan</span> (padahal kejadiannya belum terjadi dan mungkin tidak akan pernah terjadi)? Atau <span className={highlightTextClasses}>rasa bersalah</span> atau <span className={highlightTextClasses}>penyesalan</span> yang belum terselesaikan (padahal peristiwa itu sudah lewat dan tidak bisa diubah)?</li>
-            <li className={`${paragraphClasses} !mb-0`}>**Jangan melabeli "buruk" atau "baik".** Penting sekali untuk tidak menghakimi perasaan yang muncul. Ini bukan tentang menjadi "orang baik" atau "orang buruk" karena merasakan sesuatu. Ini hanyalah tentang mengenali dan menerima keberadaan perasaan tersebut. Anggap saja Anda sedang mengamati cuaca dalam diri; Anda tidak mengatakan hujan itu "buruk" atau cerah itu "baik", Anda hanya mencatat bahwa "sekarang sedang hujan" atau "sekarang sedang cerah". Begitu pula dengan emosi, cukup kenali: "Oh, saya sedang merasa cemas."</li>
-        </ul>
+    <div className={`${contentContainerClasses}`}>
+        <h2 className={`${sectionTitleClasses}`}>Bab 9. Contoh Kasus SIRNA – Masalah Hutang</h2>
+        <p className={`${paragraphClasses}`}>
+            <blockquote className={`${quoteClasses}`}>
+                "Barangsiapa bertakwa kepada Allah, niscaya Dia akan mengadakan baginya jalan keluar. Dan memberinya rezeki dari arah yang tidak disangka-sangka."
+            </blockquote>
+        </p>
+        <h3 className={`${subHeadingClasses}`}>🌿 SIRNA – Melepas Sesak karena Hutang</h3>
+        <p className={`${paragraphClasses}`}>
+            Hutang bukan sekadar angka. Ia kadang menyisakan rasa bersalah, malu, bahkan beban batin yang diam-diam menggerus iman dan harap. Di titik ini, kita perlu hening. Bukan untuk menyerah — tapi untuk kembali jujur, dan bersandar penuh pada Allah. Mari kita jalani prosesnya…
+        </p>
 
-        <h3 className={`${subHeadingClasses}`}>2. On Heart – Hadapi Tanpa Menghakimi</h3>
-        <p className={`${paragraphClasses}`}>
-            Setelah menyadari dan mengenali perasaan, langkah selanjutnya adalah membuka ruang bagi perasaan itu untuk hadir di hati Anda, tanpa perlawanan dan tanpa penghakiman. Rasakan sensasi emosi itu di dada atau bagian tubuh lain tempat ia bermanifestasi. Jangan buru-buru menganalisis, mencari penyebab, atau mencoba menyelesaikannya saat itu juga.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Praktikkan <span className={highlightTextClasses}>mindfulness</span> atau kesadaran penuh. Ini melibatkan fokus total pada momen sekarang, tanpa memikirkan masa lalu atau masa depan. Caranya adalah dengan mengamati napas Anda yang masuk dan keluar, merasakan sensasi tubuh (seperti duduk atau berdiri), dan menyaksikan pikiran-pikiran yang muncul di benak Anda *tanpa berusaha mengubahnya atau bereaksi terhadapnya*. Dengan mengamati, Anda mulai menciptakan jarak yang sehat antara diri Anda sebagai pengamat dan beban-beban emosional atau pikiran tersebut. Anda akan sadar, "Oh, ini cuma pikiran cemas, bukan diri saya yang cemas," atau "Ini hanya rasa takut yang lewat, bukan saya yang takut itu." Ini seperti Anda melihat awan di langit; Anda tahu itu awan, Anda bisa melihat bentuk dan pergerakannya, tapi Anda bukan awan itu. Anda adalah langit yang luas dan tak terbatas, yang menyaksikan awan datang dan pergi.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Dalam proses kesadaran ini, setelah memberi ruang pada perasaan, mulailah secara perlahan mengidentifikasi hal-hal kecil yang patut disyukuri dalam hidup Anda. Mungkin hari ini Anda masih bisa bernapas lega, masih bisa menikmati secangkir kopi hangat, atau masih bisa melihat indahnya matahari terbit. Rasa syukur adalah fondasi yang sangat kuat untuk melepaskan beban emosional dan pikiran negatif, karena ia secara efektif menggeser fokus dari kekurangan dan keterbatasan menuju kelimpahan dan anugerah. Ini seperti menyalakan lampu kecil di ruangan yang gelap gulita; perlahan-lahan, dengan hadirnya cahaya syukur, kegelapan akan berkurang dan menghilang.
-        </p>
+        <ul className="list-none mb-4 space-y-6">
+            <li>
+                <h4 className="text-xl font-bold text-gray-800 mb-2">S – Santai / Rileks / Tenang</h4>
+                <p className={`${paragraphClasses}`}>
+                    Tarik napas perlahan. Pejamkan mata sejenak. Sadari posisi tubuhmu. Rasakan beratnya beban yang selama ini kamu bawa. “Ya Allah… aku datang dengan banyak rasa. Tapi aku izinkan diriku tenang sekarang. Aku izinkan diriku menghela napas, dan bersandar pada-Mu.”
+                </p>
+            </li>
+            <li>
+                <h4 className="text-xl font-bold text-gray-800 mb-2">I – Identifikasi</h4>
+                <p className={`${paragraphClasses}`}>
+                    Apa sebenarnya yang terasa berat? Apa rasa yang muncul setiap kali teringat hutang? “Aku merasa… takut. Malu. Tidak berdaya. Seperti gagal sebagai kepala rumah tangga. Aku merasa seperti beban.” Biarkan rasa itu muncul tanpa dihakimi. Rasakan saja.
+                </p>
+            </li>
+            <li>
+                <h4 className="text-xl font-bold text-gray-800 mb-2">R – Ridho / Terima</h4>
+                <p className={`${paragraphClasses}`}>
+                    Bukan menyerah — tapi menerima bahwa ini yang sedang terjadi. “Ya Allah… aku ridho dengan apa yang sedang Engkau izinkan terjadi. Aku terima bahwa aku punya hutang. Aku tidak menyangkal. Tapi aku juga tahu Engkau tidak akan membebaniku melebihi kemampuanku.”
+                </p>
+            </li>
+            <li>
+                <h4 className="text-xl font-bold text-gray-800 mb-2">N – Nanya dan Niat</h4>
+                <p className={`${paragraphClasses}`}>
+                    Kini tanyakan pada hatimu: “Bolehkah ini aku lepaskan?” “Maukah aku melepaskan rasa takut dan malu ini?” “Kapan aku siap melepaskan?” Jika belum bisa, tanya: “Kenapa belum bisa?” Ulangi proses ini dengan lembut… sampai hatimu berkata, “Aku mau…” “Ya Allah… aku mau. Aku mau melepaskan beban rasa ini. Aku niatkan untuk berserah, dan tetap berikhtiar. Aku mau kembali lapang.”
+                </p>
+            </li>
+            <li>
+                <h4 className="text-xl font-bold text-gray-800 mb-2">A – Alirkan, Lepaskan, dan Alhamdulillah</h4>
+                <p className={`${paragraphClasses}`}>
+                    Sekarang bayangkan semua rasa itu mengalir keluar lewat napasmu. Lepaskan dari dada, dari pundak, dari leher… Biarkan semuanya Lepas. Biarkan hanya Allah yang menanggungmu. “Alhamdulillah… Ya Allah, aku izinkan rasa ini pergi. Aku izinkan Diriku berserah. Aku izinkan jiwaku damai dalam penjagaan-Mu…”
+                </p>
+            </li>
+        </ul>
 
-        <h3 className={`${subHeadingClasses}`}>3. Off Heart – Lepaskan dengan Izin dan Ikhlas</h3>
-        <p className={`${paragraphClasses}`}>
-            Setelah Anda cukup hadir dan mengenali perasaan tersebut, kini saatnya memberi izin pada diri untuk melepaskan. Proses pelepasan ini bisa melalui berbagai cara, seperti dengan mengatur napas, doa, dzikir, atau menulis. Salah satu cara sederhana adalah dengan mengakui secara jujur perasaan atau pikiran yang selama ini membatasi Anda, kemudian secara sadar dan sengaja memilih untuk melepaskannya. Bayangkan beban itu seperti Anda memegang kentang panas. Semakin lama Anda menggenggamnya, ia akan terasa semakin panas dan menyakitkan. Lepaskan saja!
-        </p>
-        
-        <p className={`${paragraphClasses}`}>
-            Daripada terus-menerus mencoba mengendalikan atau melawan perasaan-perasaan tersebut, fokuslah pada konsep <span className={highlightTextClasses}>penyerahan</span>. Serahkan segala kekhawatiran, ketakutan, atau keinginan untuk mengendalikan hasil di luar batas kendali Anda. Penyerahan ini bukan berarti Anda menjadi pasif atau malas-malasan; justru sebaliknya, Anda menjadi *powerful* karena bersandar pada kekuatan tak terbatas yang ada di luar diri Anda.
-        </p>
+        <h3 className={`${subHeadingClasses}`}>🌙 Dzikir Penutup (Opsional)</h3>
+        <p className={`${paragraphClasses}`}>
+            Astaghfirullah… Shallallahu ‘ala Sayyidina Muhammad… Baca perlahan, sambil tetap menyambung dengan rasa tenang di dalam. SIRNA bukan solusi instan. Tapi ia menguatkanmu agar tetap bisa hidup — bukan dengan panik, tapi dengan yakin. Yakin bahwa Allah akan cukupkan, ketika kamu cukup jujur untuk berserah.
+        </p>
 
-        <h4 className="text-lg font-bold text-gray-700 mt-4 mb-2">• Menyerahkan Hasil dan Tidak Membatasi Kehendak Ilahi</h4>
-        <p className={`${paragraphClasses}`}>
-            Sadari bahwa tidak semua hal dalam hidup berada sepenuhnya dalam kendali Anda. Setelah melakukan upaya terbaik yang Anda bisa, serahkan hasilnya kepada Tuhan Yang Maha Esa. Ini adalah bentuk <span className={highlightTextClasses}>kepercayaan yang mendalam</span> yang ada kekuatan yang lebih besar yang mengatur segala sesuatu dengan hikmah-Nya. Jangan membatasi diri Anda dengan asumsi atau kekhawatiran manusiawi, sebab kehendak Ilahi itu tidak terbatas. Seringkali kita berkata, "Ah, mana mungkin saya bisa begini," atau "Rezeki saya cuma segini." Padahal, Allah bisa memberikan rezeki dan jalan keluar dari arah yang tidak disangka-sangka. Percayalah pada kemungkinan tak terhingga yang bisa datang dari-Nya. Ini ibarat Anda memesan makanan di restoran bintang lima. Anda tidak perlu tahu bagaimana koki menyiapkan hidangan itu; Anda hanya perlu percaya bahwa makanan terbaik akan segera tiba.
-        </p>
-
-        <h4 className="text-lg font-bold text-gray-700 mt-4 mb-2">• Membangun Rasa Percaya dan Penerimaan</h4>
-        <p className={`${paragraphClasses}`}>
-            Kembangkanlah rasa percaya yang tulus bahwa apa pun yang terjadi dalam hidup Anda adalah yang terbaik untuk Anda, sesuai dengan rencana dan ketentuan Ilahi. Penerimaan semacam ini bukanlah sikap pasif yang menyerah tanpa usaha, melainkan penerimaan aktif yang justru membebaskan Anda dari perjuangan batin yang tidak perlu dan melelahkan. Ini ibarat Anda naik perahu di sungai; Anda bisa mendayung untuk mengarahkan, namun pada saat yang sama, Anda juga harus menerima dan beradaptasi dengan arus sungai itu sendiri.
-        </p>
-
-        <h4 className="text-lg font-bold text-gray-700 mt-4 mb-2">• Ridho sebagai Kunci</h4>
-        <p className={`${paragraphClasses}`}>
-            <span className={highlightTextClasses}>Ridho Ilahi</span> adalah kunci utama menuju ketenangan batin dan keberkahan yang sejati. Ketika Anda telah mencapai tingkatan ridho dengan ketetapan-Nya, hati Anda akan menemukan kedamaian yang tak tergoyahkan, dan pintu-pintu keberkahan akan terbuka lebar. Ini adalah keadaan di mana Anda menerima segala sesuatu dengan lapang dada, baik dalam suka maupun duka, karena Anda meyakini bahwa semua itu datang dari sumber yang Maha Bijaksana dan Maha Mengetahui. 
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Dengan melepaskan beban dan menyerahkan diri dengan ridho Ilahi, Anda akan menemukan bahwa jalan menuju tujuan hidup yang bermakna dan diberkahi menjadi jauh lebih jelas dan ringan. Inilah saatnya Anda mulai 'memanen' hasil dari proses pembersihan dan penyerahan yang sudah Anda jalani.
-        </p>
-
-        <h4 className="text-lg font-bold text-gray-700 mt-4 mb-2">• Mengarahkan Energi</h4>
-        <p className={`${paragraphClasses}`}>
-            Energi yang sebelumnya terbuang sia-sia untuk kecemasan, ketakutan, dan perjuangan batin yang tak berujung, kini dapat diarahkan sepenuhnya untuk tindakan yang produktif dan selaras dengan panggilan hati Anda. Anda akan merasa lebih termotivasi, fokus, dan memiliki kejelasan tentang langkah-langkah nyata yang perlu diambil. Ibaratnya, baterai *smartphone* Anda kini penuh dan siap digunakan untuk hal-hal yang esensial dan bermakna.
-        </p>
-
-        <h4 className="text-lg font-bold text-gray-700 mt-4 mb-2">• Rezeki Tanpa Ngoyo</h4>
-        <p className={`${paragraphClasses}`}>
-            Ketika Anda telah hidup selaras dengan hati yang bersih dan ridho Ilahi, Anda akan menemukan bahwa rezeki datang dengan cara yang lebih mudah dan tanpa perlu 'ngoyo' (berusaha mati-matian dengan penuh tekanan dan kecemasan). Ini bukan berarti Anda tidak berusaha; sebaliknya, Anda tetap berusaha dengan sungguh-sungguh, namun dengan ketenangan, keyakinan, dan kepercayaan penuh bahwa Allah akan mencukupi kebutuhan Anda dari arah yang tidak disangka-sangka. Pernahkah Anda melihat orang yang terlihat santai dan tidak terlalu ngoyo, namun rezekinya senantiasa lancar dan berkah? Nah, mungkin mereka telah menerapkan prinsip ini. Mereka berusaha, tetapi hati mereka tidak terikat pada hasil, sehingga rezeki seolah datang dengan sendirinya, penuh berkah.
-        </p>
-
-        <h4 className="text-lg font-bold text-gray-700 mt-4 mb-2">• Tujuan yang Selaras dengan Hati</h4>
-        <p className={`${paragraphClasses}`}>
-            Ketika hati Anda jernih dan telah terhubung dengan kebijaksanaan batin, tujuan-tujuan yang Anda kejar akan menjadi tujuan yang benar-benar selaras dengan diri sejati Anda dan kehendak Ilahi. Ini bukan lagi tujuan yang semata-mata didorong oleh ego atau tekanan eksternal, melainkan tujuan yang membawa kedamaian, kepuasan, dan keberkahan sejati dalam setiap langkah.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Latihan Kawrooh ini bisa dilakukan kapan saja dan dalam kondisi emosi apa pun. Baik saat Anda sedang merasakan kemarahan yang membakar, kekecewaan yang mendalam, atau bahkan kebahagiaan yang begitu intens hingga membuat Anda lekat pada dunia. Sebab, bahkan hal-hal yang paling kita cintai pun kadang perlu dilepaskan dengan ikhlas ke langit agar tidak menjadi 'berhala' yang mengikat hati dan menghalangi kedamaian batin.
-        </p>
-    <IntegratedAudioPlayer
-            src="musik/PelepasanEmosiIslamic.mp3"
-            text="Contoh Audio Pelepasan Emosi"
-            
-        />
-    </div>
+        <IntegratedAudioPlayer
+            src="musik/PelepasanEmosiIslamic.mp3"
+            text="Contoh Audio Pelepasan Emosi"
+        />
+    </div>
 );
 
 const Bab10 = () => {
