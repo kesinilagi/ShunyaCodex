@@ -427,7 +427,8 @@ const DaftarIsi = () => {
     <li className="pt-2"><button onClick={() => setCurrentPageKey('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}>Ruang Rahasia </button></li>
 
                     <li className="pt-2"><button onClick={() => setCurrentPageKey('doapilihan')} className="text-green-600 hover:underline font-bold text-xl">🙏 Doa-doa Pilihan (Kelapangan Rezeki dan Pelunasan Utang)</button></li>
-    {<li className="pt-2"><button onClick={() => setCurrentPageKey('doa-harian')} className="text-emerald-600 hover:underline font-bold text-xl">🤲 Doa Pilihan Khusus</button></li>}
+    {/* Tombol yang Anda minta untuk disembunyikan */}
+                {/* <li className="pt-2"><button onClick={() => setCurrentPageKey('doa-harian')} className="text-emerald-600 hover:underline font-bold text-xl">🤲 Doa Pilihan Khusus</button></li> */}
               <li className="pt-2"><button onClick={() => setCurrentPageKey('reminder-settings')} className={`${tocFeatureClasses} text-white-200`}>🔔 Bucket List Goal</button></li>
   </ul>
             <AuthorFootnote />
