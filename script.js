@@ -311,10 +311,10 @@ const closeFullscreen = () => {
 // --- Styling Constants ---
 const contentContainerClasses = "p-6 md:p-10 [background-color:rgba(254,243,199,var(--content-bg-opacity))] backdrop-blur-sm rounded-3xl shadow-lg animate-fade-in mb-8";  // <-- DARI bg-white MENJADI bg-stone-100
 const sectionTitleClasses = "text-2xl md:text-3xl font-bold text-center text-black-800 mb-6 border-b-2 pb-2 border-black-200";
-const paragraphClasses = "dynamic-paragraph text-white-1000 leading-loose mb-4 text-justify[text-shadow:1px_1px_3px_rgba(0,0,0,0.7)]";
+const paragraphClasses = "dynamic-paragraph text-black-1000 leading-loose mb-4 text-justify[text-shadow:1px_1px_3px_rgba(0,0,0,0.7)]";
 const highlightTextClasses = "text-blue-600 font-semibold";
-const quoteClasses = "italic text-gray-600 border-l-4 border-blue-400 pl-4 py-2 my-4 text-justify";
-const subHeadingClasses = "text-xl font-bold text-gray-800 mb-3 mt-6";
+const quoteClasses = "italic text-black-600 border-l-4 border-blue-400 pl-4 py-2 my-4 text-justify";
+const subHeadingClasses = "text-xl font-bold text-black-800 mb-3 mt-6";
 const arabicTextClass = "font-serif text-2xl";
 
 // --- KOMPONEN BARU UNTUK HALAMAN KATA PENGANTAR ---
