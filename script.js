@@ -387,10 +387,10 @@ const DaftarIsi = () => {
                                               </ul>
                     </li>
 
-                    <li><button onClick={() => setCurrentPageKey('bab8')} className={tocSectionClasses}> Bagian IV: Kawrooh – Metode Menjernihkan Hati</button>
+                    <li><button onClick={() => setCurrentPageKey('bab8')} className={tocSectionClasses}> Bagian IV: SIRNA - METODE MELEPASKAN BEBAN BATIN</button>
                         <ul className="ml-4 mt-1 space-y-1">
-                            <li><button onClick={() => setCurrentPageKey('bab8')} className={tocChapterClasses}> 8. Kawrooh: Ilmu Melepas Tanpa Drama</button></li>
-                            <li><button onClick={() => setCurrentPageKey('bab9')} className={tocChapterClasses}> 9. Langkah-Langkah Kawrooh (di sertakan audio contoh pelepasan emosi)</button></li>
+                            <li><button onClick={() => setCurrentPageKey('bab8')} className={tocChapterClasses}> 8. Pengertian SIRNA</button></li>
+                            <li><button onClick={() => setCurrentPageKey('bab9')} className={tocChapterClasses}> 9. Contoh Kasus (di sertakan audio contoh pelepasan emosi)</button></li>
                                               </ul>
                     </li>
 
@@ -2671,7 +2671,7 @@ const Bab7 = () => (
 
 const Bab8 = () => (
     <div className={`${contentContainerClasses}`}>
-        <h2 className={`${sectionTitleClasses}`}>Bab 8. SIRNA — Jalan Lembut Menuju Lapang</h2>
+        <h2 className={`${sectionTitleClasses}`}>Bab 8. Pengertian SIRNA</h2>
         <p className={`${paragraphClasses}`}>
             <blockquote className={`${quoteClasses}`}>
                 "Barang siapa bertakwa kepada Allah, niscaya Dia akan menjadikan baginya jalan keluar. Dan memberinya rezeki dari arah yang tidak disangka-sangka."
