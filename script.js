@@ -5205,15 +5205,11 @@ style.innerHTML = `
 }
     /* Tambahan untuk teks di dalam SholawatAccordion dan DoaAccordion agar warnanya sesuai */
     /* Menggunakan selektor yang lebih spesifik */
-    .bg-white\\/10 .text-black, .bg-white\\/10 .text-black-800 { /* Untuk judul utama di akordeon */
-        color: #F8FAFC !important; /* Menggunakan warna teks paragraf bersinar */
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
-    }
-    .bg-white\/10 h4,
+   .bg-white\/10 h4,
 .bg-white\/10 p,
 .bg-white\/10 li,
-.bg-white\/10 span {
-    color: #000000 !important; /* Warna teks di dalam akordeon menjadi hitam */
+.bg-white\/10 b {
+    color: #000000 !important; /* Warna teks menjadi hitam */
     text-shadow: 1px 1px 2px #ffffff !important; /* Tambah bayangan putih */
 }
 
@@ -5221,6 +5217,11 @@ style.innerHTML = `
 .bg-white\/10 .highlightTextClasses {
     color: #60A5FA !important;
     text-shadow: none !important; /* Hapus bayangan agar lebih bersih */
+}
+
+/* Juga perbarui warna ikon audio agar terlihat di latar belakang gelap */
+.bg-white\/10 .inline-flex.items-center.gap-2 svg {
+    color: #000000 !important; /* Atur warna ikon ke hitam */
 }
 
 /* Juga perbarui warna ikon audio agar terlihat di latar belakang gelap */
