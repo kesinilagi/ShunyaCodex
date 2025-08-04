@@ -2953,10 +2953,22 @@ const Bab12 = () => (
         <p className={`${paragraphClasses}`}>
             Para sufi menjadikan tazkiyah sebagai fondasi utama. Tidak ada ilmu, maqam, atau hikmah yang bisa menetap di hati yang kotor. Maka sebelum melangkah lebih jauh, kita bersihkan dulu dalamnya.
         </p>
+
+        <blockquote className={`${quoteClasses}`}>
+            *“Sesungguhnya hati itu berkarat sebagaimana besi berkarat oleh air.”*
+            <br />
+            Mereka berkata, “Lalu bagaimana menghilangkan karat itu, wahai Rasulullah?”
+            <br />
+            Beliau bersabda, “Dengan memperbanyak mengingat mati dan membaca Al-Qur’an.”
+        </blockquote>
+        
         <p className={`${paragraphClasses}`}>
             Pemurnian jiwa adalah sebuah perjalanan yang melibatkan serangkaian praktik dan perubahan internal:
         </p>
         <ul className="list-disc list-inside mb-4">
+            <li className={`${paragraphClasses} !mb-0`}>
+                <span className={highlightTextClasses}>Istighfar (الاستغفار):</span> Secara harfiah berarti memohon ampun kepada Allah. Ini adalah bentuk pengakuan akan dosa dan kelemahan diri, serta permohonan agar Allah menghapuskan kesalahan itu dan melindungi dari akibatnya. Istighfar menjadi cara efektif untuk membersihkan "karat" yang menutupi hati.
+            </li>
             <li className={`${paragraphClasses} !mb-0`}>**Takhalli (Pengosongan Sifat Tercela):** Ini adalah langkah awal yang krusial, yaitu upaya untuk mengosongkan sifat-sifat tercela (*takhalli*), dimulai dengan menyadari keburukan maksiat lahir dan batin untuk menghindarinya.</li>
             <li className={`${paragraphClasses} !mb-0`}>**Tahalli (Pengisian Sifat Terpuji):** Setelah melakukan takhalli, hati diisi dengan sifat-sifat terpuji (*tahallī*) seperti taat, taubat, ikhlas, zuhud, sabar, dan syukur.</li>
             <li className={`${paragraphClasses} !mb-0`}>**Mujahadah an-Nafs (Perjuangan Melawan Hawa Nafsu):** Ini adalah perjuangan melawan tuntutan hawa nafsu, yang merupakan inti dari riyadoh yang telah dilakukan.</li>
@@ -2966,6 +2978,7 @@ const Bab12 = () => (
             <li className={`${paragraphClasses} !mb-0`}>**Ikhlas (Ketulusan):** Ini adalah syarat mutlak diterimanya ibadah dan untuk mendapatkan faedah dari amalan.</li>
             <li className={`${paragraphClasses} !mb-0`}>**Puasa dan Jaga Malam (Sholat Malam/Tahajjud):** Praktik-praktik ini memperdalam koneksi spiritual dan membantu pemurnian. Sholat Tahajjud adalah waktu khusus untuk mencari bimbingan dan dukungan Allah.</li>
         </ul>
+        
         <p className={`${paragraphClasses}`}>
             Pemurnian jiwa memiliki hubungan erat dengan terbukanya <span className={highlightTextClasses}>Kasyf</span> (penyingkapan batin) dan intuisi. <span className={highlightTextClasses}>Kasyf</span> adalah anugerah langsung dari Allah (*ilmu Rabbanī* atau *ilmu lāduni*) yang diberikan kepada orang yang teguh dalam dzikir, uzlah, dan mujahadah. Jangan tunggu sempurna untuk memulai. Karena justru dengan memulai, kita sedang bergerak menuju penyucian.
         </p>
@@ -4272,10 +4285,10 @@ const SidebarMenu = () => {
                                               </ul>
                     </li>
 
-                    <li><button onClick={() => handleNavigate('bab8')} className={tocSectionClasses}> Bagian IV: Kawrooh – Metode Menjernihkan Hati</button>
+                    <li><button onClick={() => handleNavigate('bab8')} className={tocSectionClasses}> Bagian IV: SIRNA - Metode Melepaskan Beban</button>
                         <ul className="ml-4 mt-1 space-y-1">
-                            <li><button onClick={() => handleNavigate('bab8')} className={tocChapterClasses}> 8. Kawrooh: Ilmu Melepas Tanpa Drama</button></li>
-                            <li><button onClick={() => handleNavigate('bab9')} className={tocChapterClasses}> 9. Langkah-Langkah Kawrooh (di sertakan audio contoh pelepasan emosi)</button></li>
+                            <li><button onClick={() => handleNavigate('bab8')} className={tocChapterClasses}> 8. Pengetian SIRNA</button></li>
+                            <li><button onClick={() => handleNavigate('bab9')} className={tocChapterClasses}> 9. Contoh Kasus (di sertakan audio contoh pelepasan emosi)</button></li>
                                               </ul>
                     </li>
 
