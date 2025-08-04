@@ -3834,137 +3834,140 @@ const DoaLoaCodex = () => {
 };
 
 const DoaPilihan = () => {
-    const { isDoaLooping, setIsDoaLooping } = useContext(AppContext);
-    const doaData = [
-        {
-            id: 1,
-            title: "Doa Perlindungan dari Kegelisahan dan Utang",
-            arab: "اللّهُـمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ.",
-            terjemahan: "\"Ya Allah, sesungguhnya aku berlindung kepada-Mu dari rasa gelisah dan sedih, dari kelemahan dan kemalasan, dari sifat kikir dan penakut, serta dari lilitan hutang dan tekanan orang-orang.\"",
-            manfaat: "Memohon perlindungan dari berbagai kesulitan hidup, termasuk beban utang.",
-            latin: "Allaahumma innii a’uudzu bika minal-hammi wal-hazan, wal-‘ajzi wal-kasal, wal-bukhli wal-jubn, wa dhala’id-dayni wa ghalabatir-rijaal",
-            audioSrc: "musik/Allahumainneaudzubika.mp3"
-        },
-        {
-            id: 2,
-            title: "Doa Memohon Kecukupan Rezeki Halal",
-            arab: "اللّهُـمَّ اكْفِـني بِحَلالِـكَ عَنْ حَـرامِـك، وَأَغْنِـني بِفَضْـلِكَ عَمَّـنْ سِـواك.",
-            terjemahan: "\"Ya Allah, cukupkanlah aku dengan rezeki halal-Mu dari yang haram, dan jadikanlah aku kaya dengan karunia-Mu dari selain-Mu.\"",
-            manfaat: "Memohon kecukupan rezeki yang halal dan kemandirian dari selain Allah.",
-            latin: "Allaahumma ikfinii bihalaalika ‘an haraamik, wa aghninii bifadhlika ‘amman siwaak.",
-            audioSrc: "musik/Allahumafinne.mp3"
-        },
-        {
-            id: 3,
-            title: "Doa Memohon Pertolongan dengan Rahmat Allah",
-            arab: "يَا حَيُّ يَا قَيُّوْمُ بِرَحْمَتِكَ أَسْتَغِيْثُ.",
-            terjemahan: "\"Wahai Yang Maha Hidup, Wahai Yang Maha Berdiri Sendiri! Dengan rahmat-Mu aku memohon pertolongan!\"",
-            manfaat: "Memohon pertolongan dan kemudahan dalam segala urusan.",
-            latin: "Ya Hayyu Ya Qayyum! Bi rahmatika astagheeth",
-            audioSrc: "musik/yahayyyaqayy.mp3"
-        },
-        {
-            id: 4,
-            title: "Doa Nabi Yunus (Saat Terdesak)",
-              arab: "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ.",
-            terjemahan: "\"Tidak ada Tuhan selain Engkau. Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.\"",
-            manfaat: "Doa permohonan ampun dan pertolongan dalam keadaan terdesak (Doa Nabi Yunus).",
-            latin: "Laa ilaaha illaa anta subhaanaka inni kuntu minazh-zhaalimiin",
-            audioSrc: "musik/NabiYunus.mp3"
-        },
-        {
-            id: 5,
-            title: "Doa Tawakal Penuh kepada Allah",
-            arab: "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ.",
-            terjemahan: "\"Cukuplah Allah bagiku, tiada Tuhan selain Dia. Hanya kepada-Nya aku bertawakal, dan Dia adalah Tuhan pemilik Arsy yang agung.\"",
-            manfaat: "Menegaskan tawakal penuh kepada Allah sebagai satu-satunya sandaran.",
-            latin: "Hasbiyallaahu laa ilaaha illaa Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arsyil-‘Azhiim.",
-            audioSrc: "musik/Hasbiyallah.mp3"
-        },
-        {
-            id: 6,
-            title: "Doa Pembebasan dari Utang",
-            arab: "اللَّهُمَّ يَا فَارِجَ الْهَمِّ، وَيَا كَاشِفَ الْغَمِّ، فَرِّجْ هَمِّي وَاكْشِفْ غَمِّي، وَارْزُقْنِي مِنْ حَيْثُ لَا أَحْتَسِبُ، يَا أَرْحَمَ الرَّاحِمِينَ",
-            terjemahan: "\"Ya Allah! Wahai penghilang kesedihan... dan bebaskanlah aku dari semua utang.\"",
-            manfaat: "Doa spesifik untuk pembebasan dari utang dan memohon rahmat.",
-            latin: "Allaahumma yaa faarija al-hamm, wa yaa kaasyifa al-ghamm, farrij hammi wakshif ghummi, warzuqni min haytsu laa ahtasib, yaa arhamar raahimiin.",
-            audioSrc: "musik/Allahumayafarijal.mp3"
-        },
-        {
-            id: 7,
-            title: "Doa Melunasi Utang Orang Lain dari Karunia Allah",
-            arab: "اللَّهُمَّ ٱرْدُدْ إِلَىٰ جَمِيعِ خَلْقِكَ مَظَالِمَهُمُ ٱلَّتِي قِبَلِي صَغِيرِهَا وَكَبِيرِهَا فِي يُسْرٍ مِنْكَ وَعَافِيَةٍ، وَمَا لَمْ تُبَلِّغْهُ قُوَّتِي وَلَمْ تَسَعْهُ ذَاتُ يَدِي وَلَمْ يَقْوَ عَلَيْهِ بَدَنِي وَيَقِينِي وَنَفْسِي، فَأَدِّهِ عَنِّي مِنْ جَزِيلِ مَا عِنْدَكَ مِنْ فَضْلِكَ، ثُمَّ لَا تُخْلِفْ عَلَيَّ مِنْهُ شَيْئًا تَقْضِيهِ مِنْ حَسَنَاتِي، يَا أَرْحَمَ الرَّاحِمِينَ.",
-            terjemahan: "\"Ya Allah, kembalikanlah kepada seluruh makhluk-Mu segala kezhaliman mereka yang masih ada padaku — baik yang kecil maupun yang besar — dengan kemudahan dan keselamatan dari-Mu. Dan apa pun yang kekuatanku tak sanggup menyampaikannya, yang tanganku tak sanggup menjangkaunya, yang tubuhku, keyakinanku, dan diriku tak mampu memikulnya — maka tunaikanlah itu dariku dengan limpahan karunia-Mu. Lalu janganlah Engkau kurangi sedikit pun darinya dari (imbalan) kebaikanku, wahai Zat Yang Maha Pengasih di antara para pengasih.\"",
-            manfaat: "Permohonan agar Allah melunasi utang yang tak mampu dibayar dari karunia-Nya.",
-            latin: "Allaahumma urdud ilaa jamii‘i khalqika mazaalimahum allati qibalii shaghiiruhaa wa kabiiruhaa fii yusrin minka wa ‘aafiyah. Wa maa lam tuballigh-hu quwwatii wa lam tasa‘hu dhaatu yadî wa lam yaqwa ‘alayhi badanii wa yaqînii wa nafsii, fa-addihi ‘annii min jaziili maa ‘indaka min fadhlika, tsumma laa tukhlif ‘alayya minhu syay’an taqdhiihi min hasanaatii, yaa arhamar raahimiin.",
-            audioSrc: "musik/Allahumaurdud.mp3"
-        },
-        {
-            id: 8,
-            title: "Doa Memohon Kemudahan",
-            arab: "االلّهُمَّ لاَ سَهْلَ إِلاَّ مَا جَعَلْتَهُ سَهْلاً، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلاً",
-            terjemahan: "\"Ya Allah, tidak ada kemudahan kecuali apa yang Engkau jadikan mudah, dan Engkaulah yang menjadikan kesedihan (kesulitan) itu mudah jika Engkau kehendaki.\"",
-            manfaat: "Memohon kemudahan dari Allah dalam menghadapi segala kesulitan.",
-            latin: "Allahumma la sahla illa maa ja‘altahu sahlan, wa anta taj‘alu al-hazna idza syi’ta sahlan.",
-            audioSrc: "musik/Allahumasahla.mp3" 
-        },
-        {
-            id: 9,
-            title: "Doa Memohon Qana'ah dan Keberkahan Rezeki",
-            arab: "اللَّهُمَّ قَنِّعْنِي بِمَا رَزَقْتَنِي وَبَارِكْ لِي فِيهِ وَاخْلُفْ عَلَيَّ كُلَّ غَائِبَةٍ لِي بِخَيْرٍ",
-            terjemahan: "\"Ya Allah, cukupkanlah aku dengan apa yang Engkau rezekikan kepadaku, berkahilah ia untukku, dan gantilah setiap yang hilang dariku dengan yang lebih baik.\"",
-            manfaat: "Memohon rasa cukup (qana'ah), keberkahan, dan penggantian yang lebih baik.",
-            latin: "Allahumma qanni’ni bima razaqtani, wa baarik li fihi, wakhluf ‘alayya kulla gha’ibatin li bikhayr.",
-            audioSrc: "musik/Allahumaqanni.mp3"
-        },
-      {
-            id: 10,
-            title: "Doa Rejeki Lapang dan Luas Surat Ali Imron 26-27",
-            arab: "قُلِ اللَّهُمَّ مَالِكَ الْمُلْكِ تُؤْتِي الْمُلْكَ مَن تَشَاءُ وَتَنزِعُ الْمُلْكَ مِمَّن تَشَاءُ وَتُعِزُّ مَن تَشَاءُ وَتُذِلُّ مَن تَشَاءُ ۖ بِيَدِكَ الْخَيْرُ ۖ إِنَّكَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ  , تُولِجُ اللَّيْلَ فِي النَّهَارِ وَتُولِجُ النَّهَارَ فِي اللَّيْلِ وَتُخْرِجُ الْحَيَّ مِنَ الْمَيِّتِ وَتُخْرِجُ الْمَيِّتَ مِنَ الْحَيِّ وَتَرْزُقُ مَن تَشَاءُ بِغَيْرِ حِسَابٍ",
-            terjemahan: "\"Katakanlah (Muhammad), ‘Wahai Allah, Pemilik kerajaan, Engkau berikan kerajaan kepada siapa yang Engkau kehendaki, dan Engkau cabut kerajaan dari siapa yang Engkau kehendaki. Engkau muliakan siapa yang Engkau kehendaki, dan Engkau hinakan siapa yang Engkau kehendaki. Di tangan-Mu segala kebajikan. Sungguh, Engkau Mahakuasa atas segala sesuatu. Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau berikan rezeki kepada siapa yang Engkau kehendaki tanpa perhitungan\"",
-            manfaat: "memohon dibalikkan keadaan, diangkat derajat, dicukupkan rezeki, dan diberi kemuliaan di dunia & akhirat.",
-            latin: "Qulillaahumma maalikal-mulki tu’til-mulka man tasyā’u wa tanzi‘ul-mulka mimman tasyā’, wa tu‘izzu man tasyā’u wa tudzillu man tasyā’, biyadikal-khayr, innaka ‘alā kulli syay’in qadiir. Tuulijul-layla fin-nahāri wa tuulijun-nahāra fil-layl, wa tukhrijul-hayya minal-mayyit, wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyā’u bighayri hisāb.",
-            audioSrc: "musik/Surah2627.mp3"
-        },
-    ];
+    const { isDoaLooping, setIsDoaLooping } = useContext(AppContext);
+    // NEW: State untuk melacak apakah ada audio yang sedang diputar
+    const [isAnyAudioPlaying, setIsAnyAudioPlaying] = useState(false);
+
+    const doaData = [
+        {
+            id: 1,
+            title: "Doa Perlindungan dari Kegelisahan dan Utang",
+            arab: "اللّهُـمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ.",
+            terjemahan: "\"Ya Allah, sesungguhnya aku berlindung kepada-Mu dari rasa gelisah dan sedih, dari kelemahan dan kemalasan, dari sifat kikir dan penakut, serta dari lilitan hutang dan tekanan orang-orang.\"",
+            manfaat: "Memohon perlindungan dari berbagai kesulitan hidup, termasuk beban utang.",
+            latin: "Allaahumma innii a’uudzu bika minal-hammi wal-hazan, wal-‘ajzi wal-kasal, wal-bukhli wal-jubn, wa dhala’id-dayni wa ghalabatir-rijaal",
+            audioSrc: "musik/Allahumainneaudzubika.mp3"
+        },
+        {
+            id: 2,
+            title: "Doa Memohon Kecukupan Rezeki Halal",
+            arab: "اللّهُـمَّ اكْفِـني بِحَلالِـكَ عَنْ حَـرامِـك، وَأَغْنِـني بِفَضْـلِكَ عَمَّـنْ سِـواك.",
+            terjemahan: "\"Ya Allah, cukupkanlah aku dengan rezeki halal-Mu dari yang haram, dan jadikanlah aku kaya dengan karunia-Mu dari selain-Mu.\"",
+            manfaat: "Memohon kecukupan rezeki yang halal dan kemandirian dari selain Allah.",
+            latin: "Allaahumma ikfinii bihalaalika ‘an haraamik, wa aghninii bifadhlika ‘amman siwaak.",
+            audioSrc: "musik/Allahumafinne.mp3"
+        },
+        {
+            id: 3,
+            title: "Doa Memohon Pertolongan dengan Rahmat Allah",
+            arab: "يَا حَيُّ يَا قَيُّوْمُ بِرَحْمَتِكَ أَسْتَغِيْثُ.",
+            terjemahan: "\"Wahai Yang Maha Hidup, Wahai Yang Maha Berdiri Sendiri! Dengan rahmat-Mu aku memohon pertolongan!\"",
+            manfaat: "Memohon pertolongan dan kemudahan dalam segala urusan.",
+            latin: "Ya Hayyu Ya Qayyum! Bi rahmatika astagheeth",
+            audioSrc: "musik/yahayyyaqayy.mp3"
+        },
+        {
+            id: 4,
+            title: "Doa Nabi Yunus (Saat Terdesak)",
+              arab: "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ.",
+            terjemahan: "\"Tidak ada Tuhan selain Engkau. Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.\"",
+            manfaat: "Doa permohonan ampun dan pertolongan dalam keadaan terdesak (Doa Nabi Yunus).",
+            latin: "Laa ilaaha illaa anta subhaanaka inni kuntu minazh-zhaalimiin",
+            audioSrc: "musik/NabiYunus.mp3"
+        },
+        {
+            id: 5,
+            title: "Doa Tawakal Penuh kepada Allah",
+            arab: "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ.",
+            terjemahan: "\"Cukuplah Allah bagiku, tiada Tuhan selain Dia. Hanya kepada-Nya aku bertawakal, dan Dia adalah Tuhan pemilik Arsy yang agung.\"",
+            manfaat: "Menegaskan tawakal penuh kepada Allah sebagai satu-satunya sandaran.",
+            latin: "Hasbiyallaahu laa ilaaha illaa Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arsyil-‘Azhiim.",
+            audioSrc: "musik/Hasbiyallah.mp3"
+        },
+        {
+            id: 6,
+            title: "Doa Pembebasan dari Utang",
+            arab: "اللَّهُمَّ يَا فَارِجَ الْهَمِّ، وَيَا كَاشِفَ الْغَمِّ، فَرِّجْ هَمِّي وَاكْشِفْ غَمِّي، وَارْزُقْنِي مِنْ حَيْثُ لَا أَحْتَسِبُ، يَا أَرْحَمَ الرَّاحِمِينَ",
+            terjemahan: "\"Ya Allah! Wahai penghilang kesedihan... dan bebaskanlah aku dari semua utang.\"",
+            manfaat: "Doa spesifik untuk pembebasan dari utang dan memohon rahmat.",
+            latin: "Allaahumma yaa faarija al-hamm, wa yaa kaasyifa al-ghamm, farrij hammi wakshif ghummi, warzuqni min haytsu laa ahtasib, yaa arhamar raahimiin.",
+            audioSrc: "musik/Allahumayafarijal.mp3"
+        },
+        {
+            id: 7,
+            title: "Doa Melunasi Utang Orang Lain dari Karunia Allah",
+            arab: "اللَّهُمَّ ٱرْدُدْ إِلَىٰ جَمِيعِ خَلْقِكَ مَظَالِمَهُمُ ٱلَّتِي قِبَلِي صَغِيرِهَا وَكَبِيرِهَا فِي يُسْرٍ مِنْكَ وَعَافِيَةٍ، وَمَا لَمْ تُبَلِّغْهُ قُوَّتِي وَلَمْ تَسَعْهُ ذَاتُ يَدِي وَلَمْ يَقْوَ عَلَيْهِ بَدَنِي وَيَقِينِي وَنَفْسِي، فَأَدِّهِ عَنِّي مِنْ جَزِيلِ مَا عِنْدَكَ مِنْ فَضْلِكَ، ثُمَّ لَا تُخْلِفْ عَلَيَّ مِنْهُ شَيْئًا تَقْضِيهِ مِنْ حَسَنَاتِي، يَا أَرْحَمَ الرَّاحِمِينَ.",
+            terjemahan: "\"Ya Allah, kembalikanlah kepada seluruh makhluk-Mu segala kezhaliman mereka yang masih ada padaku — baik yang kecil maupun yang besar — dengan kemudahan dan keselamatan dari-Mu. Dan apa pun yang kekuatanku tak sanggup menyampaikannya, yang tanganku tak sanggup menjangkaunya, yang tubuhku, keyakinanku, dan diriku tak mampu memikulnya — maka tunaikanlah itu dariku dengan limpahan karunia-Mu. Lalu janganlah Engkau kurangi sedikit pun darinya dari (imbalan) kebaikanku, wahai Zat Yang Maha Pengasih di antara para pengasih.\"",
+            manfaat: "Permohonan agar Allah melunasi utang yang tak mampu dibayar dari karunia-Nya.",
+            latin: "Allaahumma urdud ilaa jamii‘i khalqika mazaalimahum allati qibalii shaghiiruhaa wa kabiiruhaa fii yusrin minka wa ‘aafiyah. Wa maa lam tuballigh-hu quwwatii wa lam tasa‘hu dhaatu yadî wa lam yaqwa ‘alayhi badanii wa yaqînii wa nafsii, fa-addihi ‘annii min jaziili maa ‘indaka min fadhlika, tsumma laa tukhlif ‘alayya minhu syay’an taqdhiihi min hasanaatii, yaa arhamar raahimiin.",
+            audioSrc: "musik/Allahumaurdud.mp3"
+        },
+        {
+            id: 8,
+            title: "Doa Memohon Kemudahan",
+            arab: "االلّهُمَّ لاَ سَهْلَ إِلاَّ مَا جَعَلْتَهُ سَهْلاً، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلاً",
+            terjemahan: "\"Ya Allah, tidak ada kemudahan kecuali apa yang Engkau jadikan mudah, dan Engkaulah yang menjadikan kesedihan (kesulitan) itu mudah jika Engkau kehendaki.\"",
+            manfaat: "Memohon kemudahan dari Allah dalam menghadapi segala kesulitan.",
+            latin: "Allahumma la sahla illa maa ja‘altahu sahlan, wa anta taj‘alu al-hazna idza syi’ta sahlan.",
+            audioSrc: "musik/Allahumasahla.mp3" 
+        },
+        {
+            id: 9,
+            title: "Doa Memohon Qana'ah dan Keberkahan Rezeki",
+            arab: "اللَّهُمَّ قَنِّعْنِي بِمَا رَزَقْتَنِي وَبَارِكْ لِي فِيهِ وَاخْلُفْ عَلَيَّ كُلَّ غَائِبَةٍ لِي بِخَيْرٍ",
+            terjemahan: "\"Ya Allah, cukupkanlah aku dengan apa yang Engkau rezekikan kepadaku, berkahilah ia untukku, dan gantilah setiap yang hilang dariku dengan yang lebih baik.\"",
+            manfaat: "Memohon rasa cukup (qana'ah), keberkahan, dan penggantian yang lebih baik.",
+            latin: "Allahumma qanni’ni bima razaqtani, wa baarik li fihi, wakhluf ‘alayya kulla gha’ibatin li bikhayr.",
+            audioSrc: "musik/Allahumaqanni.mp3"
+        },
+      {
+            id: 10,
+            title: "Doa Rejeki Lapang dan Luas Surat Ali Imron 26-27",
+            arab: "قُلِ اللَّهُمَّ مَالِكَ الْمُلْكِ تُؤْتِي الْمُلْكَ مَن تَشَاءُ وَتَنزِعُ الْمُلْكَ مِمَّن تَشَاءُ وَتُعِزُّ مَن تَشَاءُ وَتُذِلُّ مَن تَشَاءُ ۖ بِيَدِكَ الْخَيْرُ ۖ إِنَّكَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ  , تُولِجُ اللَّيْلَ فِي النَّهَارِ وَتُولِجُ النَّهَارَ فِي اللَّيْلِ وَتُخْرِجُ الْحَيَّ مِنَ الْمَيِّتِ وَتُخْرِجُ الْمَيِّتَ مِنَ الْحَيِّ وَتَرْزُقُ مَن تَشَاءُ بِغَيْرِ حِسَابٍ",
+            terjemahan: "\"Katakanlah (Muhammad), ‘Wahai Allah, Pemilik kerajaan, Engkau berikan kerajaan kepada siapa yang Engkau kehendaki, dan Engkau cabut kerajaan dari siapa yang Engkau kehendaki. Engkau muliakan siapa yang Engkau kehendaki, dan Engkau hinakan siapa yang Engkau kehendaki. Di tangan-Mu segala kebajikan. Sungguh, Engkau Mahakuasa atas segala sesuatu. Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau berikan rezeki kepada siapa yang Engkau kehendaki tanpa perhitungan\"",
+            manfaat: "memohon dibalikkan keadaan, diangkat derajat, dicukupkan rezeki, dan diberi kemuliaan di dunia & akhirat.",
+            latin: "Qulillaahumma maalikal-mulki tu’til-mulka man tasyā’u wa tanzi‘ul-mulka mimman tasyā’, wa tu‘izzu man tasyā’u wa tudzillu man tasyā’, biyadikal-khayr, innaka ‘alā kulli syay’in qadiir. Tuulijul-layla fin-nahāri wa tuulijun-nahāra fil-layl, wa tukhrijul-hayya minal-mayyit, wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyā’u bighayri hisāb.",
+            audioSrc: "musik/Surah2627.mp3"
+        },
+    ];
 
 return (
-        <div className={contentContainerClasses}>
-            <h2 className={sectionTitleClasses}>🙏 Doa-doa Pilihan (Kelapangan Rezeki dan Pelunasan Utang)</h2>
-            <p className={paragraphClasses}>
-                Berikut adalah kumpulan doa pilihan yang dapat Anda amalkan untuk memohon kelapangan rezeki, kemudahan urusan, dan pembebasan dari utang. Klik pada judul doa untuk melihat detail dan mendengarkan audionya.
-            </p>
+        <div className={contentContainerClasses}>
+            <h2 className={sectionTitleClasses}>🙏 Doa-doa Pilihan (Kelapangan Rezeki dan Pelunasan Utang)</h2>
+            <p className={paragraphClasses}>
+                Berikut adalah kumpulan doa pilihan yang dapat Anda amalkan untuk memohon kelapangan rezeki, kemudahan urusan, dan pembebasan dari utang. Klik pada judul doa untuk melihat detail dan mendengarkan audionya.
+            </p>
 {/* --- NEW: Toggle Button for Looping --- */}
-            <div className="text-center my-6">
-                <button
-                    onClick={() => setIsDoaLooping(prev => !prev)}
-                    className={`px-6 py-3 rounded-full font-bold shadow-lg transition-all duration-300 transform hover:scale-105 ${
-                        isDoaLooping ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                    }`}
-                >
-                    {isDoaLooping ? '🔁 Looping Aktif' : '▶️ Aktifkan Looping'}
-                </button>
-                <p className="text-sm text-gray-600 mt-2">
-                    {isDoaLooping ? 'Setiap doa akan berulang otomatis.' : 'Doa akan diputar sekali lalu berhenti.'}
-                </p>
-            </div>
-            {/* --- END NEW TOGGLE --- */}
-            <div className="mt-6 space-y-3">
-                {doaData.map(doa => (
-                    <DoaAccordion
-                        key={doa.id}
-                        title={doa.title}
-                        audioSrc={doa.audioSrc}
-                        arabicText={doa.arab}
-                        latinText={doa.latin}
-                        translationText={doa.terjemahan}
-                        benefitsText={doa.manfaat}
-                        isLooping={isDoaLooping}
-                    />
-                ))}
-            </div>
-        </div>
-    );
+            <div className="text-center my-6">
+                <button
+                    onClick={() => setIsDoaLooping(prev => !prev)}
+                    className={`px-6 py-3 rounded-full font-bold shadow-lg transition-all duration-300 transform hover:scale-105 ${
+                        isDoaLooping ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                >
+                    {isDoaLooping ? '🔁 Looping Aktif' : '▶️ Aktifkan Looping'}
+                </button>
+                <p className="text-sm text-gray-600 mt-2">
+                    {isDoaLooping ? 'Setiap doa akan berulang otomatis.' : 'Doa akan diputar sekali lalu berhenti.'}
+                </p>
+            </div>
+            {/* --- END NEW TOGGLE --- */}
+            <div className="mt-6 space-y-3">
+                {doaData.map(doa => (
+                    <DoaAccordion
+                        key={doa.id}
+                        title={doa.title}
+                        audioSrc={doa.audioSrc}
+                        arabicText={doa.arab}
+                        latinText={doa.latin}
+                        translationText={doa.terjemahan}
+                        benefitsText={doa.manfaat}
+                        isLooping={isDoaLooping}
+                    />
+                ))}
+            </div>
+        </div>
+    );
 };
 
 
@@ -4371,7 +4374,8 @@ const SidebarMenu = () => {
     <li className="pt-2"><button onClick={()=> handleNavigate('affirmation-room')} className={`${tocFeatureClasses} golden-background text-sky-500`}> Ruang Afirmasi</button></li>
     <li className="pt-2"><button onClick={() => handleNavigate('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}> Ruang Rahasia Menarik Rezeki</button></li>
                 <li className="pt-2"><button onClick={()=> handleNavigate('doapilihan')} className={`${tocFeatureClasses} text-green-600`}>🙏 Doa-doa Pilihan</button></li>
-             <li className="pt-2"><button onClick={() => handleNavigate('doa-harian')} className={`${tocFeatureClasses} text-emerald-600`}>🤲 Doa Khusus</button></li>
+             {/* Tombol yang Anda minta untuk disembunyikan */}
+                {/* <li className="pt-2"><button onClick={() => handleNavigate('doa-harian')} className="text-emerald-600 hover:underline font-bold text-xl">🤲 Doa Pilihan Khusus</button></li> */}
               <li className="pt-2"><button onClick={() => handleNavigate('reminder-settings')} className={`${tocFeatureClasses} text-red-400`}>🔔 Bucket List Goal</button></li>
               </ul>
         </>
