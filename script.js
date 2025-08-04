@@ -2997,14 +2997,61 @@ const Bab13 = () => (
         <p className={`${paragraphClasses}`}>
             Berikut adalah beberapa praktik ringan namun berdampak sangat besar, yang bisa Anda terapkan setiap hari untuk memperkaya dimensi spiritual dan menemukan kedamaian batin:
         </p>
+
         <h3 className={`${subHeadingClasses}`}>🔹 Niat di Pagi Hari – Ucapkan dalam Hati: "Hari ini aku ingin hadir, bukan sekadar sibuk."</h3>
         <p className={`${paragraphClasses}`}>
             Mulailah hari Anda dengan sebuah niat yang jernih. Sebelum terperangkap dalam daftar tugas atau hiruk pikuk agenda, luangkan waktu sejenak, pejamkan mata, dan ucapkan dalam hati, "Hari ini aku ingin hadir seutuhnya, bukan sekadar sibuk tanpa makna. Aku ingin merasakan setiap momen, bukan hanya mengejar waktu. <span className={highlightTextClasses}>Dan aku kirimkan doa terbaikku, keberkahan, kesejahteraan, serta kebaikan untuk seluruh makhluk Allah di alam semesta ini.</span>" Niat ini akan menjadi jangkar yang mengarahkan fokus dan energi Anda sepanjang hari, membantu Anda tetap terhubung dengan diri sendiri di tengah segala aktivitas.
         </p>
 
-        <h3 className={`${subHeadingClasses}`}>🔹 Latih Metode Kawrooh – Agar Terbiasa Melihat Situasi Apapun dalam Kondisi Hati yang Tenang</h3>
+        {/* --- BLOK BARU: Saran Pengamalan Istighfar Sehari-hari --- */}
+        <h3 className={`${subHeadingClasses}`}>🔹 Saran Pengamalan Istighfar Sehari-hari</h3>
         <p className={`${paragraphClasses}`}>
-            Metode Kawrooh yang telah kita pelajari adalah alat paling ampuh untuk menjaga ketenangan hati di tengah badai kehidupan. Luangkan beberapa menit setiap kali Anda merasakan gejolak emosi—baik itu kecemasan, kekesalan, atau bahkan kebahagiaan berlebihan yang membuat Anda melekat. Sadari apa yang Anda rasakan (*Keep Aware*), biarkan ia hadir tanpa penghakiman (*On Heart*), lalu lepaskan dengan izin dan keikhlasan (*Off Heart*). Semakin sering Anda melatih ini, semakin terbiasa hati Anda melihat situasi apapun dari posisi yang tenang dan jernih.
+            Istighfar adalah kunci untuk membersihkan hati dan membuka pintu rezeki. Berikut adalah beberapa cara praktis untuk mengamalkannya:
+        </p>
+        <ul className="list-decimal list-inside mb-4 space-y-4">
+            <li className={`${paragraphClasses} !mb-0`}>
+                <span className={highlightTextClasses}>Dzikir Istighfar Harian (100x):</span> Baca **"Astaghfirullahal ‘Azhim wa atûbu ilaih"** (Aku mohon ampun kepada Allah Yang Maha Agung dan aku bertobat kepada-Nya). Lakukan setelah sholat fardhu (10x), saat perjalanan, menunggu, atau sebelum tidur.
+            </li>
+            <li className={`${paragraphClasses} !mb-0`}>
+                <span className={highlightTextClasses}>Saat Sedih, Emosi, atau Gagal:</span> Ketika merasa marah atau kecewa, jadikan istighfar sebagai penenang spontan. Tarik napas dalam, lalu ucapkan pelan: **“Astaghfirullah… Ya Allah, tenangkan hatiku.”**
+            </li>
+            <li className={`${paragraphClasses} !mb-0`}>
+                <span className={highlightTextClasses}>Pagi Hari (Pembuka Rezeki):</span> Sebelum memulai aktivitas, baca **"Astaghfirullah" 33x** lalu doa: **"Ya Allah, ampuni dosaku, berkahi hariku, dan mudahkan rezekiku."**
+            </li>
+            <li className={`${paragraphClasses} !mb-0`}>
+                <span className={highlightTextClasses}>Sore/Malam (Penutup Hari):</span> Sebelum tidur, ingat hal yang salah atau lalai hari itu, lalu baca istighfar 3x atau 33x pelan-pelan. Niatkan untuk menjadi lebih baik esok hari.
+            </li>
+            <li className={`${paragraphClasses} !mb-0`}>
+                <span className={highlightTextClasses}>Doa Istighfar Rasulullah ﷺ:</span> Nabi sendiri membaca ini tiap hari: **“رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ”** (Ya Rabb, ampunilah aku dan terimalah taubatku. Sungguh Engkau Maha Penerima Taubat, Maha Penyayang.)
+            </li>
+        </ul>
+        {/* --- AKHIR BLOK BARU --- */}
+        
+        <h3 className={`${subHeadingClasses}`}>🔹 Latih Metode SIRNA – Agar Hati Terbiasa Tenang, Meski Hidup Tak Selalu Tenang</h3>
+        <p className={`${paragraphClasses}`}>
+            Metode SIRNA adalah cara sederhana namun mendalam untuk menghadapi gelombang hidup tanpa tenggelam. Saat kamu merasa berat—emosi naik, pikiran kacau—luangkan sejenak untuk mempraktikannya.
+        </p>
+        <p className={`${paragraphClasses}`}>
+            Mulailah dengan <span className={highlightTextClasses}>Santai</span>: tarik napas pelan, rilekskan tubuhmu. Hadirkan dirimu utuh di momen ini.
+        </p>
+        <p className={`${paragraphClasses}`}>
+            Lalu <span className={highlightTextClasses}>Identifikasi</span>: rasa apa yang sedang muncul? Akui tanpa menghakimi.
+        </p>
+        <p className={`${paragraphClasses}`}>
+            Selanjutnya, <span className={highlightTextClasses}>Ridho</span>: terima bahwa rasa ini hadir karena Allah mengizinkan. Tidak salah. Tidak harus hilang. Cukup diterima dulu.
+        </p>
+        <p className={`${paragraphClasses}`}>
+            Kemudian masuk ke <span className={highlightTextClasses}>Nanya & Niat</span>—ini satu paket:
+        </p>
+        <ul className="list-disc list-inside mb-4">
+            <li className={`${paragraphClasses} !mb-0`}>Tanya hatimu dan Allah dengan lembut: “Bolehkah aku rasakan ini, ya Allah?” “Mau aku lepasin nggak?” “Bisa aku lepasin sekarang?” “Kapan aku mau lepasin?”</li>
+            <li className={`${paragraphClasses} !mb-0`}>Lalu tegaskan niat: “Aku niat melepas. Aku serahkan kembali kepada-Mu ya Allah.”</li>
+        </ul>
+        <p className={`${paragraphClasses}`}>
+            Terakhir, <span className={highlightTextClasses}>Alirkan</span>: lepaskan rasa itu pelan-pelan. Biarkan mengalir ke lautan rahmat-Nya. Tak perlu dipaksa. Tak perlu diikat.
+        </p>
+        <p className={`${paragraphClasses}`}>
+            Semakin sering kamu melatih ini, semakin tajam kepekaan hatimu—dan semakin lapang jiwamu menghadapi apapun yang datang.
         </p>
 
         <h3 className={`${subHeadingClasses}`}>🔹 Napas Sadar – Ambil 3 Tarikan Napas Dalam Sebelum Mulai Aktivitas. Rasakan Hadirnya Allah.</h3>
