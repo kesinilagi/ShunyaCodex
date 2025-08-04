@@ -2670,36 +2670,68 @@ const Bab7 = () => (
 );
 
 const Bab8 = () => (
-    <div className={`${contentContainerClasses}`}>
-        <h2 className={`${sectionTitleClasses}`}>Bab 8. Kawrooh: Ilmu Melepas Tanpa Drama</h2>
-        <p className={`${paragraphClasses}`}>
-            Pernahkah Anda merasa hidup ini seperti *game* yang levelnya susah banget, dan Anda terus-menerus *stuck* di satu titik? Atau seperti membawa ransel yang isinya batu semua, berat banget, tapi Anda gak tahu cara melepasnya? Nah, di sinilah Metode Kawrooh hadir sebagai "cheat code" yang halal dan berkah.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Kawrooh bukan mantra. Ia bukan metode holistik. Kawrooh adalah seni melepas yang lahir dari kesadaran. Ia sederhana tapi dalam. Ia tidak mengajari kita “cara cepat bahagia”, tapi cara jujur berdamai.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            "Kawrooh" adalah singkatan dari <span className={highlightTextClasses}>Keep Aware On Off Heart</span>. Ini bukan sekadar akronim keren, tapi inti dari sebuah filosofi yang mendalam. Kata "Kawruh" sendiri dalam bahasa Jawa berarti pengetahuan atau ilmu, yang menekankan pentingnya wawasan mendalam.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Metode Kawrooh mengajarkan kita untuk melepaskan beban emosional dan mental dengan <span className={highlightTextClasses}>ridho Ilahi</span>, sehingga kita bisa mencapai tujuan yang berkah. Ini adalah pendekatan yang fokus pada kesadaran batin dan penyerahan diri untuk meraih ketenangan dan kebahagiaan sejati.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Dalam konteks spiritual Jawa, ada "Kawruh Begja" dari Ki Ageng Suryomentaram. Beliau mengajarkan bahwa untuk bahagia, kita gak perlu mati-matian mengejarnya, dan penderitaan pun gak perlu dihindari. Kuncinya? Manusia hanya perlu mampu merespons atau mengatur perasaannya dalam memenuhi keinginan. Ini wawasan spiritual yang keren banget: kebahagiaan itu bukan tentang apa yang kita dapatkan, tapi bagaimana kita mengelola perasaan kita terhadap apa yang terjadi. Konsep "tentrem" (ketenangan batin) dalam Kawruh Jawa kontemporer juga menegaskan bahwa kebahagiaan sejati itu bukan cuma soal harta, tapi soal ketenangan pikiran dan jiwa.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Metode Kawrooh ini juga menyentuh alam bawah sadar kita. Seringkali, "keyakinan dan perasaan yang membatasi diri" itu tersimpan di alam bawah sadar, bikin kita gak bisa maju. Dengan "melepaskan" hambatan bawah sadar ini, kita bisa mengakses "pengetahuan batin" yang lebih dalam dan "Diri yang tidak terbatas" yang terhubung dengan hati. Jadi, alam bawah sadar itu bukan "kekuatan hati" itu sendiri, tapi semacam "gudang" tempat penyumbatan hati berada. Kalau gudangnya bersih, kekuatan hati kita bisa keluar maksimal.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Seringkali kita merasa berat bukan karena masalahnya besar, tapi karena kita menggenggamnya terlalu erat. Kawrooh mengajak kita untuk pelan-pelan sadar, lalu rela melepaskan. Tanpa drama. Tanpa paksaan. Tanpa *overthinking*.
-        </p>
-        <p className={`${paragraphClasses}`}>
-            Kita nggak perlu berpura-pura kuat. Tapi kita bisa belajar mengenali apa yang sedang kita tahan. Dan dari sana, kita bisa memilih: lepaskan. Serahkan. Tenangkan.
-        </p>
-        <blockquote className={`${quoteClasses}`}>
-            *“Beban hidup itu seperti batu di tas punggung. Kalau sadar, bisa dilepas. Kalau nggak, ya dibawa terus sambil ngeluh.”*
-        </blockquote>
-    </div>
+    <div className={`${contentContainerClasses}`}>
+        <h2 className={`${sectionTitleClasses}`}>Bab 8. SIRNA — Jalan Lembut Menuju Lapang</h2>
+        <p className={`${paragraphClasses}`}>
+            <blockquote className={`${quoteClasses}`}>
+                "Barang siapa bertakwa kepada Allah, niscaya Dia akan menjadikan baginya jalan keluar. Dan memberinya rezeki dari arah yang tidak disangka-sangka."
+            </blockquote>
+        </p>
+        <p className={`${paragraphClasses}`}>
+            <blockquote className={`${quoteClasses}`}>
+                "Sesungguhnya hati itu berkarat sebagaimana besi berkarat oleh air.” Mereka berkata, “Lalu bagaimana menghilangkan karat itu, wahai Rasulullah?” Beliau bersabda, “Dengan memperbanyak mengingat mati dan membaca Al-Qur’an."
+            </blockquote>
+        </p>
+        <p className={`${paragraphClasses}`}>
+            <blockquote className={`${quoteClasses}`}>
+                "Apabila sesuatu membuatmu sempit, maka jangan cari jalan keluar dengan akalmu yang bingung. Turunlah ke hati yang berserah."
+            </blockquote>
+        </p>
+        <h3 className={`${subHeadingClasses}`}>Metode SIRNA</h3>
+        <p className={`${paragraphClasses}`}>
+            Pernahkah kamu merasa seperti ditelan pusaran hidup yang berulang: masalah belum selesai, hati makin sesak, doa seolah diam di langit, dan pikiran makin ruwet? Kadang kita tahu ilmunya, tapi hati tetap terasa berat. Kita dengar banyak nasihat, tapi tetap tak tahu harus mulai dari mana. Ingin berubah, tapi terikat rasa bersalah, kecewa, trauma, atau bahkan... marah pada diri sendiri dan Tuhan.
+        </p>
+        <p className={`${paragraphClasses}`}>
+            Di sinilah **SIRNA** hadir. SIRNA bukan mantra, bukan teknik motivasi instan, dan bukan sekadar *coping mechanism*. **SIRNA adalah seni melepas rasa — dengan kesadaran sebagai hamba, dan niat untuk pulang kepada Allah.** Metode ini lahir dari perpaduan antara rasa spiritual Islam, kearifan batin, dan praktik sadar jiwa. Bukan untuk membuatmu selalu bahagia, tapi agar kamu jujur, tenang, dan tetap tersambung… bahkan saat tidak punya apa-apa.
+        </p>
+
+        <h3 className={`${subHeadingClasses}`}>✨ SIRNA: Jalan Pulang ke Dalam</h3>
+        <p className={`${paragraphClasses}`}>
+            Dalam hidup modern, terlalu banyak orang kelelahan… bukan karena dunia terlalu berat, tapi karena mereka tidak tahu bagaimana menghadapi rasa di dalam. Kita sibuk berjuang keluar, lupa menenangkan yang di dalam. Padahal, kunci perubahan hidup sering kali bukan di luar sana. Tapi di dalam dada, di ruang antara luka dan harap, antara kecewa dan percaya, antara makhluk dan Rabb-nya.
+        </p>
+
+        <h3 className={`${subHeadingClasses}`}>🔠 Apa Singkatan SIRNA?</h3>
+        <p className={`${paragraphClasses}`}>
+            **SIRNA** adalah alur spiritual yang sederhana tapi dalam. Bisa kamu praktikkan kapan saja, saat rasa mulai menyesak, saat harapan terasa jauh, atau saat kamu ingin hidup lebih ringan.
+        </p>
+        <ul className="list-disc list-inside mb-4 space-y-3">
+            <li>
+                <span className={highlightTextClasses}>S – Santai / Rileks / Tenang:</span> Mulai dengan tenangkan napas. Hadirkan tubuh. Luruhkan tegang.
+            </li>
+            <li>
+                <span className={highlightTextClasses}>I – Identifikasi:</span> Sadari apa yang terasa. Tak perlu langsung mengerti, cukup rasakan. Apakah ini takut? Sedih? Marah? Bingung?
+            </li>
+            <li>
+                <span className={highlightTextClasses}>R – Ridho:</span> Terima. Berserah pada apa adanya. Tidak melawan. Tidak menolak. Tidak menyangkal. "Ya Allah, inilah rasaku."
+            </li>
+            <li>
+                <span className={highlightTextClasses}>N – Nanya dan Niat:</span> Buka ruang tanya dan niat. Boleh tanya dengan lembut: "Kenapa ya ini terus datang?" "Apakah aku mau melepaskan?" "Apa aku siap niatkan kembali kepada-Mu, Ya Rabb?"
+            </li>
+            <li>
+                <span className={highlightTextClasses}>A – Alirkan, Lepas, dan Alhamdulillah:</span> Tarik napas… dan lepaskan. Biarkan rasa mengalir ke tangan, ke bumi, ke udara… Ucapkan: “Alhamdulillah. Aku berserah.” Karena semua kembali pada-Nya.
+            </li>
+        </ul>
+
+        <h3 className={`${subHeadingClasses}`}>💬 Kenapa Harus Melepas?</h3>
+        <p className={`${paragraphClasses}`}>
+            Dalam Law of Allah, rezeki, jodoh, dan kebahagiaan bukan datang dari kekuatan tarik — tapi dari kelapangan batin dan keterhubungan dengan-Nya. Rezeki tak akan mampir ke hati yang penuh sesak. Doa tak akan mengalir ke ruang yang penuh keluh. Maka kita perlu belajar melepas — bukan karena kita lemah, tapi karena kita tahu: Allah yang Maha Menyempurnakan.
+        </p>
+
+        <h3 className={`${subHeadingClasses}`}>🔐 SIRNA = Jembatan</h3>
+        <p className={`${paragraphClasses}`}>
+            Metode SIRNA bukan pengganti ibadah. Ia justru jembatan antara rasa dan doa, antara luka dan keikhlasan, antara manusia dan Allah. Bagi yang sedang terlilit hutang, menunggu jodoh, belum diberi keturunan, atau sedang dalam pencarian jati diri — **SIRNA bukan solusi cepat. Tapi jalan pulang.** Jalan jujur. Jalan berserah. Jalan penuh cahaya. Karena kadang… untuk bisa menerima takdir, kita perlu terlebih dulu membiarkan rasa kita didengarkan. Dan dari situ… kita akan tahu: Allah tidak pernah meninggalkan.
+        </p>
+    </div>
 );
 
 const Bab9 = () => (
