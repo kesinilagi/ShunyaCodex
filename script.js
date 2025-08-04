@@ -5174,18 +5174,16 @@ style.innerHTML = `
     }
     /* PERBAIKAN WARNA TEKS DENGAN !important */
     /* Menambahkan selektor yang lebih spesifik untuk menimpa Tailwind */
-    .contentContainerClasses .dynamic-paragraph { /* Menggunakan kelas induk */
-        color: #F8FAFC !important; /* Warna teks putih keabu-abuan */
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 
-                     0 0 10px rgba(255, 255, 255, 0.2); 
-    }
+    .contentContainerClasses .dynamic-paragraph {
+    color: #000000 !important; /* Mengubah warna teks paragraf menjadi hitam */
+    text-shadow: 1px 1px 2px #ffffff; /* Menambah bayangan putih agar lebih menonjol */
+}
 
     /* Juga terapkan pada paragraphClasses yang dipakai langsung tanpa contentContainerClasses */
     p.dynamic-paragraph {
-        color: #F8FAFC !important;
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 
-                     0 0 10px rgba(255, 255, 255, 0.2); 
-    }
+    color: #000000 !important; /* Mengubah warna teks paragraf menjadi hitam */
+    text-shadow: 1px 1px 2px #ffffff; /* Menambah bayangan putih agar lebih menonjol */
+}
 
     .highlightTextClasses {
         color: #60A5FA !important; /* Warna biru cerah */
@@ -5194,17 +5192,17 @@ style.innerHTML = `
     }
 
     .quoteClasses {
-        color: #D1D5DB !important; /* Warna abu-abu terang untuk quote */
-        font-style: italic;
-        border-left: 4px solid #60A5FA;
-        padding-left: 1rem;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        text-align: justify;
-        text-shadow: 0 0 3px rgba(255, 255, 255, 0.1);
-    }
+    color: #000000 !important; /* Mengubah warna teks kutipan menjadi hitam */
+    font-style: italic;
+    border-left: 4px solid #60A5FA;
+    padding-left: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    text-align: justify;
+    text-shadow: 1px 1px 2px #ffffff; /* Menambah bayangan putih agar lebih menonjol */
+}
     /* Tambahan untuk teks di dalam SholawatAccordion dan DoaAccordion agar warnanya sesuai */
     /* Menggunakan selektor yang lebih spesifik */
     .bg-white\\/10 .text-black, .bg-white\\/10 .text-black-800 { /* Untuk judul utama di akordeon */
