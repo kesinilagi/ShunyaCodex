@@ -427,7 +427,7 @@ const DaftarIsi = () => {
     <li className="pt-2"><button onClick={() => setCurrentPageKey('secret-room-rezeki')} className={`${tocFeatureClasses} golden-background text-purple-500`}>Ruang Rahasia </button></li>
 
                     <li className="pt-2"><button onClick={() => setCurrentPageKey('doapilihan')} className="text-green-600 hover:underline font-bold text-xl">🙏 Doa-doa Pilihan (Kelapangan Rezeki dan Pelunasan Utang)</button></li>
-                    <li className="pt-2"><button onClick={() => setCurrentPageKey('doa-harian')} className="text-emerald-600 hover:underline font-bold text-xl">🤲 Doa Pilihan Khusus</button></li>
+    {<li className="pt-2"><button onClick={() => setCurrentPageKey('doa-harian')} className="text-emerald-600 hover:underline font-bold text-xl">🤲 Doa Pilihan Khusus</button></li>}
               <li className="pt-2"><button onClick={() => setCurrentPageKey('reminder-settings')} className={`${tocFeatureClasses} text-white-200`}>🔔 Bucket List Goal</button></li>
   </ul>
             <AuthorFootnote />
@@ -3022,7 +3022,7 @@ const Bab13 = () => (
                 <span className={highlightTextClasses}>Sore/Malam (Penutup Hari):</span> Sebelum tidur, ingat hal yang salah atau lalai hari itu, lalu baca istighfar 3x atau 33x pelan-pelan. Niatkan untuk menjadi lebih baik esok hari.
             </li>
             <li className={`${paragraphClasses} !mb-0`}>
-                <span className={highlightTextClasses}>Doa Istighfar Rasulullah ﷺ:</span> Nabi sendiri membaca ini tiap hari: **“رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ”** (Ya Rabb, ampunilah aku dan terimalah taubatku. Sungguh Engkau Maha Penerima Taubat, Maha Penyayang.)
+                <span className={highlightTextClasses}>Doa Istighfar Rasulullah ﷺ:</span> Nabi sendiri membaca ini tiap hari: **“رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ”** " Rabbi ighfir lī wa tub 'alayya, innaka Antat-Tawwābu Ar-Raḥīm "(Ya Rabb, ampunilah aku dan terimalah taubatku. Sungguh Engkau Maha Penerima Taubat, Maha Penyayang.)
             </li>
         </ul>
         {/* --- AKHIR BLOK BARU --- */}
