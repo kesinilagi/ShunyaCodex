@@ -5209,10 +5209,24 @@ style.innerHTML = `
         color: #F8FAFC !important; /* Menggunakan warna teks paragraf bersinar */
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
     }
-    .bg-white\\/10 .text-black-300 { /* Untuk Latin/Italic di akordeon */
-        color: #D1D5DB !important; /* Warna abu-abu terang */
-        text-shadow: 0 0 3px rgba(255, 255, 255, 0.1);
-    }
+    .bg-white\/10 h4,
+.bg-white\/10 p,
+.bg-white\/10 li,
+.bg-white\/10 span {
+    color: #000000 !important; /* Warna teks di dalam akordeon menjadi hitam */
+    text-shadow: 1px 1px 2px #ffffff !important; /* Tambah bayangan putih */
+}
+
+/* Tapi khusus untuk teks sorotan (highlightTextClasses) tetap biru */
+.bg-white\/10 .highlightTextClasses {
+    color: #60A5FA !important;
+    text-shadow: none !important; /* Hapus bayangan agar lebih bersih */
+}
+
+/* Juga perbarui warna ikon audio agar terlihat di latar belakang gelap */
+.bg-white\/10 .inline-flex.items-center.gap-2 svg {
+    color: #000000 !important; /* Atur warna ikon ke hitam */
+}
     .bg-white\\/10 .text-yellow-300 { /* Untuk judul/sub-judul kuning di akordeon */
         color: #FCD34D !important; /* Kuning terang */
         text-shadow: 0 0 5px rgba(252, 211, 77, 0.6);
