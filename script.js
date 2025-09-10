@@ -7,7 +7,6 @@ const { useState, useEffect, useRef, createContext, useContext } = React;
 // Ini akan menjadi "pusat data" untuk aplikasi kita.
 const AppContext = createContext();
 // --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
-// --- KOMPONEN BARU: LAYAR AKTIVASI (KOREKSI STRUKTUR JSX & TOMBOL) ---
 const ActivationScreen = () => {
     const { setCurrentPageKey, setIsActivated, setUserName: setGlobalUserNameFromContext } = useContext(AppContext);
     const [activationKey, setActivationKey] = useState('');
@@ -2693,15 +2692,15 @@ const Bab8 = () => (
             Pernahkah kamu merasa seperti ditelan pusaran hidup yang berulang: masalah belum selesai, hati makin sesak, doa seolah diam di langit, dan pikiran makin ruwet? Kadang kita tahu ilmunya, tapi hati tetap terasa berat. Kita dengar banyak nasihat, tapi tetap tak tahu harus mulai dari mana. Ingin berubah, tapi terikat rasa bersalah, kecewa, trauma, atau bahkan... marah pada diri sendiri dan Tuhan.
         </p>
         <p className={`${paragraphClasses}`}>
-            Di sinilah **SIRNA** hadir. SIRNA bukan mantra, bukan teknik motivasi instan, dan bukan sekadar *coping mechanism*. **SIRNA adalah seni melepas rasa — dengan kesadaran sebagai hamba, dan niat untuk pulang kepada Allah.** Metode ini lahir dari perpaduan antara rasa spiritual Islam, kearifan batin, dan praktik sadar jiwa. Bukan untuk membuatmu selalu bahagia, tapi agar kamu jujur, tenang, dan tetap tersambung… bahkan saat tidak punya apa-apa.
+            Di sinilah **SIRNA** hadir. SIRNA bukan mantra, bukan teknik motivasi instan. [SIRNA adalah seni melepas rasa — dengan kesadaran sebagai hamba, dan niat untuk pulang kepada Allah] Metode ini lahir dari perpaduan antara rasa spiritual Islam, kearifan batin, dan praktik sadar jiwa. agar kamu jujur, tenang, dan tetap tersambung… bahkan saat tidak punya apa-apa,sehingga tercapai kondisi senantiasa Bahagia
         </p>
 
-        <h3 className={`${subHeadingClasses}`}>✨ SIRNA: Jalan Pulang ke Dalam</h3>
+        <h3 className={`${subHeadingClasses}`}>SIRNA: Jalan Pulang ke Dalam</h3>
         <p className={`${paragraphClasses}`}>
             Dalam hidup modern, terlalu banyak orang kelelahan… bukan karena dunia terlalu berat, tapi karena mereka tidak tahu bagaimana menghadapi rasa di dalam. Kita sibuk berjuang keluar, lupa menenangkan yang di dalam. Padahal, kunci perubahan hidup sering kali bukan di luar sana. Tapi di dalam dada, di ruang antara luka dan harap, antara kecewa dan percaya, antara makhluk dan Rabb-nya.
         </p>
 
-        <h3 className={`${subHeadingClasses}`}>🔠 Apa Singkatan SIRNA?</h3>
+        <h3 className={`${subHeadingClasses}`}>Kita Urai Metode SIRNA?</h3>
         <p className={`${paragraphClasses}`}>
             **SIRNA** adalah alur spiritual yang sederhana tapi dalam. Bisa kamu praktikkan kapan saja, saat rasa mulai menyesak, saat harapan terasa jauh, atau saat kamu ingin hidup lebih ringan.
         </p>
@@ -2710,7 +2709,7 @@ const Bab8 = () => (
                 <span className={highlightTextClasses}>S – Santai / Rileks / Tenang:</span> Mulai dengan tenangkan napas. Hadirkan tubuh. Luruhkan tegang.
             </li>
             <li>
-                <span className={highlightTextClasses}>I – Identifikasi:</span> Sadari apa yang terasa. Tak perlu langsung mengerti, cukup rasakan. Apakah ini takut? Sedih? Marah? Bingung?
+                <span className={highlightTextClasses}>I – Identifikasi:</span> Sadari apa yang terasa. Tak perlu langsung mengerti, cukup rasakan. Apakah ini takut? Sedih? Marah? Bingung?Nafsu?
             </li>
             <li>
                 <span className={highlightTextClasses}>R – Ridho:</span> Terima. Berserah pada apa adanya. Tidak melawan. Tidak menolak. Tidak menyangkal. "Ya Allah, inilah rasaku."
