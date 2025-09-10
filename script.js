@@ -677,6 +677,7 @@ const AffirmationRoom = () => {
                     <div className="animate-fade-in w-full px-4">
                         <h1 className="text-3xl md:text-5xl font-bold mb-4">Ruang Manifestasi Visual</h1>
                         <p className="mb-6 text-gray-300">Tuliskan doa atau Manifestasi Anda (maks. 15 kata).</p>
+                         <p className="mb-6 text-gray-300">Saat Proses Manifestasi Rasakan Itu sudah Nyata.</p>
                         <textarea value={affirmationText} onChange={(e) => setAffirmationText(e.target.value)}
                              className="w-full max-w-md h-24 bg-gray-800 border border-gray-700 rounded-lg text-xl p-4 focus:outline-none focus:ring-2 focus:ring-sky-500 force-uppercase"
     placeholder="Contoh: Rezeki berlimpah ">
