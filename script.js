@@ -2008,7 +2008,7 @@ const PixelThoughts = () => {
     const [view, setView] = useState('input'); // 'input', 'meditation_active', 'message', 'finished'
     const [thought, setThought] = useState('');
     const [message, setMessage] = useState('');
-    const [heading, setHeading] = useState('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
+    const [heading, setHeading] = useState('Nafsu keinginan,Sumpek Hutang,Cemas Tuliskan saja di Bola Emosi,Ijinkan Lepas');
     const [ballAnimationClass, setBallAnimationClass] = useState(''); // Kelas CSS untuk animasi bola
     const audioRef = useRef(null);
     const meditationIntervalRef = useRef(null);
@@ -2097,7 +2097,7 @@ const PixelThoughts = () => {
         setThought('');
         setBallAnimationClass('');
         setMessage('');
-        setHeading('Beban Apa yang saat ini kamu rasakan , pikirkan dan ingin di LEPASKAN?');
+        setHeading('Nafsu keinginan,Sumpek Hutang,Cemas Tuliskan saja di Bola Emosi,Ijinkan Lepas');
     };
 
     useEffect(() => {
@@ -2125,7 +2125,7 @@ const PixelThoughts = () => {
             {/* Area Konten Utama - Heading dan Bola Energi */}
             <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
                 {heading && (
-                    <h1 className="text-3xl md:text-5xl font-bold mb-6">{heading}</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold mb-4">{heading}</h1>
                 )}
 
                 {/* Kontainer Bola Energi: Selalu di tengah, dengan konten dinamis di dalamnya */}
